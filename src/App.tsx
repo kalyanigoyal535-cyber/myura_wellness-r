@@ -11,6 +11,8 @@ import ProductDetail from './pages/ProductDetail';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import MyAccount from './pages/MyAccount';
+import Cart from './pages/Cart';
+import { CartProvider } from './context/CartContext';
 
 function App() {
   useEffect(() => {
@@ -25,9 +27,10 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <Routes>
+      <CartProvider>
+        <div className="min-h-screen bg-white">
+          <Header />
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/product" element={<Product />} />
@@ -35,9 +38,11 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/my-account" element={<MyAccount />} />
-        </Routes>
-        <Footer />
-      </div>
+          <Route path="/cart" element={<Cart />} />
+          </Routes>
+          <Footer />
+        </div>
+      </CartProvider>
     </Router>
   );
 }
