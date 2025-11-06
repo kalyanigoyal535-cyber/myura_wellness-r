@@ -6,7 +6,8 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
 import { CartProvider } from './context/CartContext';
-
+import {RouterProvider} from "react-router-dom";
+import router from './router/routes';
 // Lazy load routes for code splitting
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
@@ -67,28 +68,30 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <CartProvider>
-        <LoadingScreen />
-        <ScrollToTop />
-        <div className="min-h-screen bg-stone-50 overflow-x-hidden">
-          <Header />
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/product" element={<Product />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/my-account" element={<MyAccount />} />
-              <Route path="/cart" element={<Cart />} />
-            </Routes>
-          </Suspense>
-          <Footer />
-        </div>
-      </CartProvider>
-    </Router>
+    // <Router>
+    //   <CartProvider>
+    //     <LoadingScreen />
+    //     <ScrollToTop />
+    //     <div className="min-h-screen bg-stone-50 overflow-x-hidden">
+    //       <Header />
+    //       <Suspense fallback={<LoadingFallback />}>
+    //         <Routes>
+    //           <Route path="/" element={<Home />} />
+    //           <Route path="/about" element={<About />} />
+    //           <Route path="/product" element={<Product />} />
+    //           <Route path="/product/:id" element={<ProductDetail />} />
+    //           <Route path="/blog" element={<Blog />} />
+    //           <Route path="/contact" element={<Contact />} />
+    //           <Route path="/my-account" element={<MyAccount />} />
+    //           <Route path="/cart" element={<Cart />} />
+    //         </Routes>
+    //       </Suspense>
+    //       <Footer />
+    //     </div>
+    //   </CartProvider>
+    // </Router>
+
+    <RouterProvider router={router} />
   );
 }
 
