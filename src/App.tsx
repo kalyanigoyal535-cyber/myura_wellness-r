@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Header from './components/Header';
@@ -24,8 +24,36 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Scroll to top component for route changes
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // Scroll to top on route change
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto' // 'auto' provides instant scroll (default behavior)
+    });
+  }, [pathname]);
+
+  return null;
+};
+
 function App() {
   useEffect(() => {
+    // Prevent browser from restoring scroll position on refresh
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    // Scroll to top on initial page load/refresh
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto' // 'auto' provides instant scroll (default behavior)
+    });
+
     // Initialize AOS only once
     if (typeof window !== 'undefined' && !document.querySelector('[data-aos]')) {
       AOS.init({
@@ -42,6 +70,7 @@ function App() {
     <Router>
       <CartProvider>
         <LoadingScreen />
+        <ScrollToTop />
         <div className="min-h-screen bg-stone-50 overflow-x-hidden">
           <Header />
           <Suspense fallback={<LoadingFallback />}>
