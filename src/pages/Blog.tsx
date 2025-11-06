@@ -44,17 +44,17 @@ const Blog: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-myura-green-400 to-myura-green-600 py-20">
+      <section className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-white mb-4">BLOG & NEWS</h1>
-          <p className="text-xl text-myura-green-100">
+          <p className="text-xl text-slate-200">
             Wellness you can feel, results you can see.
           </p>
         </div>
       </section>
 
       {/* Featured Blog Post */}
-      <section className="py-20 bg-myura-green-50">
+      <section className="py-20 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -68,7 +68,7 @@ const Blog: React.FC = () => {
                     <p className="text-lg font-semibold">Featured Article</p>
                   </div>
                 </div>
-                <div className="absolute top-4 left-4 bg-myura-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                <div className="absolute top-4 left-4 bg-stone-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
                   Featured
                 </div>
               </div>
@@ -77,17 +77,17 @@ const Blog: React.FC = () => {
               <div className="p-8 lg:p-12">
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-4">
                       The Power of Functional Foods: Nutrition That Heals
                     </h2>
-                    <p className="text-lg text-gray-700 leading-relaxed">
+                    <p className="text-lg text-slate-700 leading-relaxed">
                       When it comes to eating healthy, there's a growing interest in foods that do more than just fill our stomachs. 
                       Functional foods are those that provide health benefits beyond basic nutrition, offering therapeutic effects 
                       that can support your body's natural healing processes.
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-6 text-sm text-gray-500">
+                  <div className="flex items-center space-x-6 text-sm text-slate-500">
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4" />
                       <span>August 19, 2025</span>
@@ -98,7 +98,7 @@ const Blog: React.FC = () => {
                     </div>
                   </div>
 
-                  <button className="inline-flex items-center text-myura-green-600 font-semibold hover:text-myura-green-700 transition-colors">
+                  <button className="inline-flex items-center text-stone-600 font-semibold hover:text-stone-700 transition-colors">
                     READ MORE
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </button>
@@ -113,8 +113,8 @@ const Blog: React.FC = () => {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Latest Articles</h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Latest Articles</h2>
+            <p className="text-xl text-slate-700 max-w-3xl mx-auto">
               Stay updated with the latest insights on wellness, nutrition, and natural health solutions.
             </p>
           </div>
@@ -123,10 +123,10 @@ const Blog: React.FC = () => {
             {blogPosts.map((post) => (
               <article key={post.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 {/* Post Image */}
-                <div className="aspect-video bg-gradient-to-br from-myura-green-100 to-myura-green-200 flex items-center justify-center">
-                  <div className="text-center text-myura-green-600">
-                    <div className="w-12 h-12 bg-myura-green-600 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <div className="w-0 h-0 border-l-[6px] border-l-myura-green-600 border-y-[4px] border-y-transparent ml-1"></div>
+                <div className="aspect-video bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center">
+                  <div className="text-center text-stone-600">
+                    <div className="w-12 h-12 bg-stone-600 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <div className="w-0 h-0 border-l-[6px] border-l-stone-600 border-y-[4px] border-y-transparent ml-1"></div>
                     </div>
                     <p className="text-sm font-semibold">{post.category}</p>
                   </div>
@@ -135,20 +135,20 @@ const Blog: React.FC = () => {
                 {/* Post Content */}
                 <div className="p-6">
                   <div className="mb-4">
-                    <span className="inline-block bg-myura-green-100 text-myura-green-600 text-xs font-semibold px-3 py-1 rounded-full">
+                    <span className="inline-block bg-stone-100 text-stone-600 text-xs font-semibold px-3 py-1 rounded-full">
                       {post.category}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                  <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2">
                     {post.title}
                   </h3>
 
-                  <p className="text-gray-700 mb-4 line-clamp-3">
+                  <p className="text-slate-700 mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
 
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4" />
                       <span>{post.date}</span>
@@ -159,7 +159,7 @@ const Blog: React.FC = () => {
                     </div>
                   </div>
 
-                  <button className="inline-flex items-center text-myura-green-600 font-semibold hover:text-myura-green-700 transition-colors">
+                  <button className="inline-flex items-center text-stone-600 font-semibold hover:text-stone-700 transition-colors">
                     Read More
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </button>
@@ -170,7 +170,7 @@ const Blog: React.FC = () => {
 
           {/* Load More Button */}
           <div className="text-center mt-12">
-            <button className="bg-myura-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-myura-green-700 transition-colors">
+            <button className="bg-stone-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-stone-700 transition-colors">
               Load More Articles
             </button>
           </div>
@@ -178,10 +178,10 @@ const Blog: React.FC = () => {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-20 bg-myura-green-50">
+      <section className="py-20 bg-stone-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Stay Updated</h2>
-          <p className="text-lg text-gray-700 mb-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Stay Updated</h2>
+          <p className="text-lg text-slate-700 mb-8">
             Subscribe to our newsletter for the latest wellness tips, product updates, and exclusive offers.
           </p>
           
@@ -190,9 +190,9 @@ const Blog: React.FC = () => {
               <input
                 type="email"
                 placeholder="Enter your email address"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-myura-green-500 focus:border-transparent"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent"
               />
-              <button className="bg-myura-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-myura-green-700 transition-colors">
+              <button className="bg-stone-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-stone-700 transition-colors">
                 Subscribe
               </button>
             </div>
@@ -204,8 +204,8 @@ const Blog: React.FC = () => {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore by Category</h2>
-            <p className="text-lg text-gray-700">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Explore by Category</h2>
+            <p className="text-lg text-slate-700">
               Find articles that match your interests and wellness goals.
             </p>
           </div>
@@ -221,8 +221,8 @@ const Blog: React.FC = () => {
                 <div className={`w-16 h-16 ${category.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
                   <span className="text-2xl font-bold">{category.name.charAt(0)}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{category.name}</h3>
-                <p className="text-sm text-gray-500">{category.count} articles</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{category.name}</h3>
+                <p className="text-sm text-slate-500">{category.count} articles</p>
               </div>
             ))}
           </div>

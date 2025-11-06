@@ -75,10 +75,10 @@ const Product: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-myura-green-400 to-myura-green-600 py-20">
+      <section className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-white mb-4">PRODUCT</h1>
-          <p className="text-xl text-myura-green-100">
+          <p className="text-xl text-slate-200">
             Wellness you can feel, results you can see.
           </p>
         </div>
@@ -103,23 +103,23 @@ const Product: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">MYURA</h3>
-                  <p className="text-gray-600">Product Collection</p>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">MYURA</h3>
+                  <p className="text-slate-600 font-minimal">Product Collection</p>
                 </div>
               </div>
             </div>
 
             {/* Right Column - Text */}
             <div className="space-y-6">
-              <h2 className="text-4xl font-bold text-gray-900">MYURA Product Collection</h2>
-              <p className="text-xl text-myura-green-600 font-medium">Your Wellness Transformation Starts Here</p>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <h2 className="text-4xl font-bold text-slate-900 font-display">MYURA Product Collection</h2>
+              <p className="text-xl text-slate-600 font-medium font-sharp">Your Wellness Transformation Starts Here</p>
+              <p className="text-lg text-slate-700 font-minimal leading-relaxed">
                 At Myura, we believe in the power of nature to heal, restore, and energize. Our carefully crafted 
                 supplements blend ancient Ayurvedic wisdom with modern science to bring you the best of both worlds. 
                 Each product is designed to work with your body's natural processes, providing gentle yet effective 
                 support for your wellness journey.
               </p>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-lg text-slate-700 font-minimal leading-relaxed">
                 Our formulations are created with purpose, addressing specific health needs while maintaining the 
                 highest standards of purity and effectiveness. From energy and hormonal balance to gut health and 
                 joint support, we have thoughtfully crafted blends for every aspect of your wellness.
@@ -135,17 +135,17 @@ const Product: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Search products..."
-                    className="w-full px-4 py-3 pl-12 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-myura-green-500 focus:border-transparent"
+                    className="w-full px-4 py-3 pl-12 pr-4 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                   />
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <button className="flex items-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <button className="flex items-center space-x-2 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                   <Filter className="h-5 w-5" />
                   <span>Filter</span>
                 </button>
-                <select className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-myura-green-500">
+                <select className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500">
                   <option>Sort by: Featured</option>
                   <option>Price: Low to High</option>
                   <option>Price: High to Low</option>
@@ -163,35 +163,35 @@ const Product: React.FC = () => {
                 <div className="relative mb-6">
                   <div className={`w-24 h-24 ${product.pedestalColor} rounded-full mx-auto flex items-center justify-center mb-4`}>
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-                      <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                      <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
                     </div>
                   </div>
                   {product.inStock && (
-                    <div className="absolute top-2 right-2 bg-myura-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                    <div className="absolute top-2 right-2 bg-slate-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                       In Stock
                     </div>
                   )}
                 </div>
                 
                 <div className="text-center">
-                  <p className="text-sm text-gray-500 mb-1">MYURA</p>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{product.name}</h3>
+                  <p className="text-sm text-slate-500 mb-1">MYURA</p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{product.name}</h3>
                   
                   <div className="flex justify-center items-center space-x-1 mb-3">
                     {[...Array(product.rating)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
                     ))}
-                    <span className="text-sm text-gray-600 ml-2">({product.reviews})</span>
+                    <span className="text-sm text-slate-600 ml-2">({product.reviews})</span>
                   </div>
                   
                   <div className="flex justify-center items-center space-x-2 mb-4">
-                    <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
-                    <span className="text-lg text-gray-400 line-through">₹{product.originalPrice}</span>
+                    <span className="text-2xl font-bold text-slate-900">₹{product.price}</span>
+                    <span className="text-lg text-slate-400 line-through">₹{product.originalPrice}</span>
                   </div>
                   
                   <Link
                     to={`/product/${product.id}`}
-                    className="w-full bg-myura-green-600 text-white py-2 px-4 rounded-lg hover:bg-myura-green-700 transition-colors inline-block text-center"
+                    className="w-full bg-slate-900 text-white font-sharp py-2 px-4 rounded-lg hover:bg-slate-700 transition-colors inline-block text-center"
                   >
                     Add to cart
                   </Link>
@@ -202,7 +202,7 @@ const Product: React.FC = () => {
 
           {/* Load More Button */}
           <div className="text-center mt-12">
-            <button className="bg-myura-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-myura-green-700 transition-colors">
+            <button className="bg-slate-900 text-white font-sharp px-8 py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors">
               Load More Products
             </button>
           </div>
@@ -210,26 +210,26 @@ const Product: React.FC = () => {
       </section>
 
       {/* Discover Benefits Section */}
-      <section className="py-20 bg-myura-green-50">
+      <section className="py-20 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
             <div className="space-y-6">
-              <p className="text-sm text-myura-green-600 font-medium">Discover now Magical benefits of nature.</p>
-              <h2 className="text-4xl font-bold text-gray-900">Your best health is waiting - are you?</h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-sm text-slate-600 font-medium">Discover now Magical benefits of nature.</p>
+              <h2 className="text-4xl font-bold text-slate-900 font-display">Your best health is waiting - are you?</h2>
+              <p className="text-lg text-slate-700 font-minimal leading-relaxed">
                 Experience the power of carefully selected herbs and botanicals that have been used for centuries 
                 in Ayurvedic medicine. Our products are designed to work with your body's natural processes, 
                 providing gentle yet effective support for your wellness journey.
               </p>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-lg text-slate-700 font-minimal leading-relaxed">
                 Every ingredient is chosen for its proven benefits and synergistic effects, ensuring that you 
                 get the maximum benefit from each product. We believe in transparency, so you'll always know 
                 exactly what you're putting into your body.
               </p>
               <Link
                 to="/product"
-                className="inline-flex items-center px-6 py-3 bg-myura-green-600 text-white font-semibold rounded-lg hover:bg-myura-green-700 transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-slate-900 text-white font-sharp font-semibold rounded-lg hover:bg-slate-700 transition-colors"
               >
                 Explore Now
               </Link>
@@ -242,8 +242,8 @@ const Product: React.FC = () => {
                   <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full"></div>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">MYURA</h3>
-                  <p className="text-gray-600">DIA CARE</p>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">MYURA</h3>
+                  <p className="text-slate-600 font-minimal">DIA CARE</p>
                 </div>
               </div>
             </div>
