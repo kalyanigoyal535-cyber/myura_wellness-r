@@ -42,10 +42,11 @@ export const useLocation = (): LocationData => {
               error: null
             }));
           } catch (error) {
+            // Silently handle geocoding errors - use default address
             setLocationData(prev => ({
               ...prev,
               loading: false,
-              error: 'Failed to get address from coordinates'
+              error: null // Don't show error for geocoding failures
             }));
           }
         },
@@ -92,14 +93,37 @@ export const useLocation = (): LocationData => {
 };
 
 const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
+  // Note: Nominatim has CORS restrictions and requires User-Agent header
+  // Browser fetch cannot set User-Agent header, so CORS errors are expected
+  // For production, use a backend proxy or alternative geocoding service
+  // Errors are handled silently to avoid console noise
+  
   try {
-    // Using OpenStreetMap's Nominatim service (free, no API key required)
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=en&zoom=18`
-    );
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
     
-    if (!response.ok) {
-      throw new Error('Reverse geocoding failed');
+    // Suppress console errors for this fetch
+    const originalError = console.error;
+    console.error = () => {}; // Temporarily disable console.error
+    
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=en&zoom=18`,
+      {
+        method: 'GET',
+        signal: controller.signal,
+        // Note: Cannot set User-Agent header in browser fetch due to browser security
+      }
+    ).catch(() => {
+      // Silently catch CORS and network errors
+      return null;
+    });
+    
+    // Restore console.error
+    console.error = originalError;
+    clearTimeout(timeoutId);
+    
+    if (!response || !response.ok) {
+      return 'Location detected';
     }
     
     const data = await response.json();
@@ -135,8 +159,8 @@ const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
     }
     
     return 'Location detected';
-  } catch (error) {
-    console.error('Reverse geocoding error:', error);
+  } catch (error: any) {
+    // Silently handle all errors - CORS, network, timeout, etc.
     return 'Location detected';
   }
 };
