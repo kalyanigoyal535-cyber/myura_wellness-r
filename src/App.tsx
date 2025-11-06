@@ -28,7 +28,7 @@ function App() {
   return (
     <Router>
       <CartProvider>
-        <div className="min-h-screen bg-stone-50">
+        <div className="min-h-screen bg-stone-50 overflow-x-hidden">
           <Header />
           <Routes>
           <Route path="/" element={<Home />} />

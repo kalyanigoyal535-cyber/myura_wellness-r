@@ -88,7 +88,7 @@ const Header: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-4 flex-shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-4 flex-shrink-0">
               <a href="https://facebook.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-slate-700 transition-colors duration-200 flex items-center justify-center">
                 <FacebookIcon className="h-3 w-3 sm:h-4 sm:w-4" />
               </a>
@@ -98,13 +98,13 @@ const Header: React.FC = () => {
               <a href="https://youtube.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-slate-700 transition-colors duration-200 flex items-center justify-center">
                 <YoutubeIcon className="h-3 w-3 sm:h-4 sm:w-4" />
               </a>
-              <a href="https://pinterest.com" target="_blank" rel="noreferrer" className="hidden sm:flex text-slate-500 hover:text-slate-700 transition-colors duration-200 items-center justify-center">
+              <a href="https://pinterest.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-slate-700 transition-colors duration-200 flex items-center justify-center">
                 <PinterestIcon className="h-3 w-3 sm:h-4 sm:w-4" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="hidden sm:flex text-slate-500 hover:text-slate-700 transition-colors duration-200 items-center justify-center">
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-slate-700 transition-colors duration-200 flex items-center justify-center">
                 <TwitterIcon className="h-3 w-3 sm:h-4 sm:w-4" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hidden sm:flex text-slate-500 hover:text-slate-700 transition-colors duration-200 items-center justify-center">
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-slate-700 transition-colors duration-200 flex items-center justify-center">
                 <LinkedinIcon className="h-3 w-3 sm:h-4 sm:w-4" />
               </a>
               <a href="mailto:care@myurawellness.com" className="text-slate-500 hover:text-slate-700 transition-colors duration-200 flex items-center justify-center">
@@ -117,12 +117,12 @@ const Header: React.FC = () => {
 
       {/* Professional Main Navigation */}
       <div className="bg-white/90 backdrop-blur shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-2 sm:py-2.5 lg:py-3 gap-2 sm:gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="flex items-center justify-between py-2 sm:py-2.5 lg:py-3 gap-2 sm:gap-3 min-w-0">
             {/* Left Side - Search Icon and Logo */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 min-w-0">
               {/* Mobile Search - Icon on leftmost */}
-              <div className="lg:hidden relative">
+              <div className="lg:hidden relative flex-shrink-0">
                 {!isSearchOpen ? (
                   // Search Icon Button (Mobile - when closed)
                   <button
@@ -133,10 +133,10 @@ const Header: React.FC = () => {
                   </button>
                 ) : (
                   // Search Input (Mobile - when open) - Expands to the right
-                  <div className="relative w-[180px] sm:w-[220px] animate-[slideIn_0.5s_cubic-bezier(0.4,0,0.2,1)]">
+                  <div className="relative max-w-[calc(100vw-200px)] sm:max-w-[240px] w-[140px] sm:w-[180px] animate-[slideIn_0.5s_cubic-bezier(0.4,0,0.2,1)]">
                     <input
                       type="text"
-                      placeholder="Search products..."
+                      placeholder="Search..."
                       autoFocus
                       className="w-full px-3 py-1.5 pl-7 pr-8 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all duration-300 bg-white hover:border-slate-400 font-premium placeholder:text-slate-400 shadow-sm"
                     />
