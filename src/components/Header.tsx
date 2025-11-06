@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw } from 'lucide-react';
+import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw, Sparkles, Gift, Star, Truck } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaYoutube, FaPinterestP, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 import { useLocation as useUserLocation } from '../hooks/useLocation';
 import { useCart } from '../context/CartContext';
@@ -16,6 +16,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hideOnFooter, setHideOnFooter] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const location = useLocation();
   const { address, loading, error, refreshLocation } = useUserLocation();
   const { count } = useCart();
@@ -41,6 +42,55 @@ const Header: React.FC = () => {
     setIsMenuOpen(false);
   }, []);
 
+  // Banner data - Premium & Attractive
+  const banners = useMemo(() => [
+    {
+      text: "New to Myura? Welcome! Enjoy 10% off your first purchase. Your wellness journey starts here.",
+      textMobile: "New to Myura? Get 10% off your first purchase.",
+      highlight: "10% OFF First Purchase",
+      highlightMobile: "10% OFF",
+      badge: "NEW CUSTOMER",
+      icon: Gift,
+      color: "from-emerald-400 to-teal-500"
+    },
+    {
+      text: "Limited Time: Complimentary shipping on all orders. No minimum purchase required. Shop now.",
+      textMobile: "FREE Shipping on all orders. No minimum required.",
+      highlight: "FREE Shipping",
+      highlightMobile: "FREE Shipping",
+      badge: "THIS WEEK",
+      icon: Truck,
+      color: "from-blue-400 to-indigo-500"
+    },
+    {
+      text: "Pure ingredients. Proven results. Join thousands who trust Myura for their wellness journey.",
+      textMobile: "Pure ingredients. Trusted by thousands.",
+      highlight: "Trusted by Thousands",
+      highlightMobile: "Trusted",
+      badge: "PREMIUM QUALITY",
+      icon: Star,
+      color: "from-amber-400 to-orange-500"
+    },
+    {
+      text: "Welcome to the Myura family. Use code WELCOME10 at checkout for 10% off your first order.",
+      textMobile: "Use code WELCOME10 for 10% off your first order.",
+      highlight: "WELCOME10",
+      highlightMobile: "WELCOME10",
+      badge: "EXCLUSIVE",
+      icon: Sparkles,
+      color: "from-emerald-400 to-green-500"
+    }
+  ], []);
+
+  // Banner rotation effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+    }, 5000); // Rotate every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [banners.length]);
+
   useEffect(() => {
     const footerEl = document.getElementById('site-footer');
     if (!footerEl) return;
@@ -65,24 +115,91 @@ const Header: React.FC = () => {
     { to: '/contact', label: 'Contact' }
   ], []);
 
+  const currentBanner = banners[currentBannerIndex];
+
   return (
     <header className={`sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm transition-all duration-700 ease-in-out ${hideOnFooter ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
-      {/* Professional Discount Banner */}
-      <div className="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 py-2 sm:py-3 px-4 relative">
-        <div className="max-w-7xl mx-auto flex items-center justify-center relative">
-          <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-3 text-white text-center sm:text-left">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-              <span className="text-xs sm:text-sm font-semibold tracking-wide">SPECIAL OFFER</span>
+      {/* Premium Rotating Banner */}
+      <div className="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 py-2 sm:py-2.5 sm:py-3 px-2 sm:px-3 md:px-4 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto flex items-center justify-center relative z-10">
+          <div className="flex items-center justify-center w-full gap-1.5 sm:gap-2 md:gap-3">
+            {/* Premium Badge - Smaller on mobile */}
+            <div className="flex-shrink-0">
+              <div className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-0.5 md:px-2.5 md:py-1 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 md:w-2 md:h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span className="text-[9px] sm:text-[10px] md:text-xs font-bold font-sharp text-white tracking-wider uppercase whitespace-nowrap">
+                  {currentBanner.badge}
+                </span>
+              </div>
             </div>
-            <div className="hidden sm:block w-px h-4 bg-slate-600"></div>
-            <span className="text-xs sm:text-sm font-medium text-slate-200">Get 10% off your first order with code <span className="font-bold text-emerald-400">WELCOME10</span></span>
-            <div className="hidden lg:flex items-center space-x-2 ml-4">
-              <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
-              <span className="text-xs text-slate-400 font-medium">Limited time offer</span>
+
+            {/* Aesthetic Icon */}
+            <div className="flex-shrink-0 hidden sm:block">
+              <div className="relative">
+                <div className={`absolute inset-0 bg-gradient-to-r ${currentBanner.color} opacity-20 blur-md rounded-full`}></div>
+                <div className="relative p-1.5 sm:p-2 bg-white/5 backdrop-blur-sm rounded-full border border-white/10">
+                  {React.createElement(currentBanner.icon, {
+                    className: `h-3 w-3 sm:h-4 sm:w-4 text-white`,
+                    strokeWidth: 2.5
+                  })}
+                </div>
+              </div>
+            </div>
+            
+            {/* Banner text with fade animation - Responsive content */}
+            <div className="flex-1 text-center min-w-0">
+              <div 
+                key={currentBannerIndex}
+                className="animate-[fadeIn_0.5s_ease-in-out]"
+              >
+                {/* Mobile version - shorter text */}
+                <p className="text-xs sm:text-sm md:text-base font-medium text-white leading-tight sm:leading-normal px-1 sm:hidden">
+                  <span className="font-minimal text-slate-100">
+                    {currentBanner.textMobile.split(currentBanner.highlightMobile)[0]}
+                  </span>
+                  <span className={`font-bold font-sharp bg-gradient-to-r ${currentBanner.color} bg-clip-text text-transparent mx-0.5`}>
+                    {currentBanner.highlightMobile}
+                  </span>
+                  <span className="font-minimal text-slate-100">
+                    {currentBanner.textMobile.split(currentBanner.highlightMobile)[1]}
+                  </span>
+                </p>
+                
+                {/* Desktop version - full text */}
+                <p className="hidden sm:block text-xs sm:text-sm md:text-base font-medium text-white leading-tight sm:leading-normal px-1">
+                  <span className="font-minimal text-slate-100">
+                    {currentBanner.text.split(currentBanner.highlight)[0]}
+                  </span>
+                  <span className={`font-bold font-sharp bg-gradient-to-r ${currentBanner.color} bg-clip-text text-transparent mx-1`}>
+                    {currentBanner.highlight}
+                  </span>
+                  <span className="font-minimal text-slate-100">
+                    {currentBanner.text.split(currentBanner.highlight)[1]}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* Premium Indicator dots */}
+            <div className="hidden sm:flex items-center gap-1.5 ml-2 sm:ml-3">
+              {banners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentBannerIndex(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === currentBannerIndex
+                      ? 'w-2 h-2 bg-white shadow-lg scale-125 ring-2 ring-white/50'
+                      : 'w-1.5 h-1.5 bg-slate-400/60 hover:bg-slate-300'
+                  }`}
+                  aria-label={`Go to banner ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
+        
+        {/* Subtle shimmer effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_4s_ease-in-out_infinite] pointer-events-none"></div>
       </div>
 
       {/* Professional Top Bar */}

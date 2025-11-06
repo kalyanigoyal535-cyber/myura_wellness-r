@@ -273,6 +273,35 @@ code {
   animation: blink 1s ease-in-out infinite;
 }
 
+/* Banner Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-\[fadeIn_0\.5s_ease-in-out\] {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-\[shimmer_3s_ease-in-out_infinite\] {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
 /* Capsule Float Animation - Constrained to prevent overflow */
 @keyframes float {
   0%, 100% {
