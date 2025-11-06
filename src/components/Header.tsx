@@ -46,7 +46,7 @@ const Header: React.FC = () => {
   const banners = useMemo(() => [
     {
       text: "New to Myura? Welcome! Enjoy 10% off your first purchase. Your wellness journey starts here.",
-      textMobile: "New to Myura? Get 10% off your first purchase.",
+      textMobile: "Get 10% off your first purchase.",
       highlight: "10% OFF First Purchase",
       highlightMobile: "10% OFF",
       badge: "NEW CUSTOMER",
