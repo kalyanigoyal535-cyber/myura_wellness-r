@@ -4,6 +4,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import LoadingScreen from './components/LoadingScreen';
 import { CartProvider } from './context/CartContext';
 
 // Lazy load routes for code splitting
@@ -40,6 +41,7 @@ function App() {
   return (
     <Router>
       <CartProvider>
+        <LoadingScreen />
         <div className="min-h-screen bg-stone-50 overflow-x-hidden">
           <Header />
           <Suspense fallback={<LoadingFallback />}>

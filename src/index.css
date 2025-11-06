@@ -81,3 +81,242 @@ code {
     transform: translateX(0) scale(1);
   }
 }
+
+/* Loading Screen Animations */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-\[fadeInScale_1s_ease-out\] {
+  animation: fadeInScale 1s ease-out;
+}
+
+/* Enhanced Logo Entrance Animation */
+@keyframes logoEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.05) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-\[logoEntrance_2s_ease-out\] {
+  animation: logoEntrance 2s ease-out;
+}
+
+/* Rotating animations for orbital rings */
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-\[rotate360_20s_linear_infinite\] {
+  animation: rotate360 20s linear infinite;
+}
+
+.animate-\[rotate360_12s_linear_infinite\] {
+  animation: rotate360 12s linear infinite;
+}
+
+@keyframes rotate360Reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.animate-\[rotate360Reverse_15s_linear_infinite\] {
+  animation: rotate360Reverse 15s linear infinite;
+}
+
+/* Soft pulse animation */
+@keyframes softPulse {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.05);
+  }
+}
+
+.animate-\[softPulse_3s_ease-in-out_infinite\] {
+  animation: softPulse 3s ease-in-out infinite;
+}
+
+.animate-\[fadeInUp_1s_ease-out_0\.3s_both\] {
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.animate-\[fadeInUp_1s_ease-out_0\.6s_both\] {
+  animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.animate-\[fadeInUp_1s_ease-out_0\.9s_both\] {
+  animation: fadeInUp 1s ease-out 0.9s both;
+}
+
+/* Theme-colored Loading Screen Animations */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-\[gradientShift_12s_ease-in-out_infinite\] {
+  background-size: 200% 200%;
+  animation: gradientShift 12s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-25px) translateX(8px);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-15px) translateX(-8px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-20px) translateX(4px);
+    opacity: 0.45;
+  }
+}
+
+.animate-\[floatParticle_8s_ease-in-out_infinite\] {
+  animation: floatParticle 8s ease-in-out infinite;
+}
+
+.animate-\[floatParticle_9s_ease-in-out_infinite_1\.5s\] {
+  animation: floatParticle 9s ease-in-out infinite 1.5s;
+}
+
+.animate-\[floatParticle_10s_ease-in-out_infinite_2\.5s\] {
+  animation: floatParticle 10s ease-in-out infinite 2.5s;
+}
+
+.animate-\[floatParticle_8s_ease-in-out_infinite_2s\] {
+  animation: floatParticle 8s ease-in-out infinite 2s;
+}
+
+.animate-\[floatParticle_7s_ease-in-out_infinite_1s\] {
+  animation: floatParticle 7s ease-in-out infinite 1s;
+}
+
+.animate-\[floatParticle_9s_ease-in-out_infinite_3s\] {
+  animation: floatParticle 9s ease-in-out infinite 3s;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.08);
+  }
+}
+
+.animate-\[glowPulse_4s_ease-in-out_infinite\] {
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-\[blink_1s_ease-in-out_infinite\] {
+  animation: blink 1s ease-in-out infinite;
+}
+
+/* Capsule Float Animation - Constrained to prevent overflow */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-15px) rotate(3deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+.animate-\[float_6s_ease-in-out_infinite\] {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-\[float_8s_ease-in-out_infinite_1s\] {
+  animation: float 8s ease-in-out infinite 1s;
+}
+
+.animate-\[float_7s_ease-in-out_infinite_2s\] {
+  animation: float 7s ease-in-out infinite 2s;
+}
+
+.animate-\[float_9s_ease-in-out_infinite_0\.5s\] {
+  animation: float 9s ease-in-out infinite 0.5s;
+}
+
+.animate-\[float_5s_ease-in-out_infinite_1\.5s\] {
+  animation: float 5s ease-in-out infinite 1.5s;
+}
+
+.animate-\[float_7s_ease-in-out_infinite_2\.5s\] {
+  animation: float 7s ease-in-out infinite 2.5s;
+}
+
+.animate-\[float_6s_ease-in-out_infinite_3s\] {
+  animation: float 6s ease-in-out infinite 3s;
+}
+
+.animate-\[float_8s_ease-in-out_infinite_1\.5s\] {
+  animation: float 8s ease-in-out infinite 1.5s;
+}
