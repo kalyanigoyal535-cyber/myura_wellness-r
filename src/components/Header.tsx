@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaYoutube, FaPinterestP, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
@@ -20,7 +20,26 @@ const Header: React.FC = () => {
   const { address, loading, error, refreshLocation } = useUserLocation();
   const { count } = useCart();
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
+  
+  const handleMenuToggle = useCallback(() => {
+    setIsMenuOpen(prev => {
+      if (!prev) setIsSearchOpen(false);
+      return !prev;
+    });
+  }, []);
+  
+  const handleSearchOpen = useCallback(() => {
+    setIsSearchOpen(true);
+  }, []);
+  
+  const handleSearchClose = useCallback(() => {
+    setIsSearchOpen(false);
+  }, []);
+  
+  const handleMenuClose = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   useEffect(() => {
     const footerEl = document.getElementById('site-footer');
@@ -36,6 +55,15 @@ const Header: React.FC = () => {
     observer.observe(footerEl);
     return () => observer.disconnect();
   }, []);
+  
+  // Memoize navigation links
+  const navLinks = useMemo(() => [
+    { to: '/', label: 'Home' },
+    { to: '/about', label: 'About' },
+    { to: '/product', label: 'Products' },
+    { to: '/blog', label: 'Blog' },
+    { to: '/contact', label: 'Contact' }
+  ], []);
 
   return (
     <header className={`sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm transition-all duration-700 ease-in-out ${hideOnFooter ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
@@ -126,7 +154,7 @@ const Header: React.FC = () => {
                 {!isSearchOpen ? (
                   // Search Icon Button (Mobile - when closed)
                   <button
-                    onClick={() => setIsSearchOpen(true)}
+                    onClick={handleSearchOpen}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
                   >
                     <Search className="h-4 w-4" />
@@ -142,7 +170,7 @@ const Header: React.FC = () => {
                     />
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <button
-                      onClick={() => setIsSearchOpen(false)}
+                      onClick={handleSearchClose}
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-0.5"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,13 +200,7 @@ const Header: React.FC = () => {
 
             {/* Simple & Classy Navigation Links - Desktop only */}
             <nav className="hidden lg:flex space-x-6 xl:space-x-8 items-center flex-1 justify-center">
-              {[
-                { to: '/', label: 'Home' },
-                { to: '/about', label: 'About' },
-                { to: '/product', label: 'Products' },
-                { to: '/blog', label: 'Blog' },
-                { to: '/contact', label: 'Contact' }
-              ].map((link) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
@@ -224,10 +246,7 @@ const Header: React.FC = () => {
               </div>
               {/* Professional Mobile menu button */}
               <button
-                onClick={() => {
-                  setIsMenuOpen(!isMenuOpen);
-                  setIsSearchOpen(false); // Close search when menu opens
-                }}
+                onClick={handleMenuToggle}
                 className="lg:hidden p-2 sm:p-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 flex-shrink-0 flex items-center justify-center"
               >
                 <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -243,13 +262,7 @@ const Header: React.FC = () => {
           <div className="lg:hidden bg-white border-t border-slate-200 shadow-sm">
             <div className="px-4 py-3 space-y-1">
               {/* Mobile Navigation Links */}
-              {[
-                { to: '/', label: 'Home' },
-                { to: '/about', label: 'About' },
-                { to: '/product', label: 'Products' },
-                { to: '/blog', label: 'Blog' },
-                { to: '/contact', label: 'Contact' }
-              ].map((link) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
@@ -258,7 +271,7 @@ const Header: React.FC = () => {
                       ? 'text-slate-900 border-l-2 border-slate-900 pl-3'
                       : 'text-slate-600 hover:text-slate-900 hover:pl-3'
                   }`}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={handleMenuClose}
                 >
                   {link.label}
                 </Link>
@@ -271,5 +284,5 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default React.memo(Header);
 

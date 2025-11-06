@@ -11,7 +11,7 @@ const PinterestIcon = FaPinterestP as React.ComponentType<{ className?: string }
 const TwitterIcon = FaTwitter as React.ComponentType<{ className?: string }>;
 const LinkedinIcon = FaLinkedinIn as React.ComponentType<{ className?: string }>;
 
-const Footer: React.FC = () => {
+const Footer: React.FC = React.memo(() => {
   return (
     <footer id="site-footer" className="relative bg-gradient-to-br from-stone-50 via-neutral-50 to-stone-100 text-black overflow-hidden">
       {/* Soft Background Pattern */}
@@ -209,7 +209,7 @@ const Footer: React.FC = () => {
       </div>
     </footer>
   );
-};
+});
 
 export default Footer;
 

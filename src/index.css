@@ -18,6 +18,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1;
   text-rendering: optimizeLegibility;
+  /* Performance optimizations */
+  will-change: scroll-position;
+  contain: layout style paint;
+}
+
+/* Optimize images */
+img {
+  content-visibility: auto;
+  contain-intrinsic-size: 200px;
 }
 
 /* Clean & Sharp Font Utilities */

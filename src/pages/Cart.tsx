@@ -32,7 +32,7 @@ const Cart: React.FC = () => {
             )}
             {items.map((item) => (
               <div key={item.id} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <img src={item.image} alt={item.name} className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover ring-1 ring-slate-200" />
+                <img src={item.image} alt={item.name} className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover ring-1 ring-slate-200" loading="lazy" decoding="async" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
