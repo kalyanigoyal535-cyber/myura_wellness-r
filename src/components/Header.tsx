@@ -166,7 +166,7 @@ const Header: React.FC = () => {
                 </p>
                 
                 {/* Desktop version - full text */}
-                <p className="hidden sm:block text-xs sm:text-sm md:text-base font-medium text-white leading-tight sm:leading-normal px-1">
+                <p className="hidden sm:block text-xs sm:text-xs md:text-sm font-medium text-white leading-tight sm:leading-normal px-1">
                   <span className="font-minimal text-slate-100">
                     {currentBanner.text.split(currentBanner.highlight)[0]}
                   </span>
