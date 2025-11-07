@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Truck, Shield, Headphones, CheckCircle, ArrowRight } from 'lucide-react';
+import HeroSlider from '../components/heroSlider/HeroSlider';
 
 const Home: React.FC = () => {
   const products = [
@@ -63,65 +64,7 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-stone-50 via-neutral-50 to-stone-100 py-20">
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-slate-200 rounded-full opacity-20"></div>
-          <div className="absolute top-20 right-20 w-24 h-24 bg-slate-300 rounded-full opacity-30"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight font-display">
-                Wellness That Radiates From Within
-              </h1>
-              <p className="text-xl text-slate-700 leading-relaxed font-minimal">
-                Because your wellness deserves better - thoughtfully made Ayurvedic solutions that energize, restore, and support you through every stage of life.
-              </p>
-              <Link
-                to="/product"
-                className="inline-flex items-center px-8 py-4 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors font-sharp"
-              >
-                Shop Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </div>
-            
-            <div className="relative">
-              <div className="relative bg-white rounded-2xl p-8 shadow-2xl">
-                <div className="flex justify-center items-center space-x-4 mb-6">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                    <div className="w-12 h-12 bg-purple-500 rounded-full"></div>
-                  </div>
-                  <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center">
-                    <div className="w-12 h-12 bg-teal-500 rounded-full"></div>
-                  </div>
-                  <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center">
-                    <div className="w-12 h-12 bg-pink-500 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">MYURA</h3>
-                  <p className="text-slate-600 font-minimal">Wellness Collection</p>
-                </div>
-              </div>
-              
-              {/* Floating elements */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 bg-slate-300 rounded-full opacity-60"></div>
-              <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-slate-200 rounded-full opacity-40"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Intro Text Strip */}
-      <section className="py-8 bg-gradient-to-r from-stone-100 via-neutral-50 to-stone-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-lg text-slate-700 font-minimal">
-            Ayurvedic wellness made simple. Myura offers honest, natural supplements for daily vitality, balance, and better living—no shortcuts, just nature.
-          </p>
-        </div>
-      </section>
+      <HeroSlider/>
 
       {/* At Myura Wellness Section */}
       <section className="py-20 bg-white">
