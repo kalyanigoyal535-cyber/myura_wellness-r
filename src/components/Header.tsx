@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw, Sparkles, Gift, Star, Truck } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaYoutube, FaPinterestP, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
@@ -14,9 +15,9 @@ const LinkedinIcon = FaLinkedinIn as React.ComponentType<{ className?: string }>
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [hideOnFooter, setHideOnFooter] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const headerRef = React.useRef<HTMLElement>(null);
   const location = useLocation();
   const { address, loading, error, refreshLocation } = useUserLocation();
   const { count } = useCart();
@@ -91,19 +92,47 @@ const Header: React.FC = () => {
     return () => clearInterval(interval);
   }, [banners.length]);
 
+  // Calculate header height and set CSS variable for content padding
   useEffect(() => {
-    const footerEl = document.getElementById('site-footer');
-    if (!footerEl) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setHideOnFooter(entry.isIntersecting);
-        });
-      },
-      { root: null, threshold: 0.05 }
-    );
-    observer.observe(footerEl);
-    return () => observer.disconnect();
+    const updateHeight = () => {
+      const height = headerRef.current?.offsetHeight || 0;
+      document.documentElement.style.setProperty('--header-height', `${height}px`);
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, [currentBannerIndex]);
+
+  // Reinforce fixed positioning in case external styles interfere
+  useEffect(() => {
+    const applyFixedStyles = () => {
+      const headerEl = headerRef.current;
+      if (!headerEl) return;
+
+      headerEl.style.position = 'fixed';
+      headerEl.style.top = '0px';
+      headerEl.style.left = '0px';
+      headerEl.style.right = '0px';
+      headerEl.style.width = '100%';
+      headerEl.style.zIndex = '9999';
+    };
+
+    const handleScrollOrResize = () => {
+      requestAnimationFrame(applyFixedStyles);
+    };
+
+    applyFixedStyles();
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize);
+
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
   }, []);
   
   // Memoize navigation links
@@ -117,8 +146,20 @@ const Header: React.FC = () => {
 
   const currentBanner = banners[currentBannerIndex];
 
-  return (
-    <header className={`sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm transition-all duration-700 ease-in-out ${hideOnFooter ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}`}>
+  const headerContent = (
+    <header
+      ref={headerRef}
+      className="fixed top-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur shadow-sm transition-shadow duration-300"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        width: '100%',
+        zIndex: 9999,
+        pointerEvents: 'auto'
+      } as React.CSSProperties}
+    >
       {/* Premium Rotating Banner */}
       <div className="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 py-2 sm:py-2.5 sm:py-3 px-2 sm:px-3 md:px-4 relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex items-center justify-center relative z-10">
@@ -399,6 +440,38 @@ const Header: React.FC = () => {
       </div>
     </header>
   );
+
+  // Use portal to render header directly to body, bypassing any parent transforms
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+    if (typeof document !== 'undefined') {
+      let headerContainer = document.getElementById('header-portal-container');
+      if (!headerContainer) {
+        headerContainer = document.createElement('div');
+        headerContainer.id = 'header-portal-container';
+        // Portal container should be normal div, header inside will be fixed
+        headerContainer.style.cssText = `
+          position: relative;
+          width: 100%;
+          pointer-events: none;
+        `;
+        document.body.insertBefore(headerContainer, document.body.firstChild);
+      }
+      setPortalContainer(headerContainer);
+    }
+  }, []);
+
+  // Render header via portal if available, otherwise render directly
+  // Don't return null - always render something
+  if (typeof document !== 'undefined' && portalContainer && mounted) {
+    return createPortal(headerContent, portalContainer);
+  }
+  
+  // Fallback: render directly if portal not ready (for SSR or initial render)
+  return headerContent;
 };
 
 export default React.memo(Header);

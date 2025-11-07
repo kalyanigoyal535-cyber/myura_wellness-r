@@ -73,6 +73,7 @@ function App() {
         <ScrollToTop />
         <div className="min-h-screen bg-stone-50 overflow-x-hidden">
           <Header />
+          <div style={{ paddingTop: 'var(--header-height, 0px)' }}>
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -85,6 +86,7 @@ function App() {
               <Route path="/cart" element={<Cart />} />
             </Routes>
           </Suspense>
+          </div>
           <Footer />
         </div>
       </CartProvider>

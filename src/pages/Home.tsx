@@ -1,8 +1,97 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Truck, Shield, Headphones, CheckCircle, ArrowRight } from 'lucide-react';
+import { Star, Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Home: React.FC = () => {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [transitionStage, setTransitionStage] = useState<'idle' | 'entering'>('idle');
+  const manualResumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const heroSlides = useMemo(() => (
+    [
+      {
+        id: 'rethink-wellness-1',
+        desktopSrc: '/banners/Banner1Main.webp',
+        mobileSrc: '/banners/Banner12.jpg',
+        alt: 'Myura wellness collection showcased on stone pedestal against lush mountainscape',
+      },
+      {
+        id: 'rethink-wellness-2',
+        desktopSrc: '/banners/BannerImage.png',
+        mobileSrc: '/banners/Banner11.jpg',
+        alt: 'Myura wellness bottles with premium lighting in sunlit forest ambience',
+      },
+      {
+        id: 'pro-series',
+        desktopSrc: '/banners/BannerImage2.jpg',
+        mobileSrc: '/banners/BannerImageMobile1.png',
+        alt: 'Introducing the Myura Pro Series premium product lineup',
+      },
+    ]
+  ), []);
+
+  useEffect(() => {
+    if (isPaused) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setTransitionStage('entering');
+      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 6000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [activeSlide, heroSlides.length, isPaused]);
+
+  const pauseAutoplay = useCallback(() => {
+    setIsPaused(true);
+    if (manualResumeRef.current) {
+      clearTimeout(manualResumeRef.current);
+    }
+  }, []);
+
+  const resumeAutoplay = useCallback(() => {
+    if (manualResumeRef.current) {
+      clearTimeout(manualResumeRef.current);
+    }
+
+    manualResumeRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 2000);
+  }, []);
+
+  const handlePrev = useCallback(() => {
+    pauseAutoplay();
+    setTransitionStage('entering');
+    setActiveSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    resumeAutoplay();
+  }, [heroSlides.length, pauseAutoplay, resumeAutoplay]);
+
+  const handleNext = useCallback(() => {
+    pauseAutoplay();
+    setTransitionStage('entering');
+    setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+    resumeAutoplay();
+  }, [heroSlides.length, pauseAutoplay, resumeAutoplay]);
+
+  const handleDotClick = useCallback((index: number) => {
+    pauseAutoplay();
+    setTransitionStage('entering');
+    setActiveSlide(index);
+    resumeAutoplay();
+  }, [pauseAutoplay, resumeAutoplay]);
+
+  useEffect(() => {
+    return () => {
+      if (manualResumeRef.current) {
+        clearTimeout(manualResumeRef.current);
+      }
+    };
+  }, []);
+
   const products = [
     {
       id: 1,
@@ -62,53 +151,146 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-stone-50 via-neutral-50 to-stone-100 py-20">
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-slate-200 rounded-full opacity-20"></div>
-          <div className="absolute top-20 right-20 w-24 h-24 bg-slate-300 rounded-full opacity-30"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight font-display">
-                Wellness That Radiates From Within
-              </h1>
-              <p className="text-xl text-slate-700 leading-relaxed font-minimal">
-                Because your wellness deserves better - thoughtfully made Ayurvedic solutions that energize, restore, and support you through every stage of life.
-              </p>
-              <Link
-                to="/product"
-                className="inline-flex items-center px-8 py-4 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors font-sharp"
-              >
-                Shop Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </div>
-            
-            <div className="relative">
-              <div className="relative bg-white rounded-2xl p-8 shadow-2xl">
-                <div className="flex justify-center items-center space-x-4 mb-6">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                    <div className="w-12 h-12 bg-purple-500 rounded-full"></div>
-                  </div>
-                  <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center">
-                    <div className="w-12 h-12 bg-teal-500 rounded-full"></div>
-                  </div>
-                  <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center">
-                    <div className="w-12 h-12 bg-pink-500 rounded-full"></div>
-                  </div>
+      {/* Premium Hero Slider */}
+      <section
+        className="relative bg-gradient-to-b from-stone-100 via-stone-50 to-white pt-2 sm:pt-4 pb-12 sm:pb-16"
+      >
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-5">
+          <div
+            className="relative overflow-hidden rounded-3xl shadow-[0_40px_120px_-40px_rgba(15,23,42,0.6)] ring-1 ring-white/10 bg-slate-900/60"
+            role="region"
+            aria-label="Featured wellness collections"
+            aria-roledescription="carousel"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                handleNext();
+              }
+              if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                handlePrev();
+              }
+            }}
+          >
+            <div className="relative h-[460px] xs:h-[520px] sm:h-[580px] lg:h-[72vh] xl:h-[78vh] 2xl:h-[84vh]">
+              {heroSlides.map((slide, index) => (
+                <div
+                  key={slide.id}
+                  className="absolute inset-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
+                  style={{
+                    opacity: index === activeSlide ? 1 : 0,
+                    transform: index === activeSlide
+                      ? transitionStage === 'entering'
+                        ? 'scale(1) translateY(0)'
+                        : 'scale(1) translateY(0)'
+                      : 'scale(1.08) translateY(18px)',
+                    filter: index === activeSlide ? 'brightness(1)' : 'brightness(0.82)',
+                  }}
+                  onTransitionEnd={() => {
+                    if (index === activeSlide) {
+                      setTransitionStage('idle');
+                    }
+                  }}
+                  aria-hidden={index !== activeSlide}
+                >
+                  <picture>
+                    <source media="(min-width: 768px)" srcSet={slide.desktopSrc} />
+                    <img
+                      src={slide.mobileSrc}
+                      alt={slide.alt}
+                      className="w-full h-full object-cover object-center"
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                    />
+                  </picture>
                 </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">MYURA</h3>
-                  <p className="text-slate-600 font-minimal">Wellness Collection</p>
+              ))}
+
+              <div className="absolute inset-0 bg-gradient-to-b from-slate-900/25 via-slate-900/10 to-slate-950/40 pointer-events-none mix-blend-multiply"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(148,210,189,0.12),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(147,197,253,0.12),transparent_50%),radial-gradient(circle_at_50%_80%,rgba(244,114,182,0.1),transparent_55%)]"></div>
+              <div className="absolute -top-24 sm:-top-32 lg:-top-40 right-10 sm:right-16 w-52 sm:w-64 lg:w-72 h-52 sm:h-64 lg:h-72 bg-emerald-400/18 blur-[120px] rounded-full animate-[softPulse_6s_ease-in-out_infinite]"></div>
+              <div className="absolute top-16 sm:top-20 left-6 sm:left-10 w-24 sm:w-32 h-24 sm:h-32 bg-emerald-300/12 rounded-full blur-3xl animate-[floatParticle_12s_linear_infinite]" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute bottom-20 sm:bottom-24 right-8 sm:right-12 w-32 sm:w-40 h-32 sm:h-40 bg-teal-200/12 rounded-full blur-3xl animate-[floatParticle_14s_linear_infinite]" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0)_45%,rgba(255,255,255,0)_55%,rgba(255,255,255,0.1)_100%)] animate-[shimmer_5s_linear_infinite] opacity-0.5 pointer-events-none"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-44 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent"></div>
+
+              <div className="absolute inset-x-6 sm:inset-x-8 lg:inset-x-10 top-6 sm:top-8 flex items-center justify-between text-white/90">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
+                    Premium Wellness
+                  </span>
+                  <span className="hidden sm:inline-flex h-px w-12 sm:w-16 bg-gradient-to-r from-white/30 to-transparent"></span>
+                  <span className="hidden sm:inline text-xs font-medium text-white/70">
+                    Curated visuals from the Myura collection
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 pointer-events-auto">
+                  <button
+                    type="button"
+                    onClick={handlePrev}
+                    className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-all duration-300 text-white backdrop-blur border border-white/10 shadow-[0_12px_30px_-12px_rgba(255,255,255,0.45)]"
+                    aria-label="Show previous banner"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-all duration-300 text-white backdrop-blur border border-white/10 shadow-[0_12px_30px_-12px_rgba(255,255,255,0.45)]"
+                    aria-label="Show next banner"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-              
-              {/* Floating elements */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 bg-slate-300 rounded-full opacity-60"></div>
-              <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-slate-200 rounded-full opacity-40"></div>
+
+              <div className="absolute inset-x-0 bottom-6 sm:bottom-8 flex justify-center">
+                <div className="flex items-center gap-2 sm:gap-3 rounded-full bg-white/10 px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur border border-white/15 pointer-events-auto">
+                  {heroSlides.map((slide, index) => (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      onClick={() => handleDotClick(index)}
+                      className={`relative h-2 sm:h-2.5 rounded-full transition-all duration-500 ease-out ${
+                        index === activeSlide
+                          ? 'w-6 sm:w-8 bg-white shadow-[0_10px_30px_rgba(255,255,255,0.35)]'
+                          : 'w-2.5 sm:w-3 bg-white/40 hover:bg-white/70'
+                      }`}
+                    >
+                      <span className="sr-only">Go to banner {index + 1}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+            <div className="space-y-6 sm:space-y-7 text-center lg:text-left">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight font-display">
+                Rethink Daily Wellness
+              </h1>
+              <p className="text-base sm:text-lg lg:text-xl text-slate-700 leading-relaxed font-minimal max-w-2xl mx-auto lg:mx-0">
+                Sustainable. Smart. Simple. Discover premium Ayurvedic nutrition designed for modern rhythms, crafted to help you feel energised, balanced, and truly well.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-3 sm:gap-4">
+              <Link
+                to="/product"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-8 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_20px_40px_-20px_rgba(15,23,42,0.6)] transition-all duration-300 hover:bg-slate-800 hover:shadow-[0_24px_60px_-20px_rgba(15,23,42,0.65)] font-sharp"
+              >
+                Shop The Collection
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Link>
+              <button
+                type="button"
+                onClick={handleNext}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-900/15 bg-white px-6 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-sm transition-all duration-300 hover:border-slate-900/40 hover:shadow-lg font-sharp"
+              >
+                Next Highlight
+                <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
