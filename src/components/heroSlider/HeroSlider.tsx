@@ -1,6 +1,6 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import images from "../../images/images";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const HeroSlider: React.FC = () => {
   const desktopSlides = [
@@ -16,28 +16,21 @@ const HeroSlider: React.FC = () => {
   ];
 
   const [current, setCurrent] = useState(0);
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false
+  );
 
-  const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
-
-  useLayoutEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 768px)");
-
-    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      setIsMobile(e.matches);
-      console.log("📱 isMobile:", e.matches ? "MOBILE" : "DESKTOP");
-    };
-
-    handleChange(mediaQuery);
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+  // ✅ Detect screen size change
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const slides = isMobile ? mobileSlides : desktopSlides;
 
+  // ✅ Auto slide every 5s
   useEffect(() => {
-    if (!slides.length) return;
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 5000);
@@ -48,93 +41,60 @@ const HeroSlider: React.FC = () => {
   const prevSlide = () =>
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    touchEndX.current = e.touches[0].clientX;
-  };
-  const handleTouchEnd = () => {
-    if (touchStartX.current === null || touchEndX.current === null) return;
-    const diff = touchStartX.current - touchEndX.current;
-    if (diff > 50) nextSlide();
-    if (diff < -50) prevSlide();
-    touchStartX.current = null;
-    touchEndX.current = null;
-  };
-
-  if (isMobile === null) {
-    return (
-      <div className="w-full h-[300px] bg-gray-100 animate-pulse rounded-xl" />
-    );
-  }
-
   return (
-    <div className="relative w-full overflow-hidden bg-[#F0F4EB] rounded-xl">
-      {!isMobile && (
-        <div className="relative aspect-[1500/625]">
-          {desktopSlides.map((src, index) => (
-            <img
-              key={index}
-              src={src}
-              alt={`Desktop Slide ${index + 1}`}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                index === current ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          ))}
-          <button
-            onClick={prevSlide}
-            className="absolute left-5 top-1/2 -translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="absolute right-5 top-1/2 -translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </div>
-      )}
-
-      {isMobile && (
-        <div
-          className="relative w-full h-[300px] sm:h-[350px] overflow-hidden rounded-lg"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
+    <div id="hero-carousel" className="relative w-full">
+      {/* === Carousel Wrapper === */}
+      <div className="relative h-[80vh] overflow-hidden rounded-lg">
+        {slides.map((src, index) => (
           <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{
-              transform: `translateX(-${current * 100}%)`,
-              width: `${slides.length * 100}%`,
-            }}
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              index === current ? "opacity-100 z-10" : "opacity-0 z-0"
+            }`}
           >
-            {slides.map((src, index) => (
-              <div key={index} className="w-full flex-shrink-0">
-                <img
-                  src={src}
-                  alt={`Mobile Slide ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
+            <img
+              src={src}
+              alt={`Slide ${index + 1}`}
+              className="block w-full h-full object-cover"
+            />
           </div>
-          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrent(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  index === current ? "bg-black scale-110" : "bg-gray-400"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
+
+      {/* === Indicators === */}
+      <div className="absolute z-30 flex -translate-x-1/2 space-x-3 bottom-5 left-1/2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrent(index)}
+            className={`w-3 h-3 rounded-full ${
+              index === current ? "bg-white" : "bg-gray-400/70"
+            }`}
+            aria-label={`Slide ${index + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* === Controls === */}
+      <button
+        onClick={prevSlide}
+        className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+        aria-label="Previous Slide"
+      >
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50 group-focus:ring-4 group-focus:ring-white">
+          <ChevronLeft className="w-5 h-5 text-white" />
+        </span>
+      </button>
+
+      <button
+        onClick={nextSlide}
+        className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+        aria-label="Next Slide"
+      >
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50 group-focus:ring-4 group-focus:ring-white">
+          <ChevronRight className="w-5 h-5 text-white" />
+        </span>
+      </button>
     </div>
   );
 };
