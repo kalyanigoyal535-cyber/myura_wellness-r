@@ -21,7 +21,6 @@ const HeroSlider: React.FC = () => {
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
-  // ✅ Detect mobile instantly before first paint
   useLayoutEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 768px)");
 
@@ -35,10 +34,8 @@ const HeroSlider: React.FC = () => {
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
-  // Don’t derive `slides` until we know mobile/desktop
   const slides = isMobile ? mobileSlides : desktopSlides;
 
-  // ✅ Auto slide
   useEffect(() => {
     if (!slides.length) return;
     const interval = setInterval(() => {
@@ -51,7 +48,6 @@ const HeroSlider: React.FC = () => {
   const prevSlide = () =>
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
-  // ✅ Touch handlers
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -67,7 +63,6 @@ const HeroSlider: React.FC = () => {
     touchEndX.current = null;
   };
 
-  // ✅ Render placeholder safely *after* all hooks
   if (isMobile === null) {
     return (
       <div className="w-full h-[300px] bg-gray-100 animate-pulse rounded-xl" />
@@ -76,7 +71,6 @@ const HeroSlider: React.FC = () => {
 
   return (
     <div className="relative w-full overflow-hidden bg-[#F0F4EB] rounded-xl">
-      {/* Desktop Version */}
       {!isMobile && (
         <div className="relative aspect-[1500/625]">
           {desktopSlides.map((src, index) => (
@@ -104,7 +98,6 @@ const HeroSlider: React.FC = () => {
         </div>
       )}
 
-      {/* Mobile Version */}
       {isMobile && (
         <div
           className="relative w-full h-[300px] sm:h-[350px] overflow-hidden rounded-lg"
