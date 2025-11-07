@@ -20,7 +20,6 @@ const HeroSlider: React.FC = () => {
     typeof window !== "undefined" ? window.innerWidth <= 768 : false
   );
 
-  // ✅ Detect screen size change
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
@@ -29,7 +28,6 @@ const HeroSlider: React.FC = () => {
 
   const slides = isMobile ? mobileSlides : desktopSlides;
 
-  // ✅ Auto slide every 5s
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
@@ -42,7 +40,11 @@ const HeroSlider: React.FC = () => {
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <div id="hero-carousel" className="relative w-full">
+    // ✅ Add horizontal margins only on mobile
+    <div
+      id="hero-carousel"
+      className="relative w-[90%] mx-[5%] md:mx-0 md:w-full"
+    >
       {/* === Carousel Wrapper === */}
       <div className="relative h-[80vh] overflow-hidden rounded-lg">
         {slides.map((src, index) => (
@@ -55,7 +57,7 @@ const HeroSlider: React.FC = () => {
             <img
               src={src}
               alt={`Slide ${index + 1}`}
-              className="block w-full h-full object-cover"
+              className="block w-full h-full object-cover rounded-lg"
             />
           </div>
         ))}
