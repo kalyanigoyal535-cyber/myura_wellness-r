@@ -40,12 +40,10 @@ const HeroSlider: React.FC = () => {
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    // ✅ Add horizontal margins only on mobile
     <div
       id="hero-carousel"
       className="relative w-[90%] mx-[5%] md:mx-0 md:w-full"
     >
-      {/* === Carousel Wrapper === */}
       <div className="relative h-[80vh] overflow-hidden rounded-lg">
         {slides.map((src, index) => (
           <div
