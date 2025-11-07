@@ -177,7 +177,7 @@ const Home: React.FC = () => {
               {heroSlides.map((slide, index) => (
                 <div
                   key={slide.id}
-                  className="absolute inset-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.19,1,0.22,1)]"
+                  className="absolute inset-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.19,1,0.22,1)] flex items-center justify-center bg-slate-950"
                   style={{
                     opacity: index === activeSlide ? 1 : 0,
                     transform: index === activeSlide
@@ -185,7 +185,7 @@ const Home: React.FC = () => {
                         ? 'scale(1) translateY(0)'
                         : 'scale(1) translateY(0)'
                       : 'scale(1.08) translateY(18px)',
-                    filter: index === activeSlide ? 'brightness(1)' : 'brightness(0.82)',
+                    filter: index === activeSlide ? 'brightness(1.15)' : 'brightness(0.92)',
                   }}
                   onTransitionEnd={() => {
                     if (index === activeSlide) {
@@ -199,7 +199,7 @@ const Home: React.FC = () => {
                     <img
                       src={slide.mobileSrc}
                       alt={slide.alt}
-                      className="w-full h-full object-cover object-center"
+                      className="w-full h-full object-cover xl:object-contain object-center"
                       loading={index === 0 ? 'eager' : 'lazy'}
                     />
                   </picture>
