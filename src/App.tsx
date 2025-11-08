@@ -88,7 +88,7 @@ function App() {
       <AOSRefresher />
         <div className="min-h-screen bg-stone-50 overflow-x-hidden">
           <Header />
-          <div style={{ paddingTop: 'var(--header-height, 0px)' }}>
+          <div style={{ paddingTop: 'var(--header-height, 0px)', transition: 'padding-top 0.45s ease' }}>
           <Suspense fallback={<LoadingFallback />}>
           <Routes>
           <Route path="/" element={<Home />} />

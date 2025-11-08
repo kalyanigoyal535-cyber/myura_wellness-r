@@ -14,6 +14,12 @@ const Home: React.FC = () => {
   const heroSlides = useMemo(() => (
     [
       {
+        id: 'winter-sale',
+        desktopSrc: '/banners/winter-sale-desktop.jpg',
+        mobileSrc: '/banners/winter-sale-mobile.jpg',
+        alt: 'Winter sale announcement with Myura wellness product range and 50% discount offer',
+      },
+      {
         id: 'rethink-wellness-1',
         desktopSrc: '/banners/Banner1Main.webp',
         mobileSrc: '/banners/Banner12.jpg',
@@ -100,11 +106,11 @@ const Home: React.FC = () => {
       {
         id: 1,
         name: "Dia Care",
-        price: 799,
-        originalPrice: 999,
+        price: 1190,
+        originalPrice: 1499,
         images: [
+          '/Final Images/Dia Care/main.png',
           '/Final Images/Dia Care/1.png',
-          '/Final Images/Dia Care/2.png',
           '/Final Images/Dia Care/3.png',
           '/Final Images/Dia Care/4.png',
         ],
@@ -115,12 +121,12 @@ const Home: React.FC = () => {
       {
         id: 2,
         name: "Liver Detox",
-        price: 699,
-        originalPrice: 999,
+        price: 1320,
+        originalPrice: 1990,
         images: [
+          '/Final Images/Liver Detox/main.png',
           '/Final Images/Liver Detox/1.png',
           '/Final Images/Liver Detox/2.png',
-          '/Final Images/Liver Detox/3.png',
           '/Final Images/Liver Detox/4.png',
         ],
         pedestalColor: 'from-teal-100 via-white to-teal-50',
@@ -130,11 +136,11 @@ const Home: React.FC = () => {
       {
         id: 3,
         name: "Bones & Joints",
-        price: 4543,
-        originalPrice: 5999,
+        price: 1299,
+        originalPrice: 1499,
         images: [
+          '/Final Images/Bons &  Joints/main.png',
           '/Final Images/Bons &  Joints/1.png',
-          '/Final Images/Bons &  Joints/2.png',
           '/Final Images/Bons &  Joints/3.png',
           '/Final Images/Bons &  Joints/4.png',
         ],
@@ -145,13 +151,13 @@ const Home: React.FC = () => {
       {
         id: 4,
         name: "Gut & Digestion",
-        price: 999,
-        originalPrice: 1299,
+        price: 980,
+        originalPrice: 1199,
         images: [
+          '/Final Images/Gut & Digestions/main.png',
           '/Final Images/Gut & Digestions/1.png',
           '/Final Images/Gut & Digestions/2.png',
           '/Final Images/Gut & Digestions/3.png',
-          '/Final Images/Gut & Digestions/4.png',
         ],
         pedestalColor: 'from-amber-50 via-white to-emerald-50',
         borderClass: 'border-amber-200',
@@ -160,10 +166,10 @@ const Home: React.FC = () => {
       {
         id: 5,
         name: "Women's Health Plus",
-        price: 499,
-        originalPrice: 699,
+        price: 1260,
+        originalPrice: 1699,
         images: [
-          '/Final Images/Women_s Health Plus/1.png',
+          '/Final Images/Women_s Health Plus/main.png',
           '/Final Images/Women_s Health Plus/2.png',
           '/Final Images/Women_s Health Plus/3.png',
           '/Final Images/Women_s Health Plus/4.png',
@@ -175,12 +181,12 @@ const Home: React.FC = () => {
       {
         id: 6,
         name: "Men's Vitality Boost",
-        price: 899,
-        originalPrice: 1199,
+        price: 1599,
+        originalPrice: 2150,
         images: [
+          '/Final Images/Men_s Vitalty Boost/main.jpg',
           '/Final Images/Men_s Vitalty Boost/1.jpg',
           '/Final Images/Men_s Vitalty Boost/2.jpg',
-          '/Final Images/Men_s Vitalty Boost/3.jpg',
           '/Final Images/Men_s Vitalty Boost/4.jpg',
         ],
         pedestalColor: 'from-slate-100 via-white to-blue-50',
@@ -292,7 +298,8 @@ const Home: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen">
+    <>
+      <div className="min-h-screen">
       {/* Premium Hero Slider */}
       <section
         className="relative bg-gradient-to-b from-stone-100 via-stone-50 to-white pt-2 sm:pt-4 pb-12 sm:pb-16"
@@ -499,12 +506,11 @@ const Home: React.FC = () => {
       <section className="py-20 bg-stone-50">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12 text-center lg:text-left">
-            <div className="w-full">
-              <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500/15 via-slate-900/12 to-emerald-500/15 border border-emerald-400/30 text-xs font-semibold tracking-[0.32em] uppercase text-emerald-700/80 mx-auto lg:mx-0">
-                curated collection
-              </div>
-              <h2 className="mt-4 text-[2.65rem] sm:text-[3rem] font-display font-semibold tracking-tight leading-tight text-center lg:text-left text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-emerald-500 to-slate-900 drop-shadow-[0_20px_36px_rgba(15,23,42,0.32)]">
-                EXPLORE PRODUCTS
+            <div className="w-full text-center lg:text-left">
+              <h2 className="relative inline-flex flex-col gap-2 text-[2.45rem] sm:text-[2.85rem] font-display font-semibold tracking-tight leading-tight text-slate-900">
+                <span className="absolute inset-x-0 -inset-y-3 rounded-[3rem] bg-gradient-to-r from-emerald-100/70 via-white to-emerald-50/60 blur-2xl"></span>
+                <span className="relative z-10">Explore Products</span>
+                <span className="relative mx-auto lg:mx-0 h-[3px] w-20 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-slate-900"></span>
               </h2>
             </div>
             <div className="hidden lg:flex items-center gap-3">
@@ -542,19 +548,25 @@ const Home: React.FC = () => {
                       <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-white/60 bg-white flex items-center justify-center">
                         <button
                           type="button"
-                          onClick={() => handleProductImageNav(productIndex, -1)}
-                          className="absolute left-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-sm transition hover:bg-white"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleProductImageNav(productIndex, -1);
+                          }}
+                          className="absolute -left-4 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
                           aria-label="Previous product image"
                         >
-                          <ChevronLeft className="h-4 w-4" />
+                          <ChevronLeft className="h-4 w-4 text-slate-700" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleProductImageNav(productIndex, 1)}
-                          className="absolute right-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-sm transition hover:bg-white"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleProductImageNav(productIndex, 1);
+                          }}
+                          className="absolute -right-4 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
                           aria-label="Next product image"
                         >
-                          <ChevronRight className="h-4 w-4" />
+                          <ChevronRight className="h-4 w-4 text-slate-700" />
                         </button>
                         <img
                           key={productImageIndices[productIndex]}
@@ -569,12 +581,13 @@ const Home: React.FC = () => {
                               <button
                                 key={imageIndex}
                                 type="button"
-                                onClick={() =>
+                                onClick={(event) => {
+                                  event.stopPropagation();
                                   handleProductImageNav(
                                     productIndex,
                                     imageIndex - productImageIndices[productIndex]
-                                  )
-                                }
+                                  );
+                                }}
                                 className={`h-1.5 w-1.5 rounded-full transition ${
                                   productImageIndices[productIndex] === imageIndex
                                     ? 'bg-slate-900'
@@ -640,37 +653,37 @@ const Home: React.FC = () => {
       {/* Service Guarantees */}
       <section className="py-16 bg-white">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="text-left xs:text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
                 <Truck className="h-8 w-8 text-slate-900" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2 font-sharp">FREE SHIPPING</h3>
-              <p className="text-sm text-slate-600 font-minimal">On all orders above ₹699, No hidden charges</p>
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">FREE SHIPPING</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">On all orders above ₹699, No hidden charges</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-left xs:text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
                 <Shield className="h-8 w-8 text-slate-900" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2 font-sharp">SECURE PAYMENT</h3>
-              <p className="text-sm text-slate-600 font-minimal">Safe & encrypted</p>
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">SECURE PAYMENT</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">Safe & encrypted</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-left xs:text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
                 <CheckCircle className="h-8 w-8 text-slate-900" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2 font-sharp">GUARANTEE</h3>
-              <p className="text-sm text-slate-600 font-minimal">Easy replacements</p>
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">GUARANTEE</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">Easy replacements</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-left xs:text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
                 <Headphones className="h-8 w-8 text-slate-900" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2 font-sharp">24/7 SERVICE</h3>
-              <p className="text-sm text-slate-600 font-minimal">Need help? Our team is always here to assist you</p>
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">24/7 SERVICE</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">Need help? Our team is always here to assist you</p>
             </div>
           </div>
         </div>
@@ -736,88 +749,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Your best health is waiting section */}
-      <section className="py-20 bg-stone-50">
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-teal-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full"></div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">MYURA</h3>
-                  <p className="text-slate-600 font-minimal">DIA CARE</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-6">
-              <p className="text-sm text-slate-700 font-medium font-sharp">Discover now Magical benefits of nature.</p>
-              <h2 className="text-4xl font-bold text-slate-900 font-display">Your best health is waiting - are you?</h2>
-              <p className="text-lg text-slate-700 leading-relaxed font-minimal">
-                Experience the power of carefully selected herbs and botanicals that have been used for centuries in Ayurvedic medicine. Our products are designed to work with your body's natural processes, providing gentle yet effective support for your wellness journey.
-              </p>
-              <Link
-                to="/product"
-                className="inline-flex items-center px-6 py-3 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors font-sharp"
-              >
-                Explore Now
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Awaken Your Energy Section */}
-      <section className="py-20 bg-white">
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-4xl font-bold text-slate-900 font-display">Awaken Your Energy</h2>
-              <p className="text-xl text-slate-700 font-medium font-sharp">Nature's Pure Power In Every Bite</p>
-              <p className="text-lg text-slate-700 leading-relaxed font-minimal">
-                Our microgreens are harvested at peak freshness to deliver maximum nutritional value. Packed with enzymes, antioxidants, and live nutrients that your body thrives on.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-slate-900" />
-                  <span className="text-slate-700 font-minimal">Harvested at peak freshness for maximum potency</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-slate-900" />
-                  <span className="text-slate-700 font-minimal">Packed with enzymes, antioxidants & live nutrients your body thrives on</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-slate-900" />
-                  <span className="text-slate-700 font-minimal">Zero chemicals, 100% purity - inspired by ancient nourishment rituals</span>
-                </div>
-              </div>
-              <Link
-                to="/product"
-                className="inline-flex items-center px-6 py-3 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors font-sharp"
-              >
-                Explore Now
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
-            
-            <div className="relative">
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full"></div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">Microgreens</h3>
-                  <p className="text-slate-600 font-minimal">Nature's Superfood</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Video Section */}
       <section className="py-20 bg-stone-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -833,7 +764,9 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+
+    </>
   );
 };
 

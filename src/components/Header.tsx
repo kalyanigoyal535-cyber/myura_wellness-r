@@ -125,20 +125,25 @@ const Header: React.FC = () => {
     };
   }, []);
 
-  // Calculate header height and set CSS variable for content padding
-  useEffect(() => {
-    const updateHeight = () => {
+  const updateHeaderHeight = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    requestAnimationFrame(() => {
       const height = headerRef.current?.offsetHeight || 0;
       document.documentElement.style.setProperty('--header-height', `${height}px`);
-    };
+    });
+  }, []);
 
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
+  // Calculate header height and set CSS variable for content padding
+  useEffect(() => {
+    updateHeaderHeight();
+    const timeout = window.setTimeout(updateHeaderHeight, 520);
+    return () => window.clearTimeout(timeout);
+  }, [updateHeaderHeight, currentBannerIndex, isScrolled, topBarHeight]);
 
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-    };
-  }, [currentBannerIndex, isScrolled, topBarHeight]);
+  useEffect(() => {
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  }, [updateHeaderHeight]);
 
   // Reinforce fixed positioning in case external styles interfere
   useEffect(() => {
