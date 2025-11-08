@@ -50,7 +50,7 @@ const About: React.FC = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-white mb-4">ABOUT</h1>
           <p className="text-xl text-slate-200">
             Because your health deserves more than maintenance - It deserves transformation.
@@ -60,7 +60,7 @@ const About: React.FC = () => {
 
       {/* Our Promise Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Visual */}
             <div className="relative">
@@ -140,7 +140,7 @@ const About: React.FC = () => {
 
       {/* How We're Different Section */}
       <section className="py-20 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
             <div className="space-y-6">
@@ -179,7 +179,7 @@ const About: React.FC = () => {
 
       {/* Why Choose Myura Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Visual */}
             <div className="relative">
@@ -260,10 +260,10 @@ const About: React.FC = () => {
 
       {/* Our Team Section */}
       <section className="py-20 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-6">Our Team</h2>
-            <p className="text-lg text-slate-700 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg text-slate-700 leading-relaxed">
               We're a passionate group of wellness enthusiasts, product developers, and creatives - 
               all driven by a single mission: to make holistic health simple and accessible. Each 
               member of our team brings expertise and heart into building a brand that truly cares 

@@ -27,7 +27,7 @@ const Footer: React.FC = React.memo(() => {
 
       {/* Main Footer Content */}
       <div className="relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
             {/* Brand Section */}
             <div className="space-y-6 sm:space-y-8">
@@ -183,7 +183,7 @@ const Footer: React.FC = React.memo(() => {
 
         {/* Bottom Footer */}
         <div className="border-t border-black/20 bg-gradient-to-r from-stone-200 via-neutral-100 to-stone-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
               <div className="text-black text-sm sm:text-base text-center lg:text-left font-minimal">
                 © {new Date().getFullYear()} <span className="font-minimal font-semibold">Myura Wellness</span> is a brand of <span className="font-minimal font-semibold">JAC Nutrition Pvt. Ltd.</span> All rights reserved.

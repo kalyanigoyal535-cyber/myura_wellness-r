@@ -10,7 +10,7 @@ const Cart: React.FC = () => {
 
   return (
     <main className="min-h-[70vh] bg-stone-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div className="flex items-center justify-between mb-6 sm:mb-10">
           <div className="flex items-center space-x-3">
             <Link to="/" className="inline-flex items-center text-slate-600 hover:text-slate-900 transition-colors">

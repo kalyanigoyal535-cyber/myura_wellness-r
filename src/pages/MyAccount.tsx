@@ -21,7 +21,7 @@ const MyAccount: React.FC = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-white mb-4">MY ACCOUNT</h1>
           <p className="text-xl text-slate-200">
             Wellness you can feel, results you can see.
@@ -31,7 +31,7 @@ const MyAccount: React.FC = () => {
 
       {/* Login/Register Section */}
       <section className="py-20 bg-stone-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Login Form */}
             <div className="bg-white rounded-2xl p-8 shadow-lg">
@@ -150,7 +150,7 @@ const MyAccount: React.FC = () => {
 
       {/* Additional Account Features */}
       <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Account Benefits</h2>
             <p className="text-lg text-slate-700">

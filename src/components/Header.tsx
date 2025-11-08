@@ -162,7 +162,7 @@ const Header: React.FC = () => {
     >
       {/* Premium Rotating Banner */}
       <div className="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 py-2 sm:py-2.5 sm:py-3 px-2 sm:px-3 md:px-4 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto flex items-center justify-center relative z-10">
+        <div className="w-full flex items-center justify-center relative z-10">
           <div className="flex items-center justify-center w-full gap-1.5 sm:gap-2 md:gap-3">
             {/* Premium Badge - Smaller on mobile */}
             <div className="flex-shrink-0">
@@ -245,7 +245,7 @@ const Header: React.FC = () => {
 
       {/* Professional Top Bar */}
       <div className="bg-slate-50 border-b border-slate-200 py-2 sm:py-2.5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-row justify-between items-center text-xs sm:text-sm gap-2">
             <div className="flex items-center gap-1.5 sm:gap-2 text-slate-600 flex-1 min-w-0">
               <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-slate-500 flex-shrink-0" />
@@ -303,7 +303,7 @@ const Header: React.FC = () => {
 
       {/* Professional Main Navigation */}
       <div className="bg-white/90 backdrop-blur shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
           <div className="flex items-center justify-between py-2 sm:py-2.5 lg:py-3 gap-2 sm:gap-3 min-w-0">
             {/* Left Side - Search Icon and Logo */}
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 min-w-0">

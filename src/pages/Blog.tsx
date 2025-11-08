@@ -45,7 +45,7 @@ const Blog: React.FC = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold text-white mb-4">BLOG & NEWS</h1>
           <p className="text-xl text-slate-200">
             Wellness you can feel, results you can see.
@@ -55,7 +55,7 @@ const Blog: React.FC = () => {
 
       {/* Featured Blog Post */}
       <section className="py-20 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2">
               {/* Featured Post Image */}
@@ -111,7 +111,7 @@ const Blog: React.FC = () => {
 
       {/* Blog Posts Grid */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">Latest Articles</h2>
             <p className="text-xl text-slate-700 max-w-3xl mx-auto">
@@ -179,7 +179,7 @@ const Blog: React.FC = () => {
 
       {/* Newsletter Signup */}
       <section className="py-20 bg-stone-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Stay Updated</h2>
           <p className="text-lg text-slate-700 mb-8">
             Subscribe to our newsletter for the latest wellness tips, product updates, and exclusive offers.
@@ -202,7 +202,7 @@ const Blog: React.FC = () => {
 
       {/* Categories Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Explore by Category</h2>
             <p className="text-lg text-slate-700">

@@ -297,7 +297,7 @@ const Home: React.FC = () => {
       <section
         className="relative bg-gradient-to-b from-stone-100 via-stone-50 to-white pt-2 sm:pt-4 pb-12 sm:pb-16"
       >
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-5">
+        <div className="w-full mx-auto px-2 sm:px-4 lg:px-5">
           <div
             className="relative overflow-hidden rounded-3xl shadow-[0_40px_120px_-40px_rgba(15,23,42,0.6)] ring-1 ring-white/10 bg-slate-900/60"
             role="region"
@@ -470,7 +470,7 @@ const Home: React.FC = () => {
       <section className="relative py-8 sm:py-12">
         <div className="absolute inset-0 bg-[#112c3b]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(87,133,122,0.45),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(164,63,134,0.35),transparent_55%)] opacity-75"></div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="zoom-in" data-aos-delay="90">
+        <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8" data-aos="zoom-in" data-aos-delay="90">
           <div className="relative overflow-hidden rounded-[1.75rem] sm:rounded-[2rem] border border-white/12 bg-white/10 backdrop-blur-2xl shadow-[0_42px_85px_-40px_rgba(17,44,59,0.85)] px-5 sm:px-8 lg:px-12 py-10 sm:py-12 text-center">
             <div className="absolute -top-10 -left-8 h-28 w-28 rounded-full bg-[#3e8]/22 blur-3xl animate-[softPulse_7s_ease-in-out_infinite]" style={{ animationDelay: '1s' }}></div>
             <div className="absolute -bottom-12 -right-10 h-32 w-32 rounded-full bg-[#a43f86]/22 blur-3xl animate-[softPulse_5.5s_ease-in-out_infinite]" style={{ animationDelay: '2.2s' }}></div>
@@ -496,7 +496,7 @@ const Home: React.FC = () => {
 
       {/* At Myura Wellness Section */}
       <section className="py-14 sm:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1fr)] gap-10 items-start">
             <div className="relative flex flex-col items-center gap-4 mt-6 sm:mt-8 lg:mt-10" data-aos="zoom-in" data-aos-delay="90" data-aos-duration="650">
               <div className="bg-white rounded-[2rem] shadow-[0_28px_55px_-38px_rgba(15,23,42,0.18)] border border-slate-100/70 overflow-hidden mx-auto max-w-[11.5rem] sm:max-w-[13rem]">
@@ -556,7 +556,7 @@ const Home: React.FC = () => {
 
       {/* Explore Products Section */}
       <section className="py-20 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
             <div>
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 font-display">EXPLORE PRODUCTS</h2>
@@ -662,7 +662,7 @@ const Home: React.FC = () => {
 
       {/* Service Guarantees */}
       <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -701,7 +701,7 @@ const Home: React.FC = () => {
 
       {/* Your best health is waiting section */}
       <section className="py-20 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative">
               <div className="bg-white rounded-2xl p-8 shadow-lg">
@@ -735,7 +735,7 @@ const Home: React.FC = () => {
 
       {/* Awaken Your Energy Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-4xl font-bold text-slate-900 font-display">Awaken Your Energy</h2>

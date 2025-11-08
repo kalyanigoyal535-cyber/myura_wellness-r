@@ -53,13 +53,13 @@ const ProductDetail: React.FC = () => {
     <div className="min-h-screen bg-stone-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold text-white mb-4">PRODUCT</h1>
           <p className="text-xl text-slate-200">Wellness you can feel, results you can see.</p>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
           <div className="relative">
