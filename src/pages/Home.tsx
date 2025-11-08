@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import type { KeenSliderInstance } from 'keen-slider';
+import { useKeenSlider } from 'keen-slider/react';
+import 'keen-slider/keen-slider.min.css';
+import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 const Home: React.FC = () => {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -95,59 +98,196 @@ const Home: React.FC = () => {
   const products = [
     {
       id: 1,
-      name: "DIA CARE",
+      name: "Dia Care",
       price: 799,
       originalPrice: 999,
-      image: "/api/placeholder/200/200",
-      pedestalColor: "bg-purple-500",
+      images: [
+        '/Final Images/Dia Care/1.png',
+        '/Final Images/Dia Care/2.png',
+        '/Final Images/Dia Care/3.png',
+        '/Final Images/Dia Care/4.png',
+      ],
+      pedestalColor: 'from-rose-100 via-rose-50 to-white',
       rating: 5
     },
     {
       id: 2,
-      name: "LIVER DETOX FORMULA",
+      name: "Liver Detox",
       price: 699,
       originalPrice: 999,
-      image: "/api/placeholder/200/200",
-      pedestalColor: "bg-teal-500",
+      images: [
+        '/Final Images/Liver Detox/1.png',
+        '/Final Images/Liver Detox/2.png',
+        '/Final Images/Liver Detox/3.png',
+        '/Final Images/Liver Detox/4.png',
+      ],
+      pedestalColor: 'from-teal-100 via-white to-teal-50',
       rating: 5
     },
     {
       id: 3,
-      name: "BONE & JOINT SUPPORT",
+      name: "Bones & Joints",
       price: 4543,
       originalPrice: 5999,
-      image: "/api/placeholder/200/200",
-      pedestalColor: "bg-blue-600",
+      images: [
+        '/Final Images/Bons &  Joints/1.png',
+        '/Final Images/Bons &  Joints/2.png',
+        '/Final Images/Bons &  Joints/3.png',
+        '/Final Images/Bons &  Joints/4.png',
+      ],
+      pedestalColor: 'from-blue-100 via-white to-indigo-50',
       rating: 5
     },
     {
       id: 4,
-      name: "GUT AND DIGESTION",
+      name: "Gut & Digestion",
       price: 999,
       originalPrice: 1299,
-      image: "/api/placeholder/200/200",
-      pedestalColor: "bg-amber-600",
+      images: [
+        '/Final Images/Gut & Digestions/1.png',
+        '/Final Images/Gut & Digestions/2.png',
+        '/Final Images/Gut & Digestions/3.png',
+        '/Final Images/Gut & Digestions/4.png',
+      ],
+      pedestalColor: 'from-amber-50 via-white to-emerald-50',
       rating: 5
     },
     {
       id: 5,
-      name: "WOMEN'S HEALTH PLUS",
+      name: "Women's Health Plus",
       price: 499,
       originalPrice: 699,
-      image: "/api/placeholder/200/200",
-      pedestalColor: "bg-pink-500",
+      images: [
+        '/Final Images/Women_s Health Plus/1.png',
+        '/Final Images/Women_s Health Plus/2.png',
+        '/Final Images/Women_s Health Plus/3.png',
+        '/Final Images/Women_s Health Plus/4.png',
+      ],
+      pedestalColor: 'from-pink-100 via-white to-rose-50',
       rating: 5
     },
     {
       id: 6,
-      name: "MEN'S VITALITY BOOSTER",
+      name: "Men's Vitality Boost",
       price: 899,
       originalPrice: 1199,
-      image: "/api/placeholder/200/200",
-      pedestalColor: "bg-blue-800",
+      images: [
+        '/Final Images/Men_s Vitalty Boost/1.jpg',
+        '/Final Images/Men_s Vitalty Boost/2.jpg',
+        '/Final Images/Men_s Vitalty Boost/3.jpg',
+        '/Final Images/Men_s Vitalty Boost/4.jpg',
+      ],
+      pedestalColor: 'from-slate-100 via-white to-blue-50',
       rating: 5
     }
   ];
+
+  const [productSliderRef, productSlider] = useKeenSlider<HTMLDivElement>(
+    {
+      loop: true,
+      renderMode: 'precision',
+      drag: true,
+      slides: {
+        perView: 1.1,
+        spacing: 16,
+      },
+      breakpoints: {
+        '(min-width: 640px)': {
+          slides: {
+            perView: 1.6,
+            spacing: 20,
+          },
+        },
+        '(min-width: 768px)': {
+          slides: {
+            perView: 2.2,
+            spacing: 24,
+          },
+        },
+        '(min-width: 1024px)': {
+          slides: {
+            perView: 3.1,
+            spacing: 28,
+          },
+        },
+        '(min-width: 1280px)': {
+          slides: {
+            perView: 3.3,
+            spacing: 32,
+          },
+        },
+      },
+    },
+    [
+      (slider: KeenSliderInstance) => {
+        let timeout: ReturnType<typeof setTimeout> | undefined;
+        let mouseOver = false;
+
+        const clearNextTimeout = () => {
+          if (timeout) {
+            clearTimeout(timeout);
+          }
+        };
+
+        const nextTimeout = () => {
+          clearNextTimeout();
+          if (mouseOver) return;
+          timeout = setTimeout(() => {
+            slider.next();
+          }, 3600);
+        };
+
+        slider.on('created', () => {
+          slider.container.addEventListener('mouseenter', () => {
+            mouseOver = true;
+            clearNextTimeout();
+          });
+          slider.container.addEventListener('mouseleave', () => {
+            mouseOver = false;
+            nextTimeout();
+          });
+          nextTimeout();
+        });
+
+        slider.on('dragStarted', clearNextTimeout);
+        slider.on('animationEnded', nextTimeout);
+        slider.on('updated', nextTimeout);
+      },
+    ]
+  );
+
+  const slideToPrevProduct = useCallback(() => {
+    productSlider.current?.prev();
+  }, [productSlider]);
+
+  const slideToNextProduct = useCallback(() => {
+    productSlider.current?.next();
+  }, [productSlider]);
+
+  const [hoveredProductIndex, setHoveredProductIndex] = useState<number | null>(null);
+  const [imageFrameIndices, setImageFrameIndices] = useState<number[]>(
+    () => products.map(() => 0)
+  );
+
+  useEffect(() => {
+    if (hoveredProductIndex === null) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setImageFrameIndices((prev) =>
+        prev.map((frameIndex, index) =>
+          index === hoveredProductIndex
+            ? (frameIndex + 1) % products[index].images.length
+            : frameIndex
+        )
+      );
+    }, 1400);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [hoveredProductIndex, products]);
 
   return (
     <div className="min-h-screen">
@@ -267,29 +407,57 @@ const Home: React.FC = () => {
           </div>
 
           <div className="mt-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <div className="space-y-6 sm:space-y-7 text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight font-display">
-                Rethink Daily Wellness
+            <div className="space-y-5 sm:space-y-6 text-center lg:text-left" data-aos="fade-up">
+              <h1
+                className="font-display font-semibold text-slate-900 leading-[1.08] tracking-tight text-2xl sm:text-3xl lg:text-[3rem] xl:text-[3.25rem]"
+                data-aos="fade-up"
+                data-aos-delay="50"
+              >
+                <span className="block text-slate-800">Ayurveda. Simplified.</span>
+                <span className="block mt-1">
+                  <span className="bg-gradient-to-r from-emerald-500 via-teal-500 to-slate-900 bg-clip-text text-transparent drop-shadow-[0_12px_32px_rgba(16,185,129,0.18)]">
+                    Wellness That Works.
+                  </span>
+                </span>
               </h1>
-              <p className="text-base sm:text-lg lg:text-xl text-slate-700 leading-relaxed font-minimal max-w-2xl mx-auto lg:mx-0">
-                Sustainable. Smart. Simple. Discover premium Ayurvedic nutrition designed for modern rhythms, crafted to help you feel energised, balanced, and truly well.
+
+              <div className="flex justify-center lg:justify-start" data-aos="fade-up" data-aos-delay="120">
+                <div className="h-1 w-16 rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-800 shadow-[0_10px_30px_rgba(45,212,191,0.35)]"></div>
+              </div>
+
+              <p
+                className="text-sm sm:text-base lg:text-lg text-slate-700/90 leading-relaxed font-minimal max-w-2xl mx-auto lg:mx-0"
+                data-aos="fade-up"
+                data-aos-delay="180"
+              >
+                Thoughtfully made Ayurvedic solutions to energize, restore, and support your natural balance at every stage of life. Your wellness deserves the best.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-3 sm:gap-4" data-aos="fade-up" data-aos-delay="240">
               <Link
                 to="/product"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-8 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_20px_40px_-20px_rgba(15,23,42,0.6)] transition-all duration-300 hover:bg-slate-800 hover:shadow-[0_24px_60px_-20px_rgba(15,23,42,0.65)] font-sharp"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-7 sm:px-8 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_24px_48px_-20px_rgba(15,23,42,0.75)] transition-all duration-300 hover:bg-slate-800"
+                data-aos="zoom-in"
+                data-aos-delay="260"
               >
-                Shop The Collection
-                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="absolute inset-[1px] rounded-full bg-slate-900 blur-[0.5px] opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+                <span className="relative inline-flex items-center gap-2">
+                  Shop The Collection
+                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
               </Link>
               <button
                 type="button"
                 onClick={handleNext}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-900/15 bg-white px-6 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-sm transition-all duration-300 hover:border-slate-900/40 hover:shadow-lg font-sharp"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-full border border-slate-900/15 bg-white/90 px-6 sm:px-7 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-[0_20px_40px_-24px_rgba(15,23,42,0.65)] backdrop-blur transition-all duration-300 hover:border-emerald-500/60 hover:shadow-[0_28px_50px_-24px_rgba(16,185,129,0.45)]"
+                data-aos="zoom-in"
+                data-aos-delay="320"
               >
-                Next Highlight
-                <ChevronRight className="h-4 w-4" />
+                <span className="absolute inset-[1px] rounded-full bg-gradient-to-r from-white/70 via-white/55 to-emerald-50/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                <span className="relative inline-flex items-center gap-2">
+                  Next Highlight
+                  <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
               </button>
             </div>
           </div>
@@ -297,56 +465,88 @@ const Home: React.FC = () => {
       </section>
 
       {/* Intro Text Strip */}
-      <section className="py-8 bg-gradient-to-r from-stone-100 via-neutral-50 to-stone-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-lg text-slate-700 font-minimal">
-            Ayurvedic wellness made simple. Myura offers honest, natural supplements for daily vitality, balance, and better living—no shortcuts, just nature.
-          </p>
+      <section className="relative py-8 sm:py-12">
+        <div className="absolute inset-0 bg-[#112c3b]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(87,133,122,0.45),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(164,63,134,0.35),transparent_55%)] opacity-75"></div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="zoom-in" data-aos-delay="90">
+          <div className="relative overflow-hidden rounded-[1.75rem] sm:rounded-[2rem] border border-white/12 bg-white/10 backdrop-blur-2xl shadow-[0_42px_85px_-40px_rgba(17,44,59,0.85)] px-5 sm:px-8 lg:px-12 py-10 sm:py-12 text-center">
+            <div className="absolute -top-10 -left-8 h-28 w-28 rounded-full bg-[#3e8]/22 blur-3xl animate-[softPulse_7s_ease-in-out_infinite]" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute -bottom-12 -right-10 h-32 w-32 rounded-full bg-[#a43f86]/22 blur-3xl animate-[softPulse_5.5s_ease-in-out_infinite]" style={{ animationDelay: '2.2s' }}></div>
+            <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_60%)] opacity-55"></div>
+
+            <div className="relative flex flex-col items-center gap-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-3.5 py-1 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.24em] text-white/80" data-aos="fade-up" data-aos-delay="120">
+                <Sparkles className="h-4 w-4 text-emerald-200" />
+                Signature Ritual
+              </div>
+
+              <h2
+                className="whitespace-nowrap text-[1.35rem] xs:text-[1.5rem] sm:text-[2.05rem] lg:text-[2.5rem] font-sharp font-semibold leading-tight tracking-[0.002em] text-white drop-shadow-[0_14px_28px_rgba(17,44,59,0.35)] text-center lg:text-left"
+                data-aos="fade-up"
+                data-aos-delay="160"
+              >
+                Your Wellness, Our Promise.
+              </h2>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* At Myura Wellness Section */}
-      <section className="py-20 bg-white">
+      <section className="py-14 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full"></div>
-                </div>
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">MYURA</h3>
-                  <p className="text-slate-600 font-minimal">Women's Health Plus</p>
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1fr)] gap-10 items-start">
+            <div className="relative flex flex-col items-center gap-4 mt-6 sm:mt-8 lg:mt-10" data-aos="zoom-in" data-aos-delay="90" data-aos-duration="650">
+              <div className="bg-white rounded-[2rem] shadow-[0_28px_55px_-38px_rgba(15,23,42,0.18)] border border-slate-100/70 overflow-hidden mx-auto max-w-[11.5rem] sm:max-w-[13rem]">
+                <div className="absolute inset-0 bg-white"></div>
+                <div className="relative flex items-center justify-center">
+                  <img
+                    src="/wellness.png"
+                    alt="Myura wellness illustration"
+                    className="w-full h-full object-cover transition-transform duration-500"
+                  />
                 </div>
               </div>
             </div>
             
-            <div className="space-y-6">
-              <h2 className="text-4xl font-bold text-slate-900 font-display">At Myura Wellness</h2>
-              <p className="text-lg text-slate-700 leading-relaxed font-minimal">
-                We believe in the power of nature to heal, restore, and energize. Our carefully crafted supplements blend ancient Ayurvedic wisdom with modern science to bring you the best of both worlds.
+            <div className="space-y-5" data-aos="fade-up" data-aos-delay="160">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-[1.95rem] sm:text-[2.25rem] font-display font-semibold tracking-tight leading-snug">
+                  <span className="bg-gradient-to-r from-[#112c3b] via-[#421335] to-[#537790] bg-clip-text text-transparent">At Myura Wellness</span>
+                </h2>
+                <Link
+                  to="/product"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-7 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_22px_40px_-18px_rgba(15,23,42,0.55)] transition-all duration-300 hover:bg-slate-800 sm:self-start"
+                  data-aos="zoom-in"
+                  data-aos-delay="260"
+                >
+                  EXPLORE PRODUCTS
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <p className="text-sm sm:text-base lg:text-lg text-slate-700 leading-relaxed font-premium bg-gradient-to-r from-white via-[#f8fafc] to-white border border-slate-100 rounded-2xl px-4 sm:px-5 py-4 shadow-[0_22px_44px_-30px_rgba(15,23,42,0.25)]">
+                We believe true well-being comes from nature. Our thoughtfully crafted Ayurvedic supplements blend ancient wisdom with modern science to help you feel your best, naturally. Experience everyday balance, energy, and restoration.
               </p>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-slate-900" />
-                  <span className="text-slate-700 font-minimal">Clean Ingredients</span>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2.5" data-aos="fade-up" data-aos-delay="200">
+                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(17,44,59,0.3)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#537790] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <CheckCircle className="h-4 w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Clean Ingredients</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-slate-900" />
-                  <span className="text-slate-700 font-minimal">Traditionally Trusted Herbs</span>
+                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f9f4fb] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(66,19,53,0.3)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#421335] to-[#a43f86] text-white shadow-[0_10px_18px_rgba(164,63,134,0.3)]">
+                    <CheckCircle className="h-4 w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Traditionally Trusted Herbs</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-slate-900" />
-                  <span className="text-slate-700 font-minimal">No Harmful Additives</span>
+                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f2f9f7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(87,133,122,0.3)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#57857a] to-[#20396d] text-white shadow-[0_10px_18px_rgba(87,133,122,0.3)]">
+                    <CheckCircle className="h-4 w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">No Harmful Additives</span>
                 </div>
               </div>
-              <Link
-                to="/product"
-                className="inline-flex items-center px-6 py-3 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors font-sharp"
-              >
-                Explore Products
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
             </div>
           </div>
         </div>
@@ -355,41 +555,105 @@ const Home: React.FC = () => {
       {/* Explore Products Section */}
       <section className="py-20 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4 font-display">EXPLORE PRODUCTS</h2>
-            <p className="text-xl text-slate-700 max-w-3xl mx-auto font-minimal">
-              Pure, effective, and made for you - explore the MYURA collection for everyday health and vitality.
-            </p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 font-display">EXPLORE PRODUCTS</h2>
+              <p className="text-base sm:text-lg text-slate-700 max-w-2xl mt-3 font-minimal">
+                Pure, effective, and made for you — explore the MYURA collection crafted for everyday balance, energy, and vitality.
+              </p>
+            </div>
+            <div className="hidden lg:flex items-center gap-3">
+              <button
+                onClick={slideToPrevProduct}
+                aria-label="Previous product"
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-300 hover:border-slate-300 hover:text-slate-900"
+              >
+                <ChevronLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+              </button>
+              <button
+                onClick={slideToNextProduct}
+                aria-label="Next product"
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-300 hover:border-slate-300 hover:text-slate-900"
+              >
+                <ChevronRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </button>
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div className="relative mb-6">
-                  <div className={`w-24 h-24 ${product.pedestalColor} rounded-full mx-auto flex items-center justify-center mb-4`}>
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-                      <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
+
+          <div className="relative" data-aos="fade-up" data-aos-delay="140">
+            <div className="absolute inset-y-6 left-0 w-24 bg-gradient-to-r from-stone-50 via-stone-50/90 to-transparent pointer-events-none hidden sm:block rounded-l-3xl"></div>
+            <div className="absolute inset-y-6 right-0 w-24 bg-gradient-to-l from-stone-50 via-stone-50/90 to-transparent pointer-events-none hidden sm:block rounded-r-3xl"></div>
+
+            <div ref={productSliderRef} className="keen-slider px-2 sm:px-4">
+            {products.map((product, productIndex) => (
+                <div
+                  key={product.id}
+                  className="keen-slider__slide"
+                  onMouseEnter={() => setHoveredProductIndex(productIndex)}
+                  onMouseLeave={() => setHoveredProductIndex(null)}
+                >
+                  <div className="group relative h-full overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-[0_26px_60px_-30px_rgba(15,23,42,0.45)] backdrop-blur-xl transition-all duration-500 ease-out hover:-translate-y-2">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-slate-900/5 via-slate-900/0 to-slate-900/10"></div>
+                    <div className="relative flex flex-col items-center gap-5 p-6 sm:p-8">
+                      <div className="relative flex flex-col items-center gap-5">
+                        <div className={`w-full h-56 sm:h-60 rounded-[1.75rem] bg-gradient-to-br ${product.pedestalColor} shadow-[0_32px_70px_-32px_rgba(15,23,42,0.4)] transition-all duration-700 ease-out group-hover:shadow-[0_40px_90px_-36px_rgba(17,44,59,0.55)] overflow-hidden relative`}>
+                          <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/0 to-white/20 opacity-0 group-hover:opacity-70 transition-opacity duration-700 pointer-events-none"></div>
+                          <img
+                            key={imageFrameIndices[productIndex]}
+                            src={product.images[imageFrameIndices[productIndex]]}
+                            alt={product.name}
+                            className="h-full w-full object-contain animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards]"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="text-center space-y-2">
+                          <h3 className="text-lg font-bold text-slate-900 font-sharp">{product.name}</h3>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-center gap-3">
+                        <span className="text-2xl font-bold text-slate-900 font-sharp">₹{product.price}</span>
+                        <span className="text-lg text-slate-400 line-through font-minimal">₹{product.originalPrice}</span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-center gap-3">
+                        <button className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_26px_48px_-22px_rgba(15,23,42,0.65)] transition-all duration-300 hover:shadow-[0_32px_58px_-22px_rgba(15,23,42,0.75)]">
+                          <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                          <span className="relative inline-flex items-center gap-2">
+                            Add to cart
+                            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                          </span>
+                        </button>
+                        <button className="group relative inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/60 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_20px_42px_-26px_rgba(15,23,42,0.35)] transition-all duration-300 hover:border-slate-400/60 hover:bg-white">
+                          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-white/80 via-white/70 to-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                          <span className="relative inline-flex items-center gap-2">
+                            View details
+                            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                          </span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-slate-500 mb-1 font-minimal">MYURA</p>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2 font-sharp">{product.name}</h3>
-                    <div className="flex justify-center space-x-1 mb-3">
-                      {[...Array(product.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                    <div className="flex justify-center items-center space-x-2 mb-4">
-                      <span className="text-2xl font-bold text-slate-900 font-sharp">₹{product.price}</span>
-                      <span className="text-lg text-slate-400 line-through font-minimal">₹{product.originalPrice}</span>
-                    </div>
-                    <button className="w-full bg-slate-900 text-white py-2 px-4 rounded-lg hover:bg-slate-800 transition-colors font-sharp">
-                      Add to cart
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <div className="mt-6 flex items-center justify-center gap-3 lg:hidden">
+              <button
+                onClick={slideToPrevProduct}
+                aria-label="Previous product"
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-300 hover:border-slate-300 hover:text-slate-900"
+              >
+                <ChevronLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+              </button>
+              <button
+                onClick={slideToNextProduct}
+                aria-label="Next product"
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-300 hover:border-slate-300 hover:text-slate-900"
+              >
+                <ChevronRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>

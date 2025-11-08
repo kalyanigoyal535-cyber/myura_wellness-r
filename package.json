@@ -12,6 +12,7 @@
     "@types/node": "^16.18.126",
     "@types/react-router-dom": "^5.3.3",
     "aos": "^2.3.4",
+    "keen-slider": "^6.8.6",
     "lucide-react": "^0.548.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

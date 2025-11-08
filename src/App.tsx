@@ -56,13 +56,13 @@ function App() {
 
     // Initialize AOS only once
     if (typeof window !== 'undefined' && !document.querySelector('[data-aos]')) {
-      AOS.init({
-        duration: 1000,
-        easing: 'ease-in-out',
-        once: true,
-        mirror: false,
-        offset: 100,
-      });
+    AOS.init({
+      duration: 1000,
+      easing: 'ease-in-out',
+      once: true,
+      mirror: false,
+      offset: 100,
+    });
     }
   }, []);
 
@@ -75,16 +75,16 @@ function App() {
           <Header />
           <div style={{ paddingTop: 'var(--header-height, 0px)' }}>
           <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/product" element={<Product />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/my-account" element={<MyAccount />} />
-              <Route path="/cart" element={<Cart />} />
-            </Routes>
+          <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/product" element={<Product />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/my-account" element={<MyAccount />} />
+          <Route path="/cart" element={<Cart />} />
+          </Routes>
           </Suspense>
           </div>
           <Footer />
