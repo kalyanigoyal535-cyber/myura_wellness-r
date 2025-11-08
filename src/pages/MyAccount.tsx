@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Lock, MessageCircle } from 'lucide-react';
 
 const MyAccount: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,9 +97,9 @@ const MyAccount: React.FC = () => {
                 </button>
 
                 <div className="text-center">
-                  <a href="#" className="text-sm text-slate-600 hover:text-slate-700 underline">
+                  <Link to="/contact" className="text-sm text-slate-600 hover:text-slate-700 underline">
                     Lost your password?
-                  </a>
+                  </Link>
                 </div>
               </form>
             </div>

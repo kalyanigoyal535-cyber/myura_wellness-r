@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Star, ShoppingCart, Filter, Search } from 'lucide-react';
+import { Star, Filter, Search } from 'lucide-react';
 
 const Product: React.FC = () => {
   const products = [

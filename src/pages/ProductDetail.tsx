@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Plus, Minus, ShoppingCart, Star, Heart, MessageCircle } from 'lucide-react';
+import { Plus, Minus, Star, Heart, MessageCircle } from 'lucide-react';
 
 const ProductDetail: React.FC = () => {
-  const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>('benefits');
   const [showCart, setShowCart] = useState(false);
