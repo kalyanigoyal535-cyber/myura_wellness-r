@@ -21,7 +21,7 @@ const Home: React.FC = () => {
       originalPrice: 999,
       image: "/api/placeholder/200/200",
       pedestalColor: "bg-teal-500",
-      rating: 5
+      rating: 5 
     },
     {
       id: 3,

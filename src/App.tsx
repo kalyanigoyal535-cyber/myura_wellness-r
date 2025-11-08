@@ -8,6 +8,9 @@ import LoadingScreen from './components/LoadingScreen';
 import { CartProvider } from './context/CartContext';
 import {RouterProvider} from "react-router-dom";
 import router from './router/routes';
+import { MantineProvider } from "@mantine/core";
+import '@mantine/core/styles.css';
+
 // Lazy load routes for code splitting
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
@@ -80,7 +83,7 @@ function App() {
     //           <Route path="/about" element={<About />} />
     //           <Route path="/product" element={<Product />} />
     //           <Route path="/product/:id" element={<ProductDetail />} />
-    //           <Route path="/blog" element={<Blog />} />
+    //           <Route path=¡"/blog" element={<Blog />} />
     //           <Route path="/contact" element={<Contact />} />
     //           <Route path="/my-account" element={<MyAccount />} />
     //           <Route path="/cart" element={<Cart />} />
@@ -91,7 +94,9 @@ function App() {
     //   </CartProvider>
     // </Router>
 
+    <MantineProvider >
     <RouterProvider router={router} />
+    </MantineProvider>
   );
 }
 
