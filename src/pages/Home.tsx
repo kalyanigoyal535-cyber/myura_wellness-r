@@ -42,7 +42,7 @@ const Home: React.FC = () => {
     const timer = setTimeout(() => {
       setTransitionStage('entering');
       setActiveSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 6000);
+    }, 5000);
 
     return () => {
       clearTimeout(timer);
@@ -109,6 +109,7 @@ const Home: React.FC = () => {
           '/Final Images/Dia Care/4.png',
         ],
         pedestalColor: 'from-rose-100 via-rose-50 to-white',
+        borderClass: 'border-rose-200',
         rating: 5
       },
       {
@@ -123,6 +124,7 @@ const Home: React.FC = () => {
           '/Final Images/Liver Detox/4.png',
         ],
         pedestalColor: 'from-teal-100 via-white to-teal-50',
+        borderClass: 'border-emerald-200',
         rating: 5
       },
       {
@@ -137,6 +139,7 @@ const Home: React.FC = () => {
           '/Final Images/Bons &  Joints/4.png',
         ],
         pedestalColor: 'from-blue-100 via-white to-indigo-50',
+        borderClass: 'border-indigo-200',
         rating: 5
       },
       {
@@ -151,6 +154,7 @@ const Home: React.FC = () => {
           '/Final Images/Gut & Digestions/4.png',
         ],
         pedestalColor: 'from-amber-50 via-white to-emerald-50',
+        borderClass: 'border-amber-200',
         rating: 5
       },
       {
@@ -165,6 +169,7 @@ const Home: React.FC = () => {
           '/Final Images/Women_s Health Plus/4.png',
         ],
         pedestalColor: 'from-pink-100 via-white to-rose-50',
+        borderClass: 'border-rose-200',
         rating: 5
       },
       {
@@ -179,6 +184,7 @@ const Home: React.FC = () => {
           '/Final Images/Men_s Vitalty Boost/4.jpg',
         ],
         pedestalColor: 'from-slate-100 via-white to-blue-50',
+        borderClass: 'border-slate-200',
         rating: 5
       }
     ]
@@ -266,30 +272,24 @@ const Home: React.FC = () => {
     productSlider.current?.next();
   }, [productSlider]);
 
-  const [hoveredProductIndex, setHoveredProductIndex] = useState<number | null>(null);
-  const [imageFrameIndices, setImageFrameIndices] = useState<number[]>(
+  const [productImageIndices, setProductImageIndices] = useState<number[]>(
     () => products.map(() => 0)
   );
 
-  useEffect(() => {
-    if (hoveredProductIndex === null) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setImageFrameIndices((prev) =>
-        prev.map((frameIndex, index) =>
-          index === hoveredProductIndex
-            ? (frameIndex + 1) % products[index].images.length
-            : frameIndex
-        )
+  const handleProductImageNav = useCallback(
+    (productIndex: number, delta: number) => {
+      setProductImageIndices((prev) =>
+        prev.map((frameIndex, index) => {
+          if (index !== productIndex) return frameIndex;
+          const images = products[productIndex].images;
+          if (!images.length) return frameIndex;
+          const next = (frameIndex + delta + images.length) % images.length;
+          return next;
+        })
       );
-    }, 1400);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [hoveredProductIndex, products]);
+    },
+    [products]
+  );
 
   return (
     <div className="min-h-screen">
@@ -319,15 +319,16 @@ const Home: React.FC = () => {
               {heroSlides.map((slide, index) => (
                 <div
                   key={slide.id}
-                  className="absolute inset-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.19,1,0.22,1)] flex items-center justify-center bg-slate-950"
+                  className="absolute inset-0 transition-all duration-[820ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] flex items-center justify-center bg-slate-950"
                   style={{
                     opacity: index === activeSlide ? 1 : 0,
-                    transform: index === activeSlide
-                      ? transitionStage === 'entering'
-                        ? 'scale(1) translateY(0)'
-                        : 'scale(1) translateY(0)'
-                      : 'scale(1.08) translateY(18px)',
-                    filter: index === activeSlide ? 'brightness(1.15)' : 'brightness(0.92)',
+                    transform:
+                      index === activeSlide
+                        ? transitionStage === 'entering'
+                          ? 'translate3d(0,-14px,0) scale(1.022)'
+                          : 'translate3d(0,0,0) scale(1)'
+                        : 'translate3d(0,22px,0) scale(0.972)',
+                    filter: index === activeSlide ? 'brightness(1.08) saturate(1.05)' : 'brightness(0.9) saturate(0.92)',
                   }}
                   onTransitionEnd={() => {
                     if (index === activeSlide) {
@@ -435,10 +436,10 @@ const Home: React.FC = () => {
                 Thoughtfully made Ayurvedic solutions to energize, restore, and support your natural balance at every stage of life. Your wellness deserves the best.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-end gap-3 sm:gap-4" data-aos="fade-up" data-aos-delay="240">
+            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2 sm:gap-4" data-aos="fade-up" data-aos-delay="240">
               <Link
                 to="/product"
-                className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-7 sm:px-8 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_24px_48px_-20px_rgba(15,23,42,0.75)] transition-all duration-300 hover:bg-slate-800"
+                className="group relative inline-flex items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-base font-semibold text-white shadow-[0_24px_48px_-20px_rgba(15,23,42,0.75)] transition-all duration-300 hover:bg-slate-800"
                 data-aos="zoom-in"
                 data-aos-delay="260"
               >
@@ -451,7 +452,7 @@ const Home: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="group relative inline-flex items-center justify-center gap-2 rounded-full border border-slate-900/15 bg-white/90 px-6 sm:px-7 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-[0_20px_40px_-24px_rgba(15,23,42,0.65)] backdrop-blur transition-all duration-300 hover:border-emerald-500/60 hover:shadow-[0_28px_50px_-24px_rgba(16,185,129,0.45)]"
+                className="group relative inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-900/15 bg-white/90 px-5 sm:px-7 py-2.5 sm:py-3 text-xs sm:text-base font-semibold text-slate-900 shadow-[0_20px_40px_-24px_rgba(15,23,42,0.65)] backdrop-blur transition-all duration-300 hover:border-emerald-500/60 hover:shadow-[0_28px_50px_-24px_rgba(16,185,129,0.45)]"
                 data-aos="zoom-in"
                 data-aos-delay="320"
               >
@@ -494,75 +495,17 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* At Myura Wellness Section */}
-      <section className="py-14 sm:py-16 bg-white">
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1fr)] gap-10 items-start">
-            <div className="relative flex flex-col items-center gap-4 mt-6 sm:mt-8 lg:mt-10" data-aos="zoom-in" data-aos-delay="90" data-aos-duration="650">
-              <div className="bg-white rounded-[2rem] shadow-[0_28px_55px_-38px_rgba(15,23,42,0.18)] border border-slate-100/70 overflow-hidden mx-auto max-w-[11.5rem] sm:max-w-[13rem]">
-                <div className="absolute inset-0 bg-white"></div>
-                <div className="relative flex items-center justify-center">
-                  <img
-                    src="/wellness.png"
-                    alt="Myura wellness illustration"
-                    className="w-full h-full object-cover transition-transform duration-500"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-5" data-aos="fade-up" data-aos-delay="160">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-[1.95rem] sm:text-[2.25rem] font-display font-semibold tracking-tight leading-snug">
-                  <span className="bg-gradient-to-r from-[#112c3b] via-[#421335] to-[#537790] bg-clip-text text-transparent">At Myura Wellness</span>
-                </h2>
-                <Link
-                  to="/product"
-                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-7 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_22px_40px_-18px_rgba(15,23,42,0.55)] transition-all duration-300 hover:bg-slate-800 sm:self-start"
-                  data-aos="zoom-in"
-                  data-aos-delay="260"
-                >
-                  EXPLORE PRODUCTS
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-              <p className="text-sm sm:text-base lg:text-lg text-slate-700 leading-relaxed font-premium bg-gradient-to-r from-white via-[#f8fafc] to-white border border-slate-100 rounded-2xl px-4 sm:px-5 py-4 shadow-[0_22px_44px_-30px_rgba(15,23,42,0.25)]">
-                We believe true well-being comes from nature. Our thoughtfully crafted Ayurvedic supplements blend ancient wisdom with modern science to help you feel your best, naturally. Experience everyday balance, energy, and restoration.
-              </p>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2.5" data-aos="fade-up" data-aos-delay="200">
-                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(17,44,59,0.3)]">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#537790] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
-                    <CheckCircle className="h-4 w-4" />
-                  </div>
-                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Clean Ingredients</span>
-                </div>
-                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f9f4fb] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(66,19,53,0.3)]">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#421335] to-[#a43f86] text-white shadow-[0_10px_18px_rgba(164,63,134,0.3)]">
-                    <CheckCircle className="h-4 w-4" />
-                  </div>
-                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Traditionally Trusted Herbs</span>
-                </div>
-                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f2f9f7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(87,133,122,0.3)]">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#57857a] to-[#20396d] text-white shadow-[0_10px_18px_rgba(87,133,122,0.3)]">
-                    <CheckCircle className="h-4 w-4" />
-                  </div>
-                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">No Harmful Additives</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Explore Products Section */}
       <section className="py-20 bg-stone-50">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 font-display">EXPLORE PRODUCTS</h2>
-              <p className="text-base sm:text-lg text-slate-700 max-w-2xl mt-3 font-minimal">
-                Pure, effective, and made for you — explore the MYURA collection crafted for everyday balance, energy, and vitality.
-              </p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12 text-center lg:text-left">
+            <div className="w-full">
+              <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500/15 via-slate-900/12 to-emerald-500/15 border border-emerald-400/30 text-xs font-semibold tracking-[0.32em] uppercase text-emerald-700/80 mx-auto lg:mx-0">
+                curated collection
+              </div>
+              <h2 className="mt-4 text-[2.65rem] sm:text-[3rem] font-display font-semibold tracking-tight leading-tight text-center lg:text-left text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-emerald-500 to-slate-900 drop-shadow-[0_20px_36px_rgba(15,23,42,0.32)]">
+                EXPLORE PRODUCTS
+              </h2>
             </div>
             <div className="hidden lg:flex items-center gap-3">
               <button
@@ -586,31 +529,65 @@ const Home: React.FC = () => {
             <div className="absolute inset-y-6 left-0 w-24 bg-gradient-to-r from-stone-50 via-stone-50/90 to-transparent pointer-events-none hidden sm:block rounded-l-3xl"></div>
             <div className="absolute inset-y-6 right-0 w-24 bg-gradient-to-l from-stone-50 via-stone-50/90 to-transparent pointer-events-none hidden sm:block rounded-r-3xl"></div>
 
-            <div ref={productSliderRef} className="keen-slider px-2 sm:px-4">
+            <div ref={productSliderRef} className="keen-slider">
             {products.map((product, productIndex) => (
                 <div
                   key={product.id}
                   className="keen-slider__slide"
-                  onMouseEnter={() => setHoveredProductIndex(productIndex)}
-                  onMouseLeave={() => setHoveredProductIndex(null)}
                 >
-                  <div className="group relative h-full overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-[0_26px_60px_-30px_rgba(15,23,42,0.45)] backdrop-blur-xl transition-all duration-500 ease-out hover:-translate-y-2">
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-slate-900/5 via-slate-900/0 to-slate-900/10"></div>
-                    <div className="relative flex flex-col items-center gap-5 p-6 sm:p-8">
-                      <div className="relative flex flex-col items-center gap-5">
-                        <div className={`w-full h-56 sm:h-60 rounded-[1.75rem] bg-gradient-to-br ${product.pedestalColor} shadow-[0_32px_70px_-32px_rgba(15,23,42,0.4)] transition-all duration-700 ease-out group-hover:shadow-[0_40px_90px_-36px_rgba(17,44,59,0.55)] overflow-hidden relative`}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/0 to-white/20 opacity-0 group-hover:opacity-70 transition-opacity duration-700 pointer-events-none"></div>
-                          <img
-                            key={imageFrameIndices[productIndex]}
-                            src={product.images[imageFrameIndices[productIndex]]}
-                            alt={product.name}
-                            className="h-full w-full object-contain animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards]"
-                            loading="lazy"
-                          />
-                        </div>
-                        <div className="text-center space-y-2">
-                          <h3 className="text-lg font-bold text-slate-900 font-sharp">{product.name}</h3>
-                        </div>
+                  <div
+                    className={`group relative h-full overflow-hidden rounded-3xl border-[1.5px] bg-white transition-transform duration-500 ease-out hover:-translate-y-2 ${product.borderClass}`}
+                  >
+                    <div className={`relative flex flex-col items-center gap-4 p-5 sm:p-6 pb-6 sm:pb-7 rounded-[2.25rem] m-2 sm:m-3 bg-gradient-to-br ${product.pedestalColor}`}>
+                      <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-white/60 bg-white flex items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => handleProductImageNav(productIndex, -1)}
+                          className="absolute left-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-sm transition hover:bg-white"
+                          aria-label="Previous product image"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleProductImageNav(productIndex, 1)}
+                          className="absolute right-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-sm transition hover:bg-white"
+                          aria-label="Next product image"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                        <img
+                          key={productImageIndices[productIndex]}
+                          src={product.images[productImageIndices[productIndex]]}
+                          alt={product.name}
+                          className="w-full h-auto max-h-[22rem] object-contain animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                          loading="lazy"
+                        />
+                        {product.images.length > 1 && (
+                          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+                            {product.images.map((_, imageIndex) => (
+                              <button
+                                key={imageIndex}
+                                type="button"
+                                onClick={() =>
+                                  handleProductImageNav(
+                                    productIndex,
+                                    imageIndex - productImageIndices[productIndex]
+                                  )
+                                }
+                                className={`h-1.5 w-1.5 rounded-full transition ${
+                                  productImageIndices[productIndex] === imageIndex
+                                    ? 'bg-slate-900'
+                                    : 'bg-slate-300 hover:bg-slate-400'
+                                }`}
+                                aria-label={`Show image ${imageIndex + 1}`}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-center space-y-1.5">
+                        <h3 className="text-lg font-bold text-slate-900 font-sharp">{product.name}</h3>
                       </div>
 
                       <div className="flex items-center justify-center gap-3">
@@ -694,6 +671,66 @@ const Home: React.FC = () => {
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2 font-sharp">24/7 SERVICE</h3>
               <p className="text-sm text-slate-600 font-minimal">Need help? Our team is always here to assist you</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* At Myura Wellness Section */}
+      <section className="py-14 sm:py-16 bg-white">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1fr)] gap-10 items-start">
+            <div className="relative flex flex-col items-center gap-4 mt-6 sm:mt-8 lg:mt-10" data-aos="zoom-in" data-aos-delay="90" data-aos-duration="650">
+              <div className="bg-white rounded-[2rem] shadow-[0_28px_55px_-38px_rgba(15,23,42,0.18)] border border-slate-100/70 overflow-hidden mx-auto max-w-[11.5rem] sm:max-w-[13rem]">
+                <div className="absolute inset-0 bg-white"></div>
+                <div className="relative flex items-center justify-center">
+                  <img
+                    src="/wellness.png"
+                    alt="Myura wellness illustration"
+                    className="w-full h-full object-cover transition-transform duration-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-5" data-aos="fade-up" data-aos-delay="160">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-[1.95rem] sm:text-[2.25rem] font-display font-semibold tracking-tight leading-snug">
+                  <span className="bg-gradient-to-r from-[#112c3b] via-[#421335] to-[#537790] bg-clip-text text-transparent">At Myura Wellness</span>
+                </h2>
+                <Link
+                  to="/product"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-7 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_22px_40px_-18px_rgba(15,23,42,0.55)] transition-all duration-300 hover:bg-slate-800 sm:self-start"
+                  data-aos="zoom-in"
+                  data-aos-delay="260"
+                >
+                  EXPLORE PRODUCTS
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <p className="text-sm sm:text-base lg:text-lg text-slate-700 leading-relaxed font-premium bg-gradient-to-r from-white via-[#f8fafc] to-white border border-slate-100 rounded-2xl px-4 sm:px-5 py-4 shadow-[0_22px_44px_-30px_rgba(15,23,42,0.25)]">
+                We believe true well-being comes from nature. Our thoughtfully crafted Ayurvedic supplements blend ancient wisdom with modern science to help you feel your best, naturally. Experience everyday balance, energy, and restoration.
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2.5" data-aos="fade-up" data-aos-delay="200">
+                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(17,44,59,0.3)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#537790] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <CheckCircle className="h-4 w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Clean Ingredients</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f9f4fb] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(66,19,53,0.3)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#421335] to-[#a43f86] text-white shadow-[0_10px_18px_rgba(164,63,134,0.3)]">
+                    <CheckCircle className="h-4 w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Traditionally Trusted Herbs</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f2f9f7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(87,133,122,0.3)]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#57857a] to-[#20396d] text-white shadow-[0_10px_18px_rgba(87,133,122,0.3)]">
+                    <CheckCircle className="h-4 w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">No Harmful Additives</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

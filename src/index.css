@@ -18,8 +18,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1;
   text-rendering: optimizeLegibility;
-  /* Performance optimizations - removed will-change as it can interfere with fixed positioning */
-  contain: layout style paint;
 }
 
 /* Optimize images */

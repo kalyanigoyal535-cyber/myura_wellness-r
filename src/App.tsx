@@ -1,11 +1,10 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
-import { CartProvider } from './context/CartContext';
 
 // Lazy load routes for code splitting
 const Home = lazy(() => import('./pages/Home'));
@@ -40,6 +39,22 @@ const ScrollToTop = () => {
   return null;
 };
 
+// Refresh AOS animations on route changes
+const AOSRefresher = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // Allow the new view to render before refreshing animations
+    const timeout = setTimeout(() => {
+      AOS.refreshHard();
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [pathname]);
+
+  return null;
+};
+
 function App() {
   useEffect(() => {
     // Prevent browser from restoring scroll position on refresh
@@ -54,23 +69,23 @@ function App() {
       behavior: 'auto' // 'auto' provides instant scroll (default behavior)
     });
 
-    // Initialize AOS only once
-    if (typeof window !== 'undefined' && !document.querySelector('[data-aos]')) {
+    // Initialize AOS
+    if (typeof window !== 'undefined') {
     AOS.init({
       duration: 1000,
       easing: 'ease-in-out',
-      once: true,
-      mirror: false,
+        once: false,
+        mirror: true,
       offset: 100,
     });
     }
   }, []);
 
   return (
-    <Router>
-      <CartProvider>
+    <>
         <LoadingScreen />
         <ScrollToTop />
+      <AOSRefresher />
         <div className="min-h-screen bg-stone-50 overflow-x-hidden">
           <Header />
           <div style={{ paddingTop: 'var(--header-height, 0px)' }}>
@@ -89,8 +104,7 @@ function App() {
           </div>
           <Footer />
         </div>
-      </CartProvider>
-    </Router>
+    </>
   );
 }
 

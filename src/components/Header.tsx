@@ -18,9 +18,12 @@ const Header: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const headerRef = React.useRef<HTMLElement>(null);
+  const topBarRef = React.useRef<HTMLDivElement>(null);
+  const [topBarHeight, setTopBarHeight] = useState(0);
   const location = useLocation();
   const { address, loading, error, refreshLocation } = useUserLocation();
   const { count } = useCart();
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
   
@@ -92,6 +95,36 @@ const Header: React.FC = () => {
     return () => clearInterval(interval);
   }, [banners.length]);
 
+  // Detect scroll to adjust header sizing
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 80);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Measure top bar height for smooth collapsing
+  useEffect(() => {
+    const measureTopBar = () => {
+      if (topBarRef.current) {
+        setTopBarHeight(topBarRef.current.scrollHeight);
+      }
+    };
+
+    measureTopBar();
+    window.addEventListener('resize', measureTopBar);
+
+    return () => {
+      window.removeEventListener('resize', measureTopBar);
+    };
+  }, []);
+
   // Calculate header height and set CSS variable for content padding
   useEffect(() => {
     const updateHeight = () => {
@@ -105,7 +138,7 @@ const Header: React.FC = () => {
     return () => {
       window.removeEventListener('resize', updateHeight);
     };
-  }, [currentBannerIndex]);
+  }, [currentBannerIndex, isScrolled, topBarHeight]);
 
   // Reinforce fixed positioning in case external styles interfere
   useEffect(() => {
@@ -244,7 +277,20 @@ const Header: React.FC = () => {
       </div>
 
       {/* Professional Top Bar */}
-      <div className="bg-slate-50 border-b border-slate-200 py-2 sm:py-2.5">
+      <div
+        ref={topBarRef}
+        aria-hidden={isScrolled}
+        className="bg-slate-50 border-b border-slate-200 py-2 sm:py-2.5 overflow-hidden"
+        style={{
+          maxHeight: isScrolled ? 0 : topBarHeight || undefined,
+          opacity: isScrolled ? 0 : 1,
+          transform: isScrolled ? 'translateY(-12px)' : 'translateY(0)',
+          paddingTop: isScrolled ? '0px' : undefined,
+          paddingBottom: isScrolled ? '0px' : undefined,
+          pointerEvents: isScrolled ? 'none' : 'auto',
+          transition: 'max-height 0.45s ease, opacity 0.45s ease, transform 0.45s ease, padding 0.45s ease'
+        }}
+      >
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-row justify-between items-center text-xs sm:text-sm gap-2">
             <div className="flex items-center gap-1.5 sm:gap-2 text-slate-600 flex-1 min-w-0">
@@ -302,9 +348,18 @@ const Header: React.FC = () => {
       </div>
 
       {/* Professional Main Navigation */}
-      <div className="bg-white/90 backdrop-blur shadow-sm border-b border-slate-200">
+      <div
+        className={`bg-white/90 backdrop-blur border-b border-slate-200 transition-shadow duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${isScrolled ? 'shadow-md' : 'shadow-sm'}`}
+      >
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
-          <div className="flex items-center justify-between py-2 sm:py-2.5 lg:py-3 gap-2 sm:gap-3 min-w-0">
+          <div
+            className="flex items-center justify-between gap-2 sm:gap-3 min-w-0"
+            style={{
+              paddingTop: isScrolled ? '0.45rem' : '0.75rem',
+              paddingBottom: isScrolled ? '0.45rem' : '0.75rem',
+              transition: 'padding 0.45s ease'
+            }}
+          >
             {/* Left Side - Search Icon and Logo */}
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 min-w-0">
               {/* Mobile Search - Icon on leftmost */}
@@ -346,12 +401,19 @@ const Header: React.FC = () => {
                   isSearchOpen 
                     ? 'scale-[0.88] translate-x-1 opacity-90' 
                     : 'scale-100 translate-x-0 opacity-100'
-                }`}
+                } ${isScrolled ? 'scale-[0.95]' : 'scale-100'}`}
+                style={{
+                  transition: 'transform 0.45s ease, opacity 0.45s ease'
+                }}
               >
                 <img 
                   src="/Logo-02.png" 
                   alt="MYURA Logo" 
-                  className="h-8 xs:h-9 sm:h-10 md:h-11 lg:h-12 xl:h-12 2xl:h-14 w-auto object-contain filter brightness-0 drop-shadow-md group-hover:drop-shadow-lg group-hover:scale-105 transition-all duration-300 ease-out"
+                  className="w-auto object-contain filter brightness-0 drop-shadow-md group-hover:drop-shadow-lg group-hover:scale-105 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  style={{
+                    height: isScrolled ? '2.6rem' : '3.1rem',
+                    transition: 'height 0.45s ease'
+                  }}
                 />
               </Link>
             </div>
