@@ -95,92 +95,94 @@ const Home: React.FC = () => {
     };
   }, []);
 
-  const products = [
-    {
-      id: 1,
-      name: "Dia Care",
-      price: 799,
-      originalPrice: 999,
-      images: [
-        '/Final Images/Dia Care/1.png',
-        '/Final Images/Dia Care/2.png',
-        '/Final Images/Dia Care/3.png',
-        '/Final Images/Dia Care/4.png',
-      ],
-      pedestalColor: 'from-rose-100 via-rose-50 to-white',
-      rating: 5
-    },
-    {
-      id: 2,
-      name: "Liver Detox",
-      price: 699,
-      originalPrice: 999,
-      images: [
-        '/Final Images/Liver Detox/1.png',
-        '/Final Images/Liver Detox/2.png',
-        '/Final Images/Liver Detox/3.png',
-        '/Final Images/Liver Detox/4.png',
-      ],
-      pedestalColor: 'from-teal-100 via-white to-teal-50',
-      rating: 5
-    },
-    {
-      id: 3,
-      name: "Bones & Joints",
-      price: 4543,
-      originalPrice: 5999,
-      images: [
-        '/Final Images/Bons &  Joints/1.png',
-        '/Final Images/Bons &  Joints/2.png',
-        '/Final Images/Bons &  Joints/3.png',
-        '/Final Images/Bons &  Joints/4.png',
-      ],
-      pedestalColor: 'from-blue-100 via-white to-indigo-50',
-      rating: 5
-    },
-    {
-      id: 4,
-      name: "Gut & Digestion",
-      price: 999,
-      originalPrice: 1299,
-      images: [
-        '/Final Images/Gut & Digestions/1.png',
-        '/Final Images/Gut & Digestions/2.png',
-        '/Final Images/Gut & Digestions/3.png',
-        '/Final Images/Gut & Digestions/4.png',
-      ],
-      pedestalColor: 'from-amber-50 via-white to-emerald-50',
-      rating: 5
-    },
-    {
-      id: 5,
-      name: "Women's Health Plus",
-      price: 499,
-      originalPrice: 699,
-      images: [
-        '/Final Images/Women_s Health Plus/1.png',
-        '/Final Images/Women_s Health Plus/2.png',
-        '/Final Images/Women_s Health Plus/3.png',
-        '/Final Images/Women_s Health Plus/4.png',
-      ],
-      pedestalColor: 'from-pink-100 via-white to-rose-50',
-      rating: 5
-    },
-    {
-      id: 6,
-      name: "Men's Vitality Boost",
-      price: 899,
-      originalPrice: 1199,
-      images: [
-        '/Final Images/Men_s Vitalty Boost/1.jpg',
-        '/Final Images/Men_s Vitalty Boost/2.jpg',
-        '/Final Images/Men_s Vitalty Boost/3.jpg',
-        '/Final Images/Men_s Vitalty Boost/4.jpg',
-      ],
-      pedestalColor: 'from-slate-100 via-white to-blue-50',
-      rating: 5
-    }
-  ];
+  const products = useMemo(() => (
+    [
+      {
+        id: 1,
+        name: "Dia Care",
+        price: 799,
+        originalPrice: 999,
+        images: [
+          '/Final Images/Dia Care/1.png',
+          '/Final Images/Dia Care/2.png',
+          '/Final Images/Dia Care/3.png',
+          '/Final Images/Dia Care/4.png',
+        ],
+        pedestalColor: 'from-rose-100 via-rose-50 to-white',
+        rating: 5
+      },
+      {
+        id: 2,
+        name: "Liver Detox",
+        price: 699,
+        originalPrice: 999,
+        images: [
+          '/Final Images/Liver Detox/1.png',
+          '/Final Images/Liver Detox/2.png',
+          '/Final Images/Liver Detox/3.png',
+          '/Final Images/Liver Detox/4.png',
+        ],
+        pedestalColor: 'from-teal-100 via-white to-teal-50',
+        rating: 5
+      },
+      {
+        id: 3,
+        name: "Bones & Joints",
+        price: 4543,
+        originalPrice: 5999,
+        images: [
+          '/Final Images/Bons &  Joints/1.png',
+          '/Final Images/Bons &  Joints/2.png',
+          '/Final Images/Bons &  Joints/3.png',
+          '/Final Images/Bons &  Joints/4.png',
+        ],
+        pedestalColor: 'from-blue-100 via-white to-indigo-50',
+        rating: 5
+      },
+      {
+        id: 4,
+        name: "Gut & Digestion",
+        price: 999,
+        originalPrice: 1299,
+        images: [
+          '/Final Images/Gut & Digestions/1.png',
+          '/Final Images/Gut & Digestions/2.png',
+          '/Final Images/Gut & Digestions/3.png',
+          '/Final Images/Gut & Digestions/4.png',
+        ],
+        pedestalColor: 'from-amber-50 via-white to-emerald-50',
+        rating: 5
+      },
+      {
+        id: 5,
+        name: "Women's Health Plus",
+        price: 499,
+        originalPrice: 699,
+        images: [
+          '/Final Images/Women_s Health Plus/1.png',
+          '/Final Images/Women_s Health Plus/2.png',
+          '/Final Images/Women_s Health Plus/3.png',
+          '/Final Images/Women_s Health Plus/4.png',
+        ],
+        pedestalColor: 'from-pink-100 via-white to-rose-50',
+        rating: 5
+      },
+      {
+        id: 6,
+        name: "Men's Vitality Boost",
+        price: 899,
+        originalPrice: 1199,
+        images: [
+          '/Final Images/Men_s Vitalty Boost/1.jpg',
+          '/Final Images/Men_s Vitalty Boost/2.jpg',
+          '/Final Images/Men_s Vitalty Boost/3.jpg',
+          '/Final Images/Men_s Vitalty Boost/4.jpg',
+        ],
+        pedestalColor: 'from-slate-100 via-white to-blue-50',
+        rating: 5
+      }
+    ]
+  ), []);
 
   const [productSliderRef, productSlider] = useKeenSlider<HTMLDivElement>(
     {
