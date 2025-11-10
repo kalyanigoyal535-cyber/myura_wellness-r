@@ -79,7 +79,7 @@ const ResponsiveProductImage: React.FC<ResponsiveProductImageProps> = ({
           width={image.width}
           height={image.height}
           className={combineClasses(
-            'block h-full w-full object-contain transition-opacity duration-500 ease-out',
+            'block h-full w-full object-cover transition-opacity duration-500 ease-out',
             isLoaded ? 'opacity-100' : 'opacity-0',
             imgClassName
           )}

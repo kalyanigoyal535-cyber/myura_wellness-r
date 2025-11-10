@@ -18,6 +18,7 @@ type ProductDefinition = {
   borderClass: string;
   rating: number;
   imageFiles: string[];
+  priceTagClass: string;
 };
 
 type Product = Omit<ProductDefinition, 'folder' | 'imageFiles'> & {
@@ -128,6 +129,7 @@ const Home: React.FC = () => {
         price: 1190,
         originalPrice: 1499,
         pedestalColor: 'from-rose-100 via-rose-50 to-white',
+        priceTagClass: 'from-rose-200/80 via-rose-100/75 to-white/70',
         borderClass: 'border-rose-200',
         rating: 5,
         folder: 'Dia Care',
@@ -139,6 +141,7 @@ const Home: React.FC = () => {
         price: 1320,
         originalPrice: 1990,
         pedestalColor: 'from-teal-100 via-white to-teal-50',
+        priceTagClass: 'from-emerald-200/80 via-emerald-100/75 to-white/70',
         borderClass: 'border-emerald-200',
         rating: 5,
         folder: 'Liver Detox',
@@ -150,6 +153,7 @@ const Home: React.FC = () => {
         price: 1299,
         originalPrice: 1499,
         pedestalColor: 'from-blue-100 via-white to-indigo-50',
+        priceTagClass: 'from-indigo-200/80 via-indigo-100/75 to-white/70',
         borderClass: 'border-indigo-200',
         rating: 5,
         folder: 'Bons &  Joints',
@@ -161,6 +165,7 @@ const Home: React.FC = () => {
         price: 980,
         originalPrice: 1199,
         pedestalColor: 'from-amber-50 via-white to-emerald-50',
+        priceTagClass: 'from-amber-200/80 via-amber-100/75 to-white/70',
         borderClass: 'border-amber-200',
         rating: 5,
         folder: 'Gut & Digestions',
@@ -172,6 +177,7 @@ const Home: React.FC = () => {
         price: 1260,
         originalPrice: 1699,
         pedestalColor: 'from-pink-100 via-white to-rose-50',
+        priceTagClass: 'from-pink-200/80 via-rose-100/75 to-white/70',
         borderClass: 'border-rose-200',
         rating: 5,
         folder: "Women_s Health Plus",
@@ -183,6 +189,7 @@ const Home: React.FC = () => {
         price: 1599,
         originalPrice: 2150,
         pedestalColor: 'from-slate-100 via-white to-blue-50',
+        priceTagClass: 'from-slate-200/80 via-slate-100/75 to-white/70',
         borderClass: 'border-slate-200',
         rating: 5,
         folder: "Men_s Vitalty Boost",
@@ -212,8 +219,9 @@ const Home: React.FC = () => {
       };
     };
 
-    return baseProducts.map(({ imageFiles, folder, ...rest }) => ({
+    return baseProducts.map(({ imageFiles, folder, priceTagClass, ...rest }) => ({
       ...rest,
+      priceTagClass,
       images: imageFiles.map((fileName, index) =>
         buildImageDescriptor(folder, fileName, `${rest.name} product image ${index + 1}`)
       ),
@@ -576,78 +584,110 @@ const Home: React.FC = () => {
                     <div
                       className={`group relative h-full overflow-hidden rounded-3xl border-[1.5px] bg-white transition-transform duration-500 ease-out hover:-translate-y-2 ${product.borderClass}`}
                     >
+                      <div className="pointer-events-none absolute right-5 top-3 z-30">
+                        <div className="relative">
+                          <div className="absolute -right-2 top-1 h-2 w-2 rounded-full bg-amber-300 shadow-[0_6px_12px_rgba(234,179,8,0.35)]" />
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-300 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-900 shadow-[0_14px_28px_-18px_rgba(251,191,36,0.65)] ring-1 ring-amber-200/70">
+                            Sale
+                          </span>
+                          <div className="absolute -bottom-1 right-0 h-3 w-3 rotate-45 rounded-sm bg-amber-200" />
+                        </div>
+                      </div>
                       <div className={`relative flex flex-col items-center gap-4 p-5 sm:p-6 pb-6 sm:pb-7 rounded-[2.25rem] m-2 sm:m-3 bg-gradient-to-br ${product.pedestalColor}`}>
-                        <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-white/60 bg-white flex items-center justify-center">
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleProductImageNav(productIndex, -1);
-                            }}
-                          className="absolute -left-4 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
-                            aria-label="Previous product image"
-                          >
-                            <ChevronLeft className="h-4 w-4 text-slate-700" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleProductImageNav(productIndex, 1);
-                            }}
-                          className="absolute -right-4 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
-                            aria-label="Next product image"
-                          >
-                            <ChevronRight className="h-4 w-4 text-slate-700" />
-                          </button>
-                          <ResponsiveProductImage
-                            key={`${product.id}-${productImageIndices[productIndex]}`}
-                            image={currentImage}
-                            className="w-full max-h-[22rem]"
-                            imgClassName="w-full h-full object-contain animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                          />
+                        <div className="relative w-full">
+                          <div className="overflow-hidden rounded-[1.75rem] border border-white/60 bg-white">
+                            <ResponsiveProductImage
+                              key={`${product.id}-${productImageIndices[productIndex]}`}
+                              image={currentImage}
+                              className="w-full"
+                              imgClassName="w-full h-full object-cover animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                            />
+                          </div>
                           {product.images.length > 1 && (
-                            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
-                              {product.images.map((image, imageIndex) => (
-                                <button
-                                  key={`${product.id}-${imageIndex}`}
-                                  type="button"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    handleProductImageNav(
-                                      productIndex,
-                                      imageIndex - productImageIndices[productIndex]
-                                    );
-                                  }}
-                                  className={`h-1.5 w-1.5 rounded-full transition ${
-                                    productImageIndices[productIndex] === imageIndex
-                                      ? 'bg-slate-900'
-                                      : 'bg-slate-300 hover:bg-slate-400'
-                                  }`}
-                                  aria-label={`Show ${product.name} image ${imageIndex + 1}`}
-                                />
-                              ))}
-                            </div>
+                            <>
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleProductImageNav(productIndex, -1);
+                                }}
+                                className="absolute -left-4 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
+                                aria-label={`Show previous ${product.name} image`}
+                              >
+                                <ChevronLeft className="h-4 w-4 text-slate-700" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleProductImageNav(productIndex, 1);
+                                }}
+                                className="absolute -right-4 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
+                                aria-label={`Show next ${product.name} image`}
+                              >
+                                <ChevronRight className="h-4 w-4 text-slate-700" />
+                              </button>
+                            </>
                           )}
                         </div>
-                        <div className="text-center space-y-1.5">
-                          <h3 className="text-lg font-bold text-slate-900 font-sharp">{product.name}</h3>
+                        <div className="flex w-full flex-col gap-3 text-center sm:text-left">
+                          <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <h3 className="w-full sm:w-auto">
+                              <span className="inline-flex w-full items-center justify-center sm:justify-start rounded-full border border-white/60 bg-white/90 px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.16em] text-slate-900 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.45)]">
+                                {product.name}
+                              </span>
+                            </h3>
+                            {product.images.length > 1 && (
+                              <div className="flex items-center justify-center gap-1.5">
+                                {product.images.map((image, imageIndex) => (
+                                  <button
+                                    key={`${product.id}-${imageIndex}`}
+                                    type="button"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      handleProductImageNav(
+                                        productIndex,
+                                        imageIndex - productImageIndices[productIndex]
+                                      );
+                                    }}
+                                    className={`h-1.5 w-1.5 rounded-full transition ${
+                                      productImageIndices[productIndex] === imageIndex
+                                        ? 'bg-slate-900'
+                                        : 'bg-slate-300 hover:bg-slate-400'
+                                    }`}
+                                    aria-label={`Show ${product.name} image ${imageIndex + 1}`}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         <div className="flex items-center justify-center gap-3">
-                          <span className="text-2xl font-bold text-slate-900 font-sharp">₹{product.price}</span>
-                          <span className="text-lg text-slate-400 line-through font-minimal">₹{product.originalPrice}</span>
+                          <div
+                            className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 shadow-[0_18px_38px_-28px_rgba(15,23,42,0.25)] bg-gradient-to-r ${product.priceTagClass}`}
+                          >
+                            <span className="inline-flex items-center justify-center rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-900">
+                              Deal
+                            </span>
+                            <span className="font-display text-[1.35rem] font-semibold tracking-tight text-slate-900 drop-shadow-sm">
+                              ₹{product.price}
+                            </span>
+                          </div>
+                          <span className="text-sm font-medium text-slate-400 line-through decoration-2 decoration-dashed decoration-slate-300">
+                            ₹{product.originalPrice}
+                          </span>
                         </div>
 
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                          <button className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_26px_48px_-22px_rgba(15,23,42,0.65)] transition-all duration-300 hover:shadow-[0_32px_58px_-22px_rgba(15,23,42,0.75)]">
+                        <div className="flex items-center justify-center gap-2 w-full">
+                          <button className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(15,23,42,0.55)] transition-all duration-300 hover:shadow-[0_24px_44px_-18px_rgba(15,23,42,0.65)] max-w-[220px] whitespace-nowrap">
                             <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
                             <span className="relative inline-flex items-center gap-2">
                               Add to cart
                               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                             </span>
                           </button>
-                          <button className="group relative inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/60 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_20px_42px_-26px_rgba(15,23,42,0.35)] transition-all duration-300 hover:border-slate-400/60 hover:bg-white">
+                          <button className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-slate-200/60 bg-white/90 px-5 py-2 text-sm font-semibold text-slate-900 shadow-[0_18px_36px_-20px_rgba(15,23,42,0.3)] transition-all duration-300 hover:border-slate-400/60 hover:bg-white max-w-[220px] whitespace-nowrap">
                             <span className="absolute inset-0 rounded-full bg-gradient-to-r from-white/80 via-white/70 to-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
                             <span className="relative inline-flex items-center gap-2">
                               View details
