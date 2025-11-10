@@ -4,6 +4,25 @@ import type { KeenSliderInstance } from 'keen-slider';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import ResponsiveProductImage, { type ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
+
+const PRODUCT_IMAGE_WIDTHS = [320, 640, 960] as const;
+
+type ProductDefinition = {
+  id: number;
+  name: string;
+  price: number;
+  originalPrice: number;
+  folder: string;
+  pedestalColor: string;
+  borderClass: string;
+  rating: number;
+  imageFiles: string[];
+};
+
+type Product = Omit<ProductDefinition, 'folder' | 'imageFiles'> & {
+  images: ResponsiveImageDescriptor[];
+};
 
 const Home: React.FC = () => {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -101,100 +120,105 @@ const Home: React.FC = () => {
     };
   }, []);
 
-  const products = useMemo(() => (
-    [
+  const products = useMemo<Product[]>(() => {
+    const baseProducts: ProductDefinition[] = [
       {
         id: 1,
         name: "Dia Care",
         price: 1190,
         originalPrice: 1499,
-        images: [
-          '/Final Images/Dia Care/main.png',
-          '/Final Images/Dia Care/1.png',
-          '/Final Images/Dia Care/3.png',
-          '/Final Images/Dia Care/4.png',
-        ],
         pedestalColor: 'from-rose-100 via-rose-50 to-white',
         borderClass: 'border-rose-200',
-        rating: 5
+        rating: 5,
+        folder: 'Dia Care',
+        imageFiles: ['main.png', '1.png', '3.png', '4.png'],
       },
       {
         id: 2,
         name: "Liver Detox",
         price: 1320,
         originalPrice: 1990,
-        images: [
-          '/Final Images/Liver Detox/main.png',
-          '/Final Images/Liver Detox/1.png',
-          '/Final Images/Liver Detox/2.png',
-          '/Final Images/Liver Detox/4.png',
-        ],
         pedestalColor: 'from-teal-100 via-white to-teal-50',
         borderClass: 'border-emerald-200',
-        rating: 5
+        rating: 5,
+        folder: 'Liver Detox',
+        imageFiles: ['main.png', '1.png', '2.png', '4.png'],
       },
       {
         id: 3,
         name: "Bones & Joints",
         price: 1299,
         originalPrice: 1499,
-        images: [
-          '/Final Images/Bons &  Joints/main.png',
-          '/Final Images/Bons &  Joints/1.png',
-          '/Final Images/Bons &  Joints/3.png',
-          '/Final Images/Bons &  Joints/4.png',
-        ],
         pedestalColor: 'from-blue-100 via-white to-indigo-50',
         borderClass: 'border-indigo-200',
-        rating: 5
+        rating: 5,
+        folder: 'Bons &  Joints',
+        imageFiles: ['main.png', '1.png', '3.png', '4.png'],
       },
       {
         id: 4,
         name: "Gut & Digestion",
         price: 980,
         originalPrice: 1199,
-        images: [
-          '/Final Images/Gut & Digestions/main.png',
-          '/Final Images/Gut & Digestions/1.png',
-          '/Final Images/Gut & Digestions/2.png',
-          '/Final Images/Gut & Digestions/3.png',
-        ],
         pedestalColor: 'from-amber-50 via-white to-emerald-50',
         borderClass: 'border-amber-200',
-        rating: 5
+        rating: 5,
+        folder: 'Gut & Digestions',
+        imageFiles: ['main.png', '1.png', '2.png', '3.png'],
       },
       {
         id: 5,
         name: "Women's Health Plus",
         price: 1260,
         originalPrice: 1699,
-        images: [
-          '/Final Images/Women_s Health Plus/main.png',
-          '/Final Images/Women_s Health Plus/2.png',
-          '/Final Images/Women_s Health Plus/3.png',
-          '/Final Images/Women_s Health Plus/4.png',
-        ],
         pedestalColor: 'from-pink-100 via-white to-rose-50',
         borderClass: 'border-rose-200',
-        rating: 5
+        rating: 5,
+        folder: "Women_s Health Plus",
+        imageFiles: ['main.png', '2.png', '3.png', '4.png'],
       },
       {
         id: 6,
         name: "Men's Vitality Boost",
         price: 1599,
         originalPrice: 2150,
-        images: [
-          '/Final Images/Men_s Vitalty Boost/main.jpg',
-          '/Final Images/Men_s Vitalty Boost/1.jpg',
-          '/Final Images/Men_s Vitalty Boost/2.jpg',
-          '/Final Images/Men_s Vitalty Boost/4.jpg',
-        ],
         pedestalColor: 'from-slate-100 via-white to-blue-50',
         borderClass: 'border-slate-200',
-        rating: 5
-      }
-    ]
-  ), []);
+        rating: 5,
+        folder: "Men_s Vitalty Boost",
+        imageFiles: ['main.jpg', '1.jpg', '2.jpg', '4.jpg'],
+      },
+    ];
+
+    const buildImageDescriptor = (folder: string, fileName: string, alt: string): ResponsiveImageDescriptor => {
+      const fileExtIndex = fileName.lastIndexOf('.');
+      const baseName = fileExtIndex >= 0 ? fileName.slice(0, fileExtIndex) : fileName;
+      const fallback = `/Final Images/${folder}/${fileName}`;
+      const optimizedBasePath = `/Final Images/${folder}/optimized/${baseName}`;
+
+      const avifSrcSet = PRODUCT_IMAGE_WIDTHS.map((width) => `${optimizedBasePath}-${width}w.avif ${width}w`).join(', ');
+      const webpSrcSet = PRODUCT_IMAGE_WIDTHS.map((width) => `${optimizedBasePath}-${width}w.webp ${width}w`).join(', ');
+
+      return {
+        alt,
+        fallback,
+        placeholder: `${optimizedBasePath}-placeholder.jpg`,
+        width: 400,
+        height: 400,
+        sources: [
+          { type: 'image/avif', srcSet: avifSrcSet },
+          { type: 'image/webp', srcSet: webpSrcSet },
+        ],
+      };
+    };
+
+    return baseProducts.map(({ imageFiles, folder, ...rest }) => ({
+      ...rest,
+      images: imageFiles.map((fileName, index) =>
+        buildImageDescriptor(folder, fileName, `${rest.name} product image ${index + 1}`)
+      ),
+    }));
+  }, []);
 
   const [productSliderRef, productSlider] = useKeenSlider<HTMLDivElement>(
     {
@@ -536,98 +560,106 @@ const Home: React.FC = () => {
             <div className="absolute inset-y-6 right-0 w-24 bg-gradient-to-l from-stone-50 via-stone-50/90 to-transparent pointer-events-none hidden sm:block rounded-r-3xl"></div>
 
             <div ref={productSliderRef} className="keen-slider">
-            {products.map((product, productIndex) => (
-                <div
-                  key={product.id}
-                  className="keen-slider__slide"
-                >
+              {products.map((product, productIndex) => {
+                const currentImage =
+                  product.images[productImageIndices[productIndex]] ?? product.images[0];
+
+                if (!currentImage) {
+                  return null;
+                }
+
+                return (
                   <div
-                    className={`group relative h-full overflow-hidden rounded-3xl border-[1.5px] bg-white transition-transform duration-500 ease-out hover:-translate-y-2 ${product.borderClass}`}
+                    key={product.id}
+                    className="keen-slider__slide"
                   >
-                    <div className={`relative flex flex-col items-center gap-4 p-5 sm:p-6 pb-6 sm:pb-7 rounded-[2.25rem] m-2 sm:m-3 bg-gradient-to-br ${product.pedestalColor}`}>
-                      <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-white/60 bg-white flex items-center justify-center">
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleProductImageNav(productIndex, -1);
-                          }}
-                          className="absolute -left-4 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
-                          aria-label="Previous product image"
-                        >
-                          <ChevronLeft className="h-4 w-4 text-slate-700" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleProductImageNav(productIndex, 1);
-                          }}
-                          className="absolute -right-4 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
-                          aria-label="Next product image"
-                        >
-                          <ChevronRight className="h-4 w-4 text-slate-700" />
-                        </button>
-                        <img
-                          key={productImageIndices[productIndex]}
-                          src={product.images[productImageIndices[productIndex]]}
-                          alt={product.name}
-                          className="w-full h-auto max-h-[22rem] object-contain animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                          loading="lazy"
-                        />
-                        {product.images.length > 1 && (
-                          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
-                            {product.images.map((_, imageIndex) => (
-                              <button
-                                key={imageIndex}
-                                type="button"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleProductImageNav(
-                                    productIndex,
-                                    imageIndex - productImageIndices[productIndex]
-                                  );
-                                }}
-                                className={`h-1.5 w-1.5 rounded-full transition ${
-                                  productImageIndices[productIndex] === imageIndex
-                                    ? 'bg-slate-900'
-                                    : 'bg-slate-300 hover:bg-slate-400'
-                                }`}
-                                aria-label={`Show image ${imageIndex + 1}`}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-center space-y-1.5">
-                        <h3 className="text-lg font-bold text-slate-900 font-sharp">{product.name}</h3>
-                      </div>
+                    <div
+                      className={`group relative h-full overflow-hidden rounded-3xl border-[1.5px] bg-white transition-transform duration-500 ease-out hover:-translate-y-2 ${product.borderClass}`}
+                    >
+                      <div className={`relative flex flex-col items-center gap-4 p-5 sm:p-6 pb-6 sm:pb-7 rounded-[2.25rem] m-2 sm:m-3 bg-gradient-to-br ${product.pedestalColor}`}>
+                        <div className="relative w-full overflow-hidden rounded-[1.75rem] border border-white/60 bg-white flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleProductImageNav(productIndex, -1);
+                            }}
+                          className="absolute -left-4 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
+                            aria-label="Previous product image"
+                          >
+                            <ChevronLeft className="h-4 w-4 text-slate-700" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleProductImageNav(productIndex, 1);
+                            }}
+                          className="absolute -right-4 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200 transition hover:ring-slate-300"
+                            aria-label="Next product image"
+                          >
+                            <ChevronRight className="h-4 w-4 text-slate-700" />
+                          </button>
+                          <ResponsiveProductImage
+                            key={`${product.id}-${productImageIndices[productIndex]}`}
+                            image={currentImage}
+                            className="w-full max-h-[22rem]"
+                            imgClassName="w-full h-full object-contain animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                          />
+                          {product.images.length > 1 && (
+                            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+                              {product.images.map((image, imageIndex) => (
+                                <button
+                                  key={`${product.id}-${imageIndex}`}
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleProductImageNav(
+                                      productIndex,
+                                      imageIndex - productImageIndices[productIndex]
+                                    );
+                                  }}
+                                  className={`h-1.5 w-1.5 rounded-full transition ${
+                                    productImageIndices[productIndex] === imageIndex
+                                      ? 'bg-slate-900'
+                                      : 'bg-slate-300 hover:bg-slate-400'
+                                  }`}
+                                  aria-label={`Show ${product.name} image ${imageIndex + 1}`}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-center space-y-1.5">
+                          <h3 className="text-lg font-bold text-slate-900 font-sharp">{product.name}</h3>
+                        </div>
 
-                      <div className="flex items-center justify-center gap-3">
-                        <span className="text-2xl font-bold text-slate-900 font-sharp">₹{product.price}</span>
-                        <span className="text-lg text-slate-400 line-through font-minimal">₹{product.originalPrice}</span>
-                      </div>
+                        <div className="flex items-center justify-center gap-3">
+                          <span className="text-2xl font-bold text-slate-900 font-sharp">₹{product.price}</span>
+                          <span className="text-lg text-slate-400 line-through font-minimal">₹{product.originalPrice}</span>
+                        </div>
 
-                      <div className="flex flex-wrap items-center justify-center gap-3">
-                        <button className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_26px_48px_-22px_rgba(15,23,42,0.65)] transition-all duration-300 hover:shadow-[0_32px_58px_-22px_rgba(15,23,42,0.75)]">
-                          <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                          <span className="relative inline-flex items-center gap-2">
-                            Add to cart
-                            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                          </span>
-                        </button>
-                        <button className="group relative inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/60 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_20px_42px_-26px_rgba(15,23,42,0.35)] transition-all duration-300 hover:border-slate-400/60 hover:bg-white">
-                          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-white/80 via-white/70 to-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                          <span className="relative inline-flex items-center gap-2">
-                            View details
-                            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                          </span>
-                        </button>
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                          <button className="group relative inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_26px_48px_-22px_rgba(15,23,42,0.65)] transition-all duration-300 hover:shadow-[0_32px_58px_-22px_rgba(15,23,42,0.75)]">
+                            <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                            <span className="relative inline-flex items-center gap-2">
+                              Add to cart
+                              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                            </span>
+                          </button>
+                          <button className="group relative inline-flex items-center justify-center gap-2 rounded-full border border-slate-200/60 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_20px_42px_-26px_rgba(15,23,42,0.35)] transition-all duration-300 hover:border-slate-400/60 hover:bg-white">
+                            <span className="absolute inset-0 rounded-full bg-gradient-to-r from-white/80 via-white/70 to-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                            <span className="relative inline-flex items-center gap-2">
+                              View details
+                              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                            </span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="mt-6 flex items-center justify-center gap-3 lg:hidden">
