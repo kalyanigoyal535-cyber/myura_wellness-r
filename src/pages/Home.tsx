@@ -18,6 +18,7 @@ type ProductDefinition = {
   borderClass: string;
   rating: number;
   imageFiles: string[];
+  discountPercent: number;
   priceTagClass: string;
 };
 
@@ -134,6 +135,7 @@ const Home: React.FC = () => {
         rating: 5,
         folder: 'Dia Care',
         imageFiles: ['main.png', '1.png', '3.png', '4.png'],
+        discountPercent: Math.round(((1499 - 1190) / 1499) * 100),
       },
       {
         id: 2,
@@ -146,6 +148,7 @@ const Home: React.FC = () => {
         rating: 5,
         folder: 'Liver Detox',
         imageFiles: ['main.png', '1.png', '2.png', '4.png'],
+        discountPercent: Math.round(((1990 - 1320) / 1990) * 100),
       },
       {
         id: 3,
@@ -158,6 +161,7 @@ const Home: React.FC = () => {
         rating: 5,
         folder: 'Bons &  Joints',
         imageFiles: ['main.png', '1.png', '3.png', '4.png'],
+        discountPercent: Math.round(((1499 - 1299) / 1499) * 100),
       },
       {
         id: 4,
@@ -170,6 +174,7 @@ const Home: React.FC = () => {
         rating: 5,
         folder: 'Gut & Digestions',
         imageFiles: ['main.png', '1.png', '2.png', '3.png'],
+        discountPercent: Math.round(((1199 - 980) / 1199) * 100),
       },
       {
         id: 5,
@@ -182,6 +187,7 @@ const Home: React.FC = () => {
         rating: 5,
         folder: "Women_s Health Plus",
         imageFiles: ['main.png', '2.png', '3.png', '4.png'],
+        discountPercent: Math.round(((1699 - 1260) / 1699) * 100),
       },
       {
         id: 6,
@@ -194,6 +200,7 @@ const Home: React.FC = () => {
         rating: 5,
         folder: "Men_s Vitalty Boost",
         imageFiles: ['main.jpg', '1.jpg', '2.jpg', '4.jpg'],
+        discountPercent: Math.round(((2150 - 1599) / 2150) * 100),
       },
     ];
 
@@ -219,9 +226,12 @@ const Home: React.FC = () => {
       };
     };
 
-    return baseProducts.map(({ imageFiles, folder, priceTagClass, ...rest }) => ({
+    return baseProducts.map(({ imageFiles, folder, priceTagClass, originalPrice, price, ...rest }) => ({
       ...rest,
       priceTagClass,
+      originalPrice,
+      price,
+      discountPercent: Math.round(((originalPrice - price) / originalPrice) * 100),
       images: imageFiles.map((fileName, index) =>
         buildImageDescriptor(folder, fileName, `${rest.name} product image ${index + 1}`)
       ),
@@ -663,7 +673,7 @@ const Home: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-center gap-3">
+                        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                           <div
                             className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 shadow-[0_18px_38px_-28px_rgba(15,23,42,0.25)] bg-gradient-to-r ${product.priceTagClass}`}
                           >
@@ -674,8 +684,11 @@ const Home: React.FC = () => {
                               ₹{product.price}
                             </span>
                           </div>
-                          <span className="text-sm font-medium text-slate-400 line-through decoration-2 decoration-dashed decoration-slate-300">
-                            ₹{product.originalPrice}
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/60 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-600">
+                            Save {product.discountPercent}%
+                          </span>
+                          <span className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                            MRP ₹{product.originalPrice}
                           </span>
                         </div>
 
@@ -723,40 +736,78 @@ const Home: React.FC = () => {
       </section>
 
       {/* Service Guarantees */}
-      <section className="py-16 bg-white">
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            <div className="text-left xs:text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
-                <Truck className="h-8 w-8 text-slate-900" />
+      <section className="relative py-14 sm:py-16 bg-gradient-to-b from-white via-slate-50 to-white overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-emerald-100/20 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute -top-20 right-24 h-40 w-40 rounded-full bg-emerald-200/20 blur-[100px]" />
+        <div className="absolute -bottom-16 left-16 h-32 w-32 rounded-full bg-sky-200/25 blur-[90px]" />
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-8 sm:mb-10">
+            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200/60 bg-white/70 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-700 shadow-[0_16px_40px_-34px_rgba(16,185,129,0.65)]">
+              Myura Advantages
+            </span>
+            <h2 className="mt-3 text-xl sm:text-2xl font-display font-semibold text-slate-900">
+              Concierge Care For Every Order
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+            {[
+              {
+                id: 'shipping',
+                label: 'Free Shipping',
+                sublabel: '₹699+ orders',
+                icon: Truck,
+                halo: 'from-emerald-400/70 to-emerald-500/40',
+                ring: 'ring-emerald-200/60',
+              },
+              {
+                id: 'secure',
+                label: 'Secure Payment',
+                sublabel: '256-bit',
+                icon: Shield,
+                halo: 'from-sky-400/70 to-blue-500/40',
+                ring: 'ring-sky-200/60',
+              },
+              {
+                id: 'guarantee',
+                label: '30-Day Guarantee',
+                sublabel: 'Easy exchange',
+                icon: CheckCircle,
+                halo: 'from-amber-400/70 to-amber-500/40',
+                ring: 'ring-amber-200/60',
+              },
+              {
+                id: 'support',
+                label: '24/7 Support',
+                sublabel: 'Concierge help',
+                icon: Headphones,
+                halo: 'from-rose-400/70 to-rose-500/40',
+                ring: 'ring-rose-200/60',
+              },
+            ].map(({ id, label, sublabel, icon: Icon, halo, ring }, index) => (
+              <div
+                key={id}
+                className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/[0.9] shadow-[0_20px_55px_-42px_rgba(15,23,42,0.28)] backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_70px_-48px_rgba(15,23,42,0.38)]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/25 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="relative flex flex-col gap-3 p-5 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${halo} ring-4 ${ring} shadow-[0_18px_28px_-18px_rgba(16,185,129,0.35)] transition-transform duration-500 group-hover:scale-105`}>
+                      <Icon className="h-7 w-7 text-white" />
+                    </div>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400/80">
+                      0{index + 1}
+                    </span>
+                  </div>
+                  <div className="space-y-0.5 text-left">
+                    <h3 className="text-base font-semibold text-slate-900 font-sharp">
+                      {label}
+                    </h3>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">{sublabel}</p>
+                  </div>
+                </div>
+                <div className="absolute -bottom-12 -right-12 h-24 w-24 rounded-full bg-emerald-200/35 blur-[70px] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">FREE SHIPPING</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">On all orders above ₹699, No hidden charges</p>
-            </div>
-            
-            <div className="text-left xs:text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
-                <Shield className="h-8 w-8 text-slate-900" />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">SECURE PAYMENT</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">Safe & encrypted</p>
-            </div>
-            
-            <div className="text-left xs:text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
-                <CheckCircle className="h-8 w-8 text-slate-900" />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">GUARANTEE</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">Easy replacements</p>
-            </div>
-            
-            <div className="text-left xs:text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3 xs:mx-auto">
-                <Headphones className="h-8 w-8 text-slate-900" />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1.5 sm:mb-2 font-sharp">24/7 SERVICE</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-minimal max-w-xs xs:mx-auto">Need help? Our team is always here to assist you</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -796,24 +847,24 @@ const Home: React.FC = () => {
               <p className="text-sm sm:text-base lg:text-lg text-slate-700 leading-relaxed font-premium bg-gradient-to-r from-white via-[#f8fafc] to-white border border-slate-100 rounded-2xl px-4 sm:px-5 py-4 shadow-[0_22px_44px_-30px_rgba(15,23,42,0.25)]">
                 We believe true well-being comes from nature. Our thoughtfully crafted Ayurvedic supplements blend ancient wisdom with modern science to help you feel your best, naturally. Experience everyday balance, energy, and restoration.
               </p>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2.5" data-aos="fade-up" data-aos-delay="200">
-                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(17,44,59,0.3)]">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#537790] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
-                    <CheckCircle className="h-4 w-4" />
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-2.5" data-aos="fade-up" data-aos-delay="200">
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(17,44,59,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#537790] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
-                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Clean Ingredients</span>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">Clean Ingredients</span>
                 </div>
-                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f9f4fb] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(66,19,53,0.3)]">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#421335] to-[#a43f86] text-white shadow-[0_10px_18px_rgba(164,63,134,0.3)]">
-                    <CheckCircle className="h-4 w-4" />
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f9f4fb] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(66,19,53,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#421335] to-[#a43f86] text-white shadow-[0_10px_18px_rgba(164,63,134,0.3)]">
+                    <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
-                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">Traditionally Trusted Herbs</span>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">Traditionally Trusted Herbs</span>
                 </div>
-                <div className="flex flex-1 items-center gap-3 px-4 py-2 rounded-2xl bg-gradient-to-br from-[#f2f9f7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(87,133,122,0.3)]">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#57857a] to-[#20396d] text-white shadow-[0_10px_18px_rgba(87,133,122,0.3)]">
-                    <CheckCircle className="h-4 w-4" />
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f2f9f7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(87,133,122,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#57857a] to-[#20396d] text-white shadow-[0_10px_18px_rgba(87,133,122,0.3)]">
+                    <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
-                  <span className="text-slate-700 font-minimal text-[0.65rem] sm:text-xs">No Harmful Additives</span>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">No Harmful Additives</span>
                 </div>
               </div>
             </div>
