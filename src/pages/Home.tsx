@@ -358,20 +358,20 @@ const Home: React.FC = () => {
         <section className="relative bg-gradient-to-b from-stone-100 via-stone-50 to-white pt-2 sm:pt-4 pb-12 sm:pb-16">
           <div className="w-full mx-auto px-2 sm:px-4 lg:px-5">
             <div className="flex flex-col gap-3 sm:gap-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 text-white/90 px-2 sm:px-3 lg:px-4">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/45 px-3 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] backdrop-blur-sm shadow-[0_10px_28px_-18px_rgba(15,23,42,0.75)]">
+            <div className="flex flex-nowrap items-center justify-between gap-2 sm:gap-3 text-white/90 px-2 sm:px-3 lg:px-4">
+              <div className="flex flex-nowrap items-center gap-2 sm:gap-3 min-w-0 overflow-hidden">
+                <span className="inline-flex flex-shrink-0 items-center gap-2 rounded-full border border-white/15 bg-slate-950/45 px-3 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] backdrop-blur-sm shadow-[0_10px_28px_-18px_rgba(15,23,42,0.75)]">
                     Premium Wellness
                   </span>
-                  <span className="hidden sm:inline-flex h-px w-12 sm:w-16 bg-gradient-to-r from-white/40 to-transparent"></span>
-                  <span className="hidden sm:inline text-xs font-medium text-white/75">
-                    Curated visuals from the Myura collection
-                  </span>
-                  <span className="sm:hidden text-[11px] font-medium text-white/75">
-                    Curated Myura highlights
-                  </span>
+                <span className="hidden sm:inline-flex h-px w-12 sm:w-16 flex-shrink-0 bg-gradient-to-r from-white/40 to-transparent"></span>
+                <span className="hidden sm:inline text-xs font-medium text-white/75 truncate">
+                  Curated visuals from the Myura collection
+                </span>
+                <span className="sm:hidden text-[11px] font-medium text-white/75 truncate">
+                  Curated Myura highlights
+                </span>
                 </div>
-                <div className="flex items-center gap-2 pointer-events-auto">
+              <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto flex-shrink-0">
                   <button
                     type="button"
                     onClick={handlePrev}
