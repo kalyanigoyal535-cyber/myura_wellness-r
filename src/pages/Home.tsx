@@ -378,7 +378,7 @@ const Home: React.FC = () => {
                     className="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-slate-950/45 hover:bg-white/20 transition-all duration-300 text-white border border-white/15 shadow-[0_10px_26px_-16px_rgba(15,23,42,0.85)]"
                     aria-label="Show previous banner"
                   >
-                    <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
                   </button>
                   <button
                     type="button"
@@ -386,7 +386,7 @@ const Home: React.FC = () => {
                     className="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-slate-950/45 hover:bg-white/20 transition-all duration-300 text-white border border-white/15 shadow-[0_10px_26px_-16px_rgba(15,23,42,0.85)]"
                     aria-label="Show next banner"
                   >
-                    <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
                   </button>
                 </div>
               </div>
