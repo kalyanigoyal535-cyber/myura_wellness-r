@@ -35,12 +35,6 @@ const Home: React.FC = () => {
   const heroSlides = useMemo(() => (
     [
       {
-        id: 'winter-sale',
-        desktopSrc: '/banners/winter-sale-desktop.jpg',
-        mobileSrc: '/banners/winter-sale-mobile.jpg',
-        alt: 'Winter sale announcement with Myura wellness product range and 50% discount offer',
-      },
-      {
         id: 'rethink-wellness-1',
         desktopSrc: '/banners/Banner1Main.webp',
         mobileSrc: '/banners/Banner12.jpg',
@@ -57,6 +51,24 @@ const Home: React.FC = () => {
         desktopSrc: '/banners/BannerImage2.jpg',
         mobileSrc: '/banners/BannerImageMobile1.png',
         alt: 'Introducing the Myura Pro Series premium product lineup',
+      },
+      {
+        id: 'serene-nights',
+        desktopSrc: '/banners/desktop1.png',
+        mobileSrc: '/banners/mobile1.png',
+        alt: 'Calming Myura supplement display with moonlit sky promoting restful sleep',
+      },
+      {
+        id: 'radiant-morning',
+        desktopSrc: '/banners/desktop2.png',
+        mobileSrc: '/banners/mobile2.png',
+        alt: 'Bright morning scene featuring Myura immunity boosters with citrus accents',
+      },
+      {
+        id: 'urban-energize',
+        desktopSrc: '/banners/desktop3.png',
+        mobileSrc: '/banners/mobile3.png',
+        alt: 'Dynamic city-inspired Myura wellness lineup highlighting active lifestyle support',
       },
     ]
   ), []);
@@ -342,179 +354,181 @@ const Home: React.FC = () => {
   return (
     <>
       <div className="min-h-screen">
-      {/* Premium Hero Slider */}
-      <section
-        className="relative bg-gradient-to-b from-stone-100 via-stone-50 to-white pt-2 sm:pt-4 pb-12 sm:pb-16"
-      >
-        <div className="w-full mx-auto px-2 sm:px-4 lg:px-5">
-          <div
-            className="relative overflow-hidden rounded-3xl shadow-[0_40px_120px_-40px_rgba(15,23,42,0.6)] ring-1 ring-white/10 bg-slate-900/60"
-            role="region"
-            aria-label="Featured wellness collections"
-            aria-roledescription="carousel"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === 'ArrowRight') {
-                event.preventDefault();
-                handleNext();
-              }
-              if (event.key === 'ArrowLeft') {
-                event.preventDefault();
-                handlePrev();
-              }
-            }}
-          >
-            <div className="relative h-[460px] xs:h-[520px] sm:h-[580px] lg:h-[72vh] xl:h-[78vh] 2xl:h-[84vh]">
-              {heroSlides.map((slide, index) => (
-                <div
-                  key={slide.id}
-                  className="absolute inset-0 transition-all duration-[820ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] flex items-center justify-center bg-slate-950"
-                  style={{
-                    opacity: index === activeSlide ? 1 : 0,
-                    transform:
-                      index === activeSlide
-                        ? transitionStage === 'entering'
-                          ? 'translate3d(0,-14px,0) scale(1.022)'
-                          : 'translate3d(0,0,0) scale(1)'
-                        : 'translate3d(0,22px,0) scale(0.972)',
-                    filter: index === activeSlide ? 'brightness(1.08) saturate(1.05)' : 'brightness(0.9) saturate(0.92)',
-                  }}
-                  onTransitionEnd={() => {
-                    if (index === activeSlide) {
-                      setTransitionStage('idle');
-                    }
-                  }}
-                  aria-hidden={index !== activeSlide}
-                >
-                  <picture className="flex h-full w-full">
-                    <source media="(min-width: 768px)" srcSet={slide.desktopSrc} />
-                    <img
-                      src={slide.mobileSrc}
-                      alt={slide.alt}
-                      className="w-full h-full object-cover object-center"
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                    />
-                  </picture>
-                </div>
-              ))}
-
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-900/25 via-slate-900/10 to-slate-950/40 pointer-events-none mix-blend-multiply"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(148,210,189,0.12),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(147,197,253,0.12),transparent_50%),radial-gradient(circle_at_50%_80%,rgba(244,114,182,0.1),transparent_55%)]"></div>
-              <div className="absolute -top-24 sm:-top-32 lg:-top-40 right-10 sm:right-16 w-52 sm:w-64 lg:w-72 h-52 sm:h-64 lg:h-72 bg-emerald-400/18 blur-[120px] rounded-full animate-[softPulse_6s_ease-in-out_infinite]"></div>
-              <div className="absolute top-16 sm:top-20 left-6 sm:left-10 w-24 sm:w-32 h-24 sm:h-32 bg-emerald-300/12 rounded-full blur-3xl animate-[floatParticle_12s_linear_infinite]" style={{ animationDelay: '0.5s' }}></div>
-              <div className="absolute bottom-20 sm:bottom-24 right-8 sm:right-12 w-32 sm:w-40 h-32 sm:h-40 bg-teal-200/12 rounded-full blur-3xl animate-[floatParticle_14s_linear_infinite]" style={{ animationDelay: '2s' }}></div>
-              <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0)_45%,rgba(255,255,255,0)_55%,rgba(255,255,255,0.1)_100%)] animate-[shimmer_5s_linear_infinite] opacity-0.5 pointer-events-none"></div>
-              <div className="absolute bottom-0 left-0 right-0 h-44 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent"></div>
-
-              <div className="absolute inset-x-6 sm:inset-x-8 lg:inset-x-10 top-6 sm:top-8 flex items-center justify-between text-white/90">
+        {/* Premium Hero Slider */}
+        <section className="relative bg-gradient-to-b from-stone-100 via-stone-50 to-white pt-2 sm:pt-4 pb-12 sm:pb-16">
+          <div className="w-full mx-auto px-2 sm:px-4 lg:px-5">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-white/90 px-2 sm:px-3 lg:px-4">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/45 px-3 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] backdrop-blur-sm shadow-[0_10px_28px_-18px_rgba(15,23,42,0.75)]">
                     Premium Wellness
                   </span>
-                  <span className="hidden sm:inline-flex h-px w-12 sm:w-16 bg-gradient-to-r from-white/30 to-transparent"></span>
-                  <span className="hidden sm:inline text-xs font-medium text-white/70">
+                  <span className="hidden sm:inline-flex h-px w-12 sm:w-16 bg-gradient-to-r from-white/40 to-transparent"></span>
+                  <span className="hidden sm:inline text-xs font-medium text-white/75">
                     Curated visuals from the Myura collection
                   </span>
+                  <span className="sm:hidden text-[11px] font-medium text-white/75">
+                    Curated Myura highlights
+                  </span>
                 </div>
-
                 <div className="flex items-center gap-2 pointer-events-auto">
                   <button
                     type="button"
                     onClick={handlePrev}
-                    className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-all duration-300 text-white backdrop-blur border border-white/10 shadow-[0_12px_30px_-12px_rgba(255,255,255,0.45)]"
+                    className="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-slate-950/45 hover:bg-white/20 transition-all duration-300 text-white border border-white/15 shadow-[0_10px_26px_-16px_rgba(15,23,42,0.85)]"
                     aria-label="Show previous banner"
                   >
-                    <ChevronLeft className="h-4 w-4" />
+                    <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </button>
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-all duration-300 text-white backdrop-blur border border-white/10 shadow-[0_12px_30px_-12px_rgba(255,255,255,0.45)]"
+                    className="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-slate-950/45 hover:bg-white/20 transition-all duration-300 text-white border border-white/15 shadow-[0_10px_26px_-16px_rgba(15,23,42,0.85)]"
                     aria-label="Show next banner"
                   >
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </button>
                 </div>
               </div>
 
-              <div className="absolute inset-x-0 bottom-6 sm:bottom-8 flex justify-center">
-                <div className="flex items-center gap-2 sm:gap-3 rounded-full bg-white/10 px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur border border-white/15 pointer-events-auto">
+              <div
+                className="relative overflow-hidden rounded-3xl shadow-[0_40px_120px_-40px_rgba(15,23,42,0.6)] ring-1 ring-white/10 bg-slate-900/60"
+                role="region"
+                aria-label="Featured wellness collections"
+                aria-roledescription="carousel"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    handleNext();
+                  }
+                  if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    handlePrev();
+                  }
+                }}
+              >
+                <div className="relative h-[460px] xs:h-[520px] sm:h-[580px] lg:h-[72vh] xl:h-[78vh] 2xl:h-[84vh]">
                   {heroSlides.map((slide, index) => (
-                    <button
+                    <div
                       key={slide.id}
-                      type="button"
-                      onClick={() => handleDotClick(index)}
-                      className={`relative h-2 sm:h-2.5 rounded-full transition-all duration-500 ease-out ${
-                        index === activeSlide
-                          ? 'w-6 sm:w-8 bg-white shadow-[0_10px_30px_rgba(255,255,255,0.35)]'
-                          : 'w-2.5 sm:w-3 bg-white/40 hover:bg-white/70'
-                      }`}
+                      className="absolute inset-0 transition-all duration-[820ms] ease-[cubic-bezier(0.45,0.05,0.55,0.95)] flex items-center justify-center bg-slate-950"
+                      style={{
+                        opacity: index === activeSlide ? 1 : 0,
+                        transform:
+                          index === activeSlide
+                            ? transitionStage === 'entering'
+                              ? 'translate3d(0,-14px,0) scale(1.022)'
+                              : 'translate3d(0,0,0) scale(1)'
+                            : 'translate3d(0,22px,0) scale(0.972)',
+                        filter: index === activeSlide ? 'brightness(1.08) saturate(1.05)' : 'brightness(0.9) saturate(0.92)',
+                      }}
+                      onTransitionEnd={() => {
+                        if (index === activeSlide) {
+                          setTransitionStage('idle');
+                        }
+                      }}
+                      aria-hidden={index !== activeSlide}
                     >
-                      <span className="sr-only">Go to banner {index + 1}</span>
-                    </button>
+                      <picture className="flex h-full w-full">
+                        <source media="(min-width: 768px)" srcSet={slide.desktopSrc} />
+                        <img
+                          src={slide.mobileSrc}
+                          alt={slide.alt}
+                          className="w-full h-full object-cover object-center"
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                        />
+                      </picture>
+                    </div>
                   ))}
+                </div>
+
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/25 via-slate-900/10 to-slate-950/40 pointer-events-none mix-blend-multiply"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(148,210,189,0.12),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(147,197,253,0.12),transparent_50%),radial-gradient(circle_at_50%_80%,rgba(244,114,182,0.1),transparent_55%)]"></div>
+                <div className="absolute -top-24 sm:-top-32 lg:-top-40 right-10 sm:right-16 w-52 sm:w-64 lg:w-72 h-52 sm:h-64 lg:h-72 bg-emerald-400/18 blur-[120px] rounded-full animate-[softPulse_6s_ease-in-out_infinite]"></div>
+                <div className="absolute top-16 sm:top-20 left-6 sm:left-10 w-24 sm:w-32 h-24 sm:h-32 bg-emerald-300/12 rounded-full blur-3xl animate-[floatParticle_12s_linear_infinite]" style={{ animationDelay: '0.5s' }}></div>
+                <div className="absolute bottom-20 sm:bottom-24 right-8 sm:right-12 w-32 sm:w-40 h-32 sm:h-40 bg-teal-200/12 rounded-full blur-3xl animate-[floatParticle_14s_linear_infinite]" style={{ animationDelay: '2s' }}></div>
+                <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0)_45%,rgba(255,255,255,0)_55%,rgba(255,255,255,0.1)_100%)] animate-[shimmer_5s_linear_infinite] opacity-0.5 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-44 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent"></div>
+
+                <div className="absolute inset-x-0 bottom-6 sm:bottom-8 flex justify-center">
+                  <div className="flex items-center gap-2 sm:gap-3 rounded-full bg-white/10 px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur border border-white/15 pointer-events-auto">
+                    {heroSlides.map((slide, index) => (
+                      <button
+                        key={slide.id}
+                        type="button"
+                        onClick={() => handleDotClick(index)}
+                        className={`relative h-2 sm:h-2.5 rounded-full transition-all duration-500 ease-out ${
+                          index === activeSlide
+                            ? 'w-6 sm:w-8 bg-white shadow-[0_10px_30px_rgba(255,255,255,0.35)]'
+                            : 'w-2.5 sm:w-3 bg-white/40 hover:bg-white/70'
+                        }`}
+                      >
+                        <span className="sr-only">Go to banner {index + 1}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <div className="space-y-5 sm:space-y-6 text-center lg:text-left" data-aos="fade-up">
-              <h1
-                className="font-display font-semibold text-slate-900 leading-[1.08] tracking-tight text-2xl sm:text-3xl lg:text-[3rem] xl:text-[3.25rem]"
-                data-aos="fade-up"
-                data-aos-delay="50"
-              >
-                <span className="block text-slate-800">Ayurveda. Simplified.</span>
-                <span className="block mt-1">
-                  <span className="bg-gradient-to-r from-emerald-500 via-teal-500 to-slate-900 bg-clip-text text-transparent drop-shadow-[0_12px_32px_rgba(16,185,129,0.18)]">
-                    Wellness That Works.
+            <div className="mt-6 grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+              <div className="space-y-5 sm:space-y-6 text-center lg:text-left" data-aos="fade-up">
+                <h1
+                  className="font-display font-semibold text-slate-900 leading-[1.08] tracking-tight text-2xl sm:text-3xl lg:text-[3rem] xl:text-[3.25rem]"
+                  data-aos="fade-up"
+                  data-aos-delay="50"
+                >
+                  <span className="block text-slate-800">Ayurveda. Simplified.</span>
+                  <span className="block mt-1">
+                    <span className="bg-gradient-to-r from-emerald-500 via-teal-500 to-slate-900 bg-clip-text text-transparent drop-shadow-[0_12px_32px_rgba(16,185,129,0.18)]">
+                      Wellness That Works.
+                    </span>
                   </span>
-                </span>
-              </h1>
+                </h1>
 
-              <div className="flex justify-center lg:justify-start" data-aos="fade-up" data-aos-delay="120">
-                <div className="h-1 w-16 rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-800 shadow-[0_10px_30px_rgba(45,212,191,0.35)]"></div>
+                <div className="flex justify-center lg:justify-start" data-aos="fade-up" data-aos-delay="120">
+                  <div className="h-1 w-16 rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-slate-800 shadow-[0_10px_30px_rgba(45,212,191,0.35)]"></div>
+                </div>
+
+                <p
+                  className="text-sm sm:text-base lg:text-lg text-slate-700/90 leading-relaxed font-minimal max-w-2xl mx-auto lg:mx-0"
+                  data-aos="fade-up"
+                  data-aos-delay="180"
+                >
+                  Thoughtfully made Ayurvedic solutions to energize, restore, and support your natural balance at every stage of life. Your wellness deserves the best.
+                </p>
               </div>
-
-              <p
-                className="text-sm sm:text-base lg:text-lg text-slate-700/90 leading-relaxed font-minimal max-w-2xl mx-auto lg:mx-0"
-                data-aos="fade-up"
-                data-aos-delay="180"
-              >
-                Thoughtfully made Ayurvedic solutions to energize, restore, and support your natural balance at every stage of life. Your wellness deserves the best.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2 sm:gap-4" data-aos="fade-up" data-aos-delay="240">
-              <Link
-                to="/product"
-                className="group relative inline-flex items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-base font-semibold text-white shadow-[0_24px_48px_-20px_rgba(15,23,42,0.75)] transition-all duration-300 hover:bg-slate-800"
-                data-aos="zoom-in"
-                data-aos-delay="260"
-              >
-                <span className="absolute inset-[1px] rounded-full bg-slate-900 blur-[0.5px] opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-                <span className="relative inline-flex items-center gap-2">
-                  Shop The Collection
-                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </Link>
-              <button
-                type="button"
-                onClick={handleNext}
-                className="group relative inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-900/15 bg-white/90 px-5 sm:px-7 py-2.5 sm:py-3 text-xs sm:text-base font-semibold text-slate-900 shadow-[0_20px_40px_-24px_rgba(15,23,42,0.65)] backdrop-blur transition-all duration-300 hover:border-emerald-500/60 hover:shadow-[0_28px_50px_-24px_rgba(16,185,129,0.45)]"
-                data-aos="zoom-in"
-                data-aos-delay="320"
-              >
-                <span className="absolute inset-[1px] rounded-full bg-gradient-to-r from-white/70 via-white/55 to-emerald-50/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                <span className="relative inline-flex items-center gap-2">
-                  Next Highlight
-                  <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </button>
+              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2 sm:gap-4" data-aos="fade-up" data-aos-delay="240">
+                <Link
+                  to="/product"
+                  className="group relative inline-flex items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-base font-semibold text-white shadow-[0_24px_48px_-20px_rgba(15,23,42,0.75)] transition-all duration-300 hover:bg-slate-800"
+                  data-aos="zoom-in"
+                  data-aos-delay="260"
+                >
+                  <span className="absolute inset-[1px] rounded-full bg-slate-900 blur-[0.5px] opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+                  <span className="relative inline-flex items-center gap-2">
+                    Shop The Collection
+                    <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="group relative inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-900/15 bg-white/90 px-5 sm:px-7 py-2.5 sm:py-3 text-xs sm:text-base font-semibold text-slate-900 shadow-[0_20px_40px_-24px_rgba(15,23,42,0.65)] backdrop-blur transition-all duration-300 hover:border-emerald-500/60 hover:shadow-[0_28px_50px_-24px_rgba(16,185,129,0.45)]"
+                  data-aos="zoom-in"
+                  data-aos-delay="320"
+                >
+                  <span className="absolute inset-[1px] rounded-full bg-gradient-to-r from-white/70 via-white/55 to-emerald-50/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                  <span className="relative inline-flex items-center gap-2">
+                    Next Highlight
+                    <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Intro Text Strip */}
       <section className="relative py-8 sm:py-12">
