@@ -386,7 +386,7 @@ const Home: React.FC = () => {
                   }}
                   aria-hidden={index !== activeSlide}
                 >
-                  <picture>
+                  <picture className="flex h-full w-full">
                     <source media="(min-width: 768px)" srcSet={slide.desktopSrc} />
                     <img
                       src={slide.mobileSrc}
