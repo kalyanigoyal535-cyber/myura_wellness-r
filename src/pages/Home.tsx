@@ -391,7 +391,7 @@ const Home: React.FC = () => {
                     <img
                       src={slide.mobileSrc}
                       alt={slide.alt}
-                      className="w-full h-full object-cover xl:object-contain object-center"
+                      className="w-full h-full object-cover object-center"
                       loading={index === 0 ? 'eager' : 'lazy'}
                     />
                   </picture>
