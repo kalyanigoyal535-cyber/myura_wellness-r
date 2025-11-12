@@ -2,7 +2,7 @@ import React from "react";
 import { Calendar, MessageCircle, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button, Divider, Input } from "@mantine/core";
-import BlogTabs from "../components/blogTabs/BlogTabs";
+import BlogSection from "../components/blogTabs/BlogSection";
 
 const Blog: React.FC = () => {
   return (
@@ -22,7 +22,7 @@ const Blog: React.FC = () => {
         <p>Know more about Ayurveda </p>
       </div>
       {/* Tabs  */}
-      <BlogTabs/>
+  <BlogSection/>
 
     </div>
   );
