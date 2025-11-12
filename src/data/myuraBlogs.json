@@ -244,7 +244,7 @@
     "title": "Men’s Vitality Booster: Recovering Strength, Stamina & Confidence the Natural Way",
     "subtitle": "Reclaim Energy and Confidence with Ayurveda",
     "slug": "mens-vitality-booster",
-    "thumbnail": "/Images/blogs/men/still-life-ashes-with-charcoal.jpg",
+    "thumbnail": "/Images/blogs/men/bodyBuilding.webp",
     "author": "Shevya Chaturvedi",
     "date": "2025-01-20",
     "tags": ["mens-health", "vitality", "ayurveda", "wellness"],
@@ -336,7 +336,7 @@
     "title": "From PMS to Menopause: Herbal Support for Every Stage of Womanhood",
     "subtitle": "Natural Ayurvedic Support for Every Phase of Life",
     "slug": "herbal-support-for-womanhood",
-    "thumbnail": "/Images/blogs/women/WomenHealthThumbnail.png",
+    "thumbnail": "/Images/blogs/women/Your Role as a Smart Consumerda.jpg",
     "author": "Shevya Chaturvedi",
     "date": "2025-01-28",
     "tags": ["women-health", "hormones", "ayurveda", "wellness"],
@@ -355,6 +355,12 @@
         "data": "Let’s explore how herbal wellness can support you — whether you’re dealing with monthly mood swings or navigating the hormonal shifts of menopause."
       },
       {
+        "type": "image",
+        "src": "/Images/blogs/women/jh.jpg",
+        "alt": "Women Fitness ",
+        "caption": "..."
+      },
+      {
         "type": "heading",
         "data": "Understanding the Stages"
       },
@@ -371,6 +377,7 @@
           "Menopause: Typically sets in between ages 45–55, marking the end of monthly periods. It can bring symptoms like hot flashes, night sweats, vaginal dryness, and mood changes."
         ]
       },
+  
       {
         "type": "heading",
         "data": "Herbal Support for Women’s Health"
@@ -420,9 +427,17 @@
         "data": "Commonly found in Indian kitchens, fenugreek is known to ease menstrual cramps and also reduce hot flashes during menopause."
       },
       {
+        "type": "image",
+        "src": "/Images/blogs/women/still-life-ashes-with-charcoal.jpg",
+        "alt": "Your Role as a Smart Consumer.png",
+        "caption": "..."
+      },
+  
+      {
         "type": "heading",
         "data": "Introducing MYURA WELLNESS Women’s Health+"
       },
+      
       {
         "type": "text",
         "data": "At MYURA WELLNESS, we understand the emotional and physical toll hormonal changes can bring. That’s why we created Women’s Health+, a supplement designed specifically for women’s wellness through every phase — from monthly PMS to perimenopause and beyond."
@@ -438,7 +453,7 @@
       },
       {
         "type": "text",
-        "data": "Taking Women’s Health+ daily can help you feel more grounded, less overwhelmed, and more in sync with your body — naturally.\n\nClick here to explore Women’s Health+. [Insert product link]"
+        "data": "Taking Women’s Health+ daily can help you feel more grounded, less overwhelmed, and more in sync with your body — naturally. "
       },
       {
         "type": "heading",
@@ -463,7 +478,7 @@
     "title": "Liver Health and Skin Glow: The Surprising Connection",
     "subtitle": "How a Healthy Liver Leads to Naturally Radiant Skin",
     "slug": "liver-health-and-skin-glow",
-    "thumbnail": "/Images/blogs/liverHealth/LiverHealthThumbnail.png",
+    "thumbnail": "/Images/blogs/liver/newLiver.jpeg",
     "author": "Shevya Chaturvedi",
     "date": "2025-02-05",
     "tags": ["liver-health", "skin-glow", "ayurveda", "detox", "wellness"],
@@ -480,6 +495,12 @@
       {
         "type": "text",
         "data": "Let’s break down this powerful liver-skin connection in a simple, human way."
+      },
+      {
+        "type": "image",
+        "src": "/Images/blogs/liver/liverr.jpeg",
+        "alt": "Your Role as a Smart Consumer.png",
+        "caption": "..."
       },
       {
         "type": "heading",
@@ -507,6 +528,15 @@
         "type": "text",
         "data": "In short: If your skin is not glowing despite a good skincare routine, it might be time to care for your liver."
       },
+
+      {
+        "type": "image",
+        "src": "/Images/blogs/liver/concentrated-muscular.jpeg",
+        "alt": "Your Role as a Smart Consumer.png",
+        "caption": "..."
+      },
+ 
+      
       {
         "type": "heading",
         "data": "The Science Behind the Liver-Skin Glow Connection"
@@ -519,6 +549,7 @@
         "type": "heading",
         "data": "Everyday Habits to Support Liver Health (and Skin Glow)"
       },
+    
       {
         "type": "list",
         "data": [
@@ -544,6 +575,12 @@
       {
         "type": "text",
         "data": "Modern science now backs these herbs, showing their role in supporting detoxification, reducing oxidative stress, and improving liver enzymes. This fusion of ancient wisdom and modern validation makes natural liver care a holistic solution."
+      },
+      {
+        "type": "image",
+        "src": "/Images/blogs/liver/concentrated-muscular-man-d.jpeg",
+        "alt": "Your Role as a Smart Consumer.png",
+        "caption": "..."
       },
       {
         "type": "heading",
@@ -576,7 +613,7 @@
     "title": "Your Gut is Your Second Brain—Here's How to Keep It Happy",
     "subtitle": "Understanding the Gut-Brain Connection and How to Nourish It Naturally",
     "slug": "your-gut-is-your-second-brain",
-    "thumbnail": "/Images/blogs/gutHealth/GutHealthThumbnail.png",
+    "thumbnail": "/Images/blogs/gutDigestion/cute-cartoon-intestine-character-illustration-on-white-background-vector-8319110_8fb9cd25-1261-456b-8804-90d1de29ef26-7202405.jpeg",
     "author": "Shevya Chaturvedi",
     "date": "2025-02-10",
     "tags": ["gut-health", "digestion", "ayurveda", "mental-health", "wellness"],
@@ -626,6 +663,13 @@
         "type": "text",
         "data": "Ignoring these signs can create long-term health issues — both mental and physical."
       },
+
+      {
+        "type": "image",
+        "src": "/Images/blogs/gutDigestion/healthy_gut_teaser.jpeg",
+        "alt": "Your Role as a Smart Consumer.png",
+        "caption": "..."
+      },
       {
         "type": "heading",
         "data": "Simple Ways to Keep Your Gut Happy"
@@ -634,6 +678,7 @@
         "type": "heading",
         "data": "1. Eat Gut-Friendly Foods"
       },
+      
       {
         "type": "text",
         "data": "Start including more fiber-rich foods, fermented items (like curd, kombucha, or sauerkraut), and prebiotics (bananas, garlic, onions). These nourish the good bacteria in your gut, helping them flourish."
@@ -676,11 +721,17 @@
       },
       {
         "type": "text",
-        "data": "Explore Gut & Digestion Support → [Insert product link]"
+        "data": "Explore Gut & Digestion Support "
       },
       {
         "type": "heading",
         "data": "Why Gut Health Is More Than Just Digestion"
+      },
+      {
+        "type": "image",
+        "src": "/Images/blogs/gutDigestion/newGut.jpeg",
+        "alt": "Your Role as a Smart Consumer.png",
+        "caption": "..."
       },
       {
         "type": "text",

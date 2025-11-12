@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import BlogCard from "../blogCard/BlogCard";
-import images from "../../images/images";
-import Testing from "../test/Testing";
-import { Link } from "react-router-dom";
 import { MainCard } from "../mainBlogCard/MainCard";
-import blogs from "../../data/myuraBlogs.json"
-const BlogSection = () => {
-  const [activeTab, setActiveTab] = useState("All");
+import blogs from "../../data/myuraBlogs.json";
 
-  const tabs = ["All", "Men", "Women", "Shilajit", "Herbal"];
+const BlogSection: React.FC = () => {
+  // Pick 3 blogs to show here (for example blogs 3–5)
+  const displayedBlogs = blogs.slice(3, 6);
 
   return (
-    <div className="text-[#192537] p-4">
+    <div className="text-[#192537] p-4 max-w-7xl mx-auto">
+      {/* Your main card stays unchanged */}
       <MainCard />
-      <div className="mt-4 p-4   grid grid-cols-12">
-        <BlogCard />
-        <BlogCard /> 
-        <BlogCard />
+
+      {/* 👇 Now we pass actual blog data */}
+      <div className="mt-4 p-4 grid grid-cols-12">
+      {displayedBlogs.map((blog, i) => (
+        <BlogCard key={i} blog={blog} />  
+      ))}
       </div>
     </div>
   );
