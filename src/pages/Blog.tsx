@@ -24,7 +24,6 @@ const Blog: React.FC = () => {
       {/* Tabs  */}
       <BlogTabs/>
 
-
     </div>
   );
 };
