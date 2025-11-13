@@ -5,8 +5,28 @@ import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import ResponsiveProductImage, { type ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
+import ProductLuxuryModal, { type LuxuryModalContext } from '../components/ProductLuxuryModal';
 
 const PRODUCT_IMAGE_WIDTHS = [320, 640, 960] as const;
+
+type SpotlightCalloutPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+
+type ProductSpotlight = {
+  image: string;
+  badge?: string;
+  headline: string;
+  subheadline?: string;
+  highlights: string[];
+  accentGradient?: string;
+  chipClassName?: string;
+  glowClassName?: string;
+  callouts?: Array<{
+    text: string;
+    position: SpotlightCalloutPosition;
+  }>;
+  calloutClassName?: string;
+  showActions?: boolean;
+};
 
 type ProductDefinition = {
   id: number;
@@ -20,9 +40,10 @@ type ProductDefinition = {
   imageFiles: string[];
   discountPercent: number;
   priceTagClass: string;
+  spotlight: ProductSpotlight;
 };
 
-type Product = Omit<ProductDefinition, 'folder' | 'imageFiles'> & {
+export type Product = Omit<ProductDefinition, 'folder' | 'imageFiles'> & {
   images: ResponsiveImageDescriptor[];
 };
 
@@ -31,6 +52,8 @@ const Home: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [transitionStage, setTransitionStage] = useState<'idle' | 'entering'>('idle');
   const manualResumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [productImageIndices, setProductImageIndices] = useState<number[]>(() => new Array(6).fill(0));
+  const [modalContext, setModalContext] = useState<LuxuryModalContext | null>(null);
 
   const heroSlides = useMemo(() => (
     [
@@ -148,6 +171,21 @@ const Home: React.FC = () => {
         folder: 'Dia Care',
         imageFiles: ['main.png', '1.png', '3.png', '4.png'],
         discountPercent: Math.round(((1499 - 1190) / 1499) * 100),
+        spotlight: {
+          image: '/products/DiaCare/main.png',
+          badge: 'New',
+          headline: 'Your Daily Wellness Companion',
+          subheadline: 'Experience the power of Ayurveda in every bottle',
+          highlights: ['Natural ingredients', 'No artificial colors', 'Easy to digest'],
+          accentGradient: 'from-rose-500/50 to-rose-400/50',
+          chipClassName: 'bg-rose-100/70 text-rose-800',
+          glowClassName: 'glow-rose',
+          callouts: [
+            { text: '100% Natural', position: 'top-left' },
+            { text: 'No Artificial Colors', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
       },
       {
         id: 2,
@@ -161,6 +199,20 @@ const Home: React.FC = () => {
         folder: 'Liver Detox',
         imageFiles: ['main.png', '1.png', '2.png', '4.png'],
         discountPercent: Math.round(((1990 - 1320) / 1990) * 100),
+        spotlight: {
+          image: '/products/LiverDetox/main.png',
+          headline: 'Detoxify Your Body',
+          subheadline: 'Support your liver with powerful Ayurvedic herbs',
+          highlights: ['Herbal detox', 'Improved digestion', 'Better skin'],
+          accentGradient: 'from-teal-500/50 to-teal-400/50',
+          chipClassName: 'bg-teal-100/70 text-teal-800',
+          glowClassName: 'glow-teal',
+          callouts: [
+            { text: 'Herbal Detox', position: 'top-left' },
+            { text: 'Improved Digestion', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
       },
       {
         id: 3,
@@ -174,6 +226,20 @@ const Home: React.FC = () => {
         folder: 'Bons &  Joints',
         imageFiles: ['main.png', '1.png', '3.png', '4.png'],
         discountPercent: Math.round(((1499 - 1299) / 1499) * 100),
+        spotlight: {
+          image: '/products/BonesJoints/main.png',
+          headline: 'Stronger Bones, Better Joints',
+          subheadline: 'Support your skeletal system with Ayurvedic remedies',
+          highlights: ['Bone health', 'Joint support', 'Anti-inflammatory'],
+          accentGradient: 'from-indigo-500/50 to-indigo-400/50',
+          chipClassName: 'bg-indigo-100/70 text-indigo-800',
+          glowClassName: 'glow-indigo',
+          callouts: [
+            { text: 'Bone Health', position: 'top-left' },
+            { text: 'Joint Support', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
       },
       {
         id: 4,
@@ -187,6 +253,20 @@ const Home: React.FC = () => {
         folder: 'Gut & Digestions',
         imageFiles: ['main.png', '1.png', '2.png', '3.png'],
         discountPercent: Math.round(((1199 - 980) / 1199) * 100),
+        spotlight: {
+          image: '/products/GutDigestion/main.png',
+          headline: 'Healthy Gut, Happy Life',
+          subheadline: 'Support your digestive system with natural remedies',
+          highlights: ['Digestive health', 'Better absorption', 'Anti-inflammatory'],
+          accentGradient: 'from-amber-500/50 to-amber-400/50',
+          chipClassName: 'bg-amber-100/70 text-amber-800',
+          glowClassName: 'glow-amber',
+          callouts: [
+            { text: 'Digestive Health', position: 'top-left' },
+            { text: 'Better Absorption', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
       },
       {
         id: 5,
@@ -200,6 +280,24 @@ const Home: React.FC = () => {
         folder: "Women_s Health Plus",
         imageFiles: ['main.png', '2.png', '3.png', '4.png'],
         discountPercent: Math.round(((1699 - 1260) / 1699) * 100),
+        spotlight: {
+          image: '/spotlights/womens-health-plus-hand.png',
+          headline: 'TIRED OF THE IMBALANCE?',
+          highlights: [
+            'Irregular periods & PMS discomfort',
+            'Unexplained fatigue & low energy',
+            'Hormonal stress and mood swings',
+            'You deserve holistic wellness',
+          ],
+          accentGradient: 'from-pink-500 via-rose-500 to-pink-400',
+          chipClassName: 'bg-pink-50 border border-pink-200 text-pink-600',
+          glowClassName: 'bg-pink-400/35',
+          callouts: [
+            { text: 'Irregular periods & PMS discomfort', position: 'top-left' },
+            { text: 'Unexplained fatigue & low energy', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
       },
       {
         id: 6,
@@ -213,6 +311,20 @@ const Home: React.FC = () => {
         folder: "Men_s Vitalty Boost",
         imageFiles: ['main.jpg', '1.jpg', '2.jpg', '4.jpg'],
         discountPercent: Math.round(((2150 - 1599) / 2150) * 100),
+        spotlight: {
+          image: '/products/MensVitalityBoost/main.jpg',
+          headline: 'Your Natural Energy Source',
+          subheadline: 'Support your vitality with Ayurvedic herbs',
+          highlights: ['Energy boost', 'Immune support', 'Anti-inflammatory'],
+          accentGradient: 'from-slate-500/50 to-slate-400/50',
+          chipClassName: 'bg-slate-100/70 text-slate-800',
+          glowClassName: 'glow-slate',
+          callouts: [
+            { text: 'Energy Boost', position: 'top-left' },
+            { text: 'Immune Support', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
       },
     ];
 
@@ -332,10 +444,6 @@ const Home: React.FC = () => {
     productSlider.current?.next();
   }, [productSlider]);
 
-  const [productImageIndices, setProductImageIndices] = useState<number[]>(
-    () => products.map(() => 0)
-  );
-
   const handleProductImageNav = useCallback(
     (productIndex: number, delta: number) => {
       setProductImageIndices((prev) =>
@@ -350,6 +458,33 @@ const Home: React.FC = () => {
     },
     [products]
   );
+
+  const handleOpenProductModal = useCallback(
+    (product: Product, image: ResponsiveImageDescriptor) => {
+      setModalContext({
+        product: {
+          name: product.name,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          discountPercent: product.discountPercent,
+          spotlight: {
+            badge: product.spotlight.badge,
+            headline: product.spotlight.headline ?? product.name,
+            subheadline: product.spotlight.subheadline,
+            highlights: product.spotlight.highlights,
+            callouts: product.spotlight.callouts,
+          },
+        },
+        image,
+        spotlightImage: product.spotlight.image,
+      });
+    },
+    [],
+  );
+
+  const handleCloseProductModal = useCallback(() => {
+    setModalContext(null);
+  }, []);
 
   return (
     <>
@@ -620,12 +755,21 @@ const Home: React.FC = () => {
                       <div className={`relative flex flex-col items-center gap-4 p-5 sm:p-6 pb-6 sm:pb-7 rounded-[2.25rem] m-2 sm:m-3 bg-gradient-to-br ${product.pedestalColor}`}>
                         <div className="relative w-full">
                           <div className="overflow-hidden rounded-[1.75rem] border border-white/60 bg-white">
-                            <ResponsiveProductImage
-                              key={`${product.id}-${productImageIndices[productIndex]}`}
-                              image={currentImage}
-                              className="w-full"
-                              imgClassName="w-full h-full object-cover animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                            />
+                            <button
+                              type="button"
+                              onClick={() => handleOpenProductModal(product, currentImage)}
+                              className="relative block w-full focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-200/70 focus-visible:ring-offset-4 focus-visible:ring-offset-white"
+                            >
+                              <ResponsiveProductImage
+                                key={`${product.id}-${productImageIndices[productIndex]}`}
+                                image={currentImage}
+                                className="w-full"
+                                imgClassName="w-full h-full object-cover animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                              />
+                              <span className="pointer-events-none absolute bottom-4 left-1/2 w-[82%] -translate-x-1/2 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 px-4 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-white shadow-[0_26px_58px_-30px_rgba(236,72,153,0.55)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                Discover Ritual
+                              </span>
+                            </button>
                           </div>
                           {product.images.length > 1 && (
                             <>
@@ -902,7 +1046,7 @@ const Home: React.FC = () => {
         </div>
       </section>
       </div>
-
+      <ProductLuxuryModal context={modalContext} onClose={handleCloseProductModal} />
     </>
   );
 };
