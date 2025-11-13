@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import {
   X,
   Sparkles,
-  Star,
   Droplets,
   ShieldCheck,
   Leaf,
@@ -111,6 +110,9 @@ const ProductLuxuryModal: React.FC<ProductLuxuryModalProps> = ({ context, onClos
             <h2 className="text-[1.95rem] sm:text-[2.15rem] font-sharp font-semibold leading-snug tracking-tight text-slate-900">
               {headline}
             </h2>
+            <p className="mt-2 max-w-[520px] text-sm font-medium leading-relaxed text-slate-600 sm:text-base">
+              {subheadline}
+            </p>
           </div>
 
           <div className="relative w-full max-w-[820px]">
