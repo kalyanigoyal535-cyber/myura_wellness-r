@@ -22,67 +22,47 @@ const Product: React.FC = () => {
       {/* Product Collection Section */}
       <section className="py-20 bg-white">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 mb-16">
+          <div className="relative mb-16">
+            <div className="pointer-events-none absolute -inset-6 bg-gradient-to-br from-purple-200/40 via-white to-emerald-200/40 blur-3xl" />
+            <div className="relative grid grid-cols-1 items-center gap-8 sm:gap-10 lg:gap-12 lg:grid-cols-2">
             {/* Left Column - Image */}
-            <div className="relative">
-              <div className="pointer-events-none absolute -inset-6 bg-gradient-to-br from-slate-200 via-white to-slate-200 blur-3xl" />
-              <div className="relative overflow-hidden rounded-3xl bg-white/80 p-8 shadow-2xl backdrop-blur">
-                <div className="absolute inset-0">
-                  <div className="pointer-events-none absolute -left-16 top-10 h-40 w-40 rounded-full bg-gradient-to-br from-purple-200 via-fuchsia-200 to-slate-100 opacity-70 blur-3xl" />
-                  <div className="pointer-events-none absolute bottom-0 right-0 h-56 w-56 rounded-full bg-gradient-to-br from-teal-200 via-emerald-200 to-slate-100 opacity-70 blur-3xl" />
-                  <div className="pointer-events-none absolute right-12 top-12 h-20 w-20 rounded-full border border-slate-200/70" />
-                  <div className="pointer-events-none absolute bottom-12 left-10 h-16 w-36 rounded-full border border-slate-200/60" />
-                </div>
-                <div className="relative space-y-6">
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">
-                      Since 2012
-                    </p>
-                    <h3 className="text-3xl font-bold text-slate-900 font-display">Myura Apothecary</h3>
-                    <p className="text-base text-slate-600 font-minimal">
-                      Ritual-led wellness crafted through slow extraction, mindful sourcing, and uncompromising purity.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-6 text-sm text-slate-600">
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Botanicals</p>
-                        <p className="text-lg font-semibold text-slate-900">38 Wild-Harvested</p>
-                      </div>
-                      <p className="leading-relaxed">
-                        Each blend balances adaptogens, antioxidants, and bioavailable minerals for daily rituals that feel
-                        indulgent yet purposeful.
-                      </p>
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Craft Hours</p>
-                        <p className="text-lg font-semibold text-slate-900">72 Slow-Steeped</p>
-                      </div>
-                      <p className="leading-relaxed">
-                        Small-batch infusion ensures every capsule carries the full-spectrum essence of its botanical origin.
-                      </p>
-                    </div>
-                  </div>
+            <div className="relative h-full" data-aos="fade-up">
+              <div className="relative h-full overflow-hidden rounded-3xl bg-white p-3 sm:p-4">
+                <div className="pointer-events-none absolute -inset-3 sm:-inset-4 rounded-3xl bg-gradient-to-br from-myura-purple-200/50 via-white to-myura-green-200/40 blur-2xl"></div>
+                <div className="relative flex h-full min-h-[210px] sm:min-h-[260px] lg:min-h-[320px] w-full items-center justify-center bg-transparent">
+                  <img
+                    src="/184259779_e669ef7a-646b-48c9-b4d8-b73a0d499df2.png"
+                    alt="Happy customers illustration"
+                    className="relative z-10 h-full w-auto max-h-[220px] sm:max-h-[280px] lg:max-h-[320px] object-contain"
+                    loading="lazy"
+                  />
                 </div>
               </div>
             </div>
 
             {/* Right Column - Text */}
-            <div className="space-y-6">
-              <h2 className="text-4xl font-bold text-slate-900 font-display">MYURA Product Collection</h2>
-              <p className="text-xl text-slate-600 font-medium font-sharp">Your Wellness Transformation Starts Here</p>
-              <p className="text-lg text-slate-700 font-minimal leading-relaxed">
-                At Myura, we believe in the power of nature to heal, restore, and energize. Our carefully crafted 
-                supplements blend ancient Ayurvedic wisdom with modern science to bring you the best of both worlds. 
-                Each product is designed to work with your body's natural processes, providing gentle yet effective 
-                support for your wellness journey.
+            <div className="space-y-4 sm:space-y-6 max-w-lg mx-auto lg:mx-0 text-center lg:text-left" data-aos="fade-up" data-aos-delay="80">
+              <p className="inline-flex items-center justify-center rounded-full bg-slate-900/5 px-3 py-1.5 text-[9px] sm:text-xs font-sharp uppercase tracking-[0.35em] text-slate-500">
+                Myura Rituals
               </p>
-              <p className="text-lg text-slate-700 font-minimal leading-relaxed">
-                Our formulations are created with purpose, addressing specific health needs while maintaining the 
-                highest standards of purity and effectiveness. From energy and hormonal balance to gut health and 
-                joint support, we have thoughtfully crafted blends for every aspect of your wellness.
-              </p>
+              <div className="space-y-2">
+                <h2 className="text-2xl sm:text-4xl font-display text-slate-900 leading-tight">
+                  <span className="font-bold">Myura </span>
+                  <span className="font-light tracking-tight text-slate-500">Product Collection</span>
+                </h2>
+                <p className="text-lg sm:text-2xl font-display text-slate-800">
+                  Nature-built formulas <span className="font-sharp text-myura-purple-600">crafted for daily balance.</span>
+                </p>
+              </div>
+              <div className="space-y-2.5 text-sm sm:text-base text-slate-700 leading-relaxed">
+                <p className="font-minimal">
+                  Ayurvedic wisdom meets modern science so your body gets nutrients it recognises.
+                </p>
+                <p className="font-sharp italic text-slate-800">
+                  Pick a ritual for focus, calm, gut harmony, or joint ease—every blend is small-batch and traceable.
+                </p>
+              </div>
+            </div>
             </div>
           </div>
 
