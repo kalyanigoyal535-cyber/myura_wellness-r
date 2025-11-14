@@ -1,344 +1,269 @@
-import React, { useState } from 'react';
-import { Plus, Minus, Star, Heart, MessageCircle } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Link, Navigate, useParams } from 'react-router-dom';
+import { Plus, Minus, Star, Heart } from 'lucide-react';
+import ResponsiveProductImage from '../components/ResponsiveProductImage';
+import { getProductById, getRelatedProducts } from '../data/products';
 
 const ProductDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const product = getProductById(id ?? '');
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>('benefits');
-  const [showCart, setShowCart] = useState(false);
 
-  const product = {
-    id: 1,
-    name: "DIA CARE",
-    price: 799,
-    originalPrice: 999,
-    image: "/api/placeholder/400/400",
-    rating: 5,
-    reviews: 128,
-    inStock: true,
-    description: "MYURA Diabetes Management is an Ayurvedic wellness formula created for those looking to support healthy blood sugar levels without relying on synthetic or harsh solutions.",
-    benefits: [
-      "Supports balanced blood sugar levels naturally",
-      "Improves energy, metabolism, and sugar control",
-      "Helps curb cravings and reduces fatigue after meals",
-      "Aids in pancreatic, liver, and cardiovascular health",
-      "Promotes a steady, non-spiking energy flow"
-    ],
-    keyIngredients: "Your liver works around the clock to filter out toxins, regulate metabolism, and keep your body balanced — and it deserves the same care in return. MYURA Liver Detox Formula is a powerful Ayurvedic blend designed to gently cleanse and support liver function, aid digestion, and promote inner clarity.",
-    suitableFor: "Whether you're feeling heavy, sluggish, or dealing with lifestyle stressors like processed foods or alcohol, this herbal supplement helps reset your system and restore your natural rhythm — the Ayurvedic way.",
-    howToUse: "Take 2 capsules twice daily with water, preferably after meals. For best results, maintain a balanced diet and regular exercise routine.",
-    faqs: "Your liver works around the clock to filter out toxins, regulate metabolism, and keep your body balanced — and it deserves the same care in return. MYURA Liver Detox Formula is a powerful Ayurvedic blend designed to gently cleanse and support liver function, aid digestion, and promote inner clarity."
-  };
+  const relatedProducts = useMemo(
+    () => (product ? getRelatedProducts(product.id) : []),
+    [product]
+  );
+
+  if (!product) {
+    return <Navigate to="/product" replace />;
+  }
+
+  const heroImage = product.gallery[0] ?? product.image;
+  const supportingGallery = product.gallery.slice(1, 4);
 
   const accordionSections = [
     { id: 'benefits', title: 'Benefits', content: product.benefits, isList: true },
-    { id: 'description', title: 'Description', content: product.description, isList: false },
     { id: 'keyIngredients', title: 'Key Ingredients', content: product.keyIngredients, isList: false },
     { id: 'suitableFor', title: 'Suitable For', content: product.suitableFor, isList: false },
     { id: 'howToUse', title: 'How To Use', content: product.howToUse, isList: false },
-    { id: 'faqs', title: 'Faqs', content: product.faqs, isList: false }
-  ];
-
-  const relatedProducts = [
-    { id: 2, name: "LIVER DETOX FORMULA", price: 699, originalPrice: 999, image: "/api/placeholder/200/200" },
-    { id: 3, name: "BONE & JOINT SUPPORT", price: 4543, originalPrice: 5999, image: "/api/placeholder/200/200" },
-    { id: 4, name: "GUT AND DIGESTION", price: 999, originalPrice: 1299, image: "/api/placeholder/200/200" },
-    { id: 5, name: "WOMEN'S HEALTH PLUS", price: 499, originalPrice: 699, image: "/api/placeholder/200/200" }
+    { id: 'faqs', title: 'FAQs', content: product.faqs, isList: false },
   ];
 
   const toggleSection = (sectionId: string) => {
-    setExpandedSection(expandedSection === sectionId ? null : sectionId);
+    setExpandedSection((current) => (current === sectionId ? null : sectionId));
   };
 
   return (
     <div className="min-h-screen bg-stone-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 py-16">
+      <section className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-20">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">PRODUCT</h1>
-          <p className="text-xl text-slate-200">Wellness you can feel, results you can see.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-300">
+            Myura Apothecary
+          </p>
+          <h1 className="text-5xl font-bold text-white mt-4">{product.name}</h1>
+          <p className="text-xl text-slate-200 mt-6">{product.heroTagline}</p>
         </div>
       </section>
 
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
-          <div className="relative">
-            <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <div className="relative">
-                <div className="w-64 h-64 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl mx-auto flex items-center justify-center mb-6">
-                  <div className="w-48 h-48 bg-white rounded-xl shadow-lg flex items-center justify-center">
-                    <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-2xl">MYURA</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute top-4 left-4 bg-slate-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  Sale!
-                </div>
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+          <div className="space-y-6">
+            <div className="relative overflow-hidden rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur">
+              <div className="pointer-events-none absolute -left-12 top-16 h-40 w-40 rounded-full bg-gradient-to-br from-purple-200 via-white to-slate-100 opacity-60 blur-3xl" />
+              <div className="pointer-events-none absolute right-0 bottom-0 h-48 w-48 rounded-full bg-gradient-to-br from-emerald-200 via-white to-slate-100 opacity-50 blur-3xl" />
+              <div className="relative overflow-hidden rounded-2xl bg-slate-900/5">
+                <ResponsiveProductImage
+                  image={heroImage}
+                  className="aspect-[4/5]"
+                  imgClassName="object-contain p-6"
+                />
               </div>
             </div>
+            {supportingGallery.length > 0 && (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {supportingGallery.map((galleryImage) => (
+                  <div
+                    key={`${galleryImage.fallback}-${galleryImage.alt}`}
+                    className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white/80 p-3 shadow-lg"
+                  >
+                    <ResponsiveProductImage
+                      image={galleryImage}
+                      className="aspect-square overflow-hidden rounded-xl bg-slate-900/5"
+                      imgClassName="object-contain p-4"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Product Details */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">{product.name}</h1>
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex items-center space-x-1">
-                  {[...Array(product.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                  <span className="text-sm text-slate-600 ml-2">({product.reviews} reviews)</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4 mb-6">
-              <span className="text-3xl font-bold text-slate-900">₹{product.price}</span>
-              <span className="text-xl text-slate-400 line-through">₹{product.originalPrice}</span>
-            </div>
-
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="flex items-center border border-gray-300 rounded-lg">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 hover:bg-gray-100"
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="px-4 py-2 border-x border-gray-300">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-2 hover:bg-gray-100"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-              <button
-                onClick={() => setShowCart(true)}
-                className="flex-1 bg-slate-600 text-white py-3 px-6 rounded-lg hover:bg-slate-700 transition-colors font-semibold"
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <Link
+                to="/product"
+                className="inline-flex items-center text-sm font-semibold uppercase tracking-[0.3em] text-slate-500 transition-colors hover:text-slate-700"
               >
-                ADD TO CART
+                ← Product Collection
+              </Link>
+              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">
+                {product.headline}
+              </p>
+              <h2 className="text-4xl font-bold text-slate-900">{product.name}</h2>
+              <p className="text-lg leading-relaxed text-slate-700">{product.summary}</p>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 text-amber-400">
+                  {Array.from({ length: product.rating }).map((_, index) => (
+                    <Star key={index} className="h-5 w-5 fill-current" />
+                  ))}
+                </div>
+                <span className="text-sm text-slate-500">({product.reviews} artisan reviews)</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-semibold text-slate-900">₹{product.price}</span>
+                <span className="text-lg text-slate-400 line-through">₹{product.originalPrice}</span>
+              </div>
+              <span className="inline-flex items-center rounded-full bg-emerald-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-700">
+                {product.inStock ? 'In Stock' : 'Back Soon'}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center rounded-full border border-slate-200 bg-white/70">
+                <button
+                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                  className="px-4 py-3 transition-colors hover:bg-slate-100"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="h-4 w-4 text-slate-700" />
+                </button>
+                <span className="px-6 py-3 text-base font-semibold text-slate-900">{quantity}</span>
+                <button
+                  onClick={() => setQuantity((value) => value + 1)}
+                  className="px-4 py-3 transition-colors hover:bg-slate-100"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="h-4 w-4 text-slate-700" />
+                </button>
+              </div>
+              <button className="inline-flex grow basis-48 items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-colors hover:bg-slate-700">
+                Add to cart
+              </button>
+              <button
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                aria-label="Save to wishlist"
+              >
+                <Heart className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Accordion Sections */}
-            <div className="space-y-4">
-              {accordionSections.map((section) => (
-                <div key={section.id} className="bg-white rounded-lg border border-gray-200">
-                  <button
-                    onClick={() => toggleSection(section.id)}
-                    className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Highlights</p>
+              <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {product.notes.map((note) => (
+                  <li
+                    key={note}
+                    className="flex gap-3 rounded-2xl border border-slate-200/60 bg-white/70 p-4 text-sm text-slate-700 shadow-sm"
                   >
-                    <span className="font-semibold text-slate-900">{section.title}</span>
-                    {expandedSection === section.id ? (
-                      <Minus className="h-5 w-5 text-slate-500" />
-                    ) : (
-                      <Plus className="h-5 w-5 text-slate-500" />
-                    )}
-                  </button>
-                  {expandedSection === section.id && (
-                    <div className="px-6 pb-4">
-                      {section.isList ? (
-                        <ul className="space-y-2">
-                          {(section.content as string[]).map((item, index) => (
-                            <li key={index} className="flex items-start space-x-2">
-                              <div className="w-2 h-2 bg-slate-600 rounded-full mt-2 flex-shrink-0"></div>
-                              <span className="text-slate-700">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-slate-700 leading-relaxed">{section.content}</p>
-                      )}
-                    </div>
+                    <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-slate-900" />
+                    <span>{note}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <section className="grid grid-cols-1 gap-10 lg:grid-cols-5">
+          <div className="space-y-4 lg:col-span-2">
+            <h3 className="text-3xl font-bold text-slate-900">Inside the ritual</h3>
+            <p className="text-lg leading-relaxed text-slate-700">{product.description}</p>
+          </div>
+          <div className="space-y-4 lg:col-span-3">
+            {accordionSections.map((section) => (
+              <div key={section.id} className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/80 shadow-sm">
+                <button
+                  onClick={() => toggleSection(section.id)}
+                  className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-slate-50"
+                >
+                  <span className="text-base font-semibold text-slate-900">{section.title}</span>
+                  {expandedSection === section.id ? (
+                    <Minus className="h-5 w-5 text-slate-500" />
+                  ) : (
+                    <Plus className="h-5 w-5 text-slate-500" />
                   )}
-                </div>
+                </button>
+                {expandedSection === section.id && (
+                  <div className="px-6 pb-6">
+                    {section.isList ? (
+                      <ul className="space-y-3">
+                        {(section.content as string[]).map((item) => (
+                          <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+                            <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-slate-900" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm leading-relaxed text-slate-700">{section.content}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="overflow-hidden rounded-3xl bg-slate-900 text-white">
+          <div className="relative px-6 py-14 sm:px-10 lg:px-16">
+            <div className="pointer-events-none absolute -left-24 top-12 h-56 w-56 rounded-full bg-gradient-to-br from-purple-500 via-indigo-500 to-slate-900 opacity-60 blur-3xl" />
+            <div className="pointer-events-none absolute right-0 bottom-0 h-64 w-64 rounded-full bg-gradient-to-tr from-emerald-400 via-teal-500 to-slate-900 opacity-50 blur-3xl" />
+            <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-4 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-200">
+                  Daily devotion
+                </p>
+                <h3 className="text-3xl font-bold leading-tight lg:text-4xl">
+                  {product.heroTagline}
+                </h3>
+                <p className="text-lg text-slate-200">
+                  Build a mindful ritual and experience how consistent nourishment transforms the way you
+                  move, feel, and glow.
+                </p>
+              </div>
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center rounded-full bg-white/10 px-8 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-colors hover:bg-white/20"
+              >
+                Talk to a specialist
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {relatedProducts.length > 0 && (
+          <section className="space-y-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <h3 className="text-3xl font-bold text-slate-900">You may also love</h3>
+              <Link
+                to="/product"
+                className="inline-flex items-center text-sm font-semibold uppercase tracking-[0.3em] text-slate-500 transition-colors hover:text-slate-700"
+              >
+                View all products
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {relatedProducts.map((related) => (
+                <Link
+                  key={related.id}
+                  to={`/product/${related.id}`}
+                  className="group flex flex-col gap-5 overflow-hidden rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-lg transition-transform duration-300 hover:-translate-y-1"
+                >
+                  <div className="overflow-hidden rounded-2xl bg-slate-900/5 p-4">
+                    <ResponsiveProductImage
+                      image={related.image}
+                      className="aspect-square overflow-hidden rounded-xl"
+                      imgClassName="object-contain transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                      {related.headline}
+                    </p>
+                    <h4 className="text-xl font-semibold text-slate-900">{related.name}</h4>
+                    <div className="flex items-baseline gap-3 text-slate-900">
+                      <span className="text-lg font-semibold">₹{related.price}</span>
+                      <span className="text-sm text-slate-400 line-through">₹{related.originalPrice}</span>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* A Perfect Ingredient & Combination Section */}
-        <section className="mt-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">A Perfect Ingredient & Combination</h2>
-            <p className="text-lg text-slate-700 max-w-4xl mx-auto">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full"></div>
-                </div>
-                <h3 className="font-semibold text-slate-900 mb-2">Nano Vitamin C</h3>
-                <p className="text-sm text-slate-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Call to Action Banner */}
-        <section className="mt-20">
-          <div className="bg-blue-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
-            <div className="relative z-10">
-              <h2 className="text-3xl font-bold mb-4">YOUR JOURNEY TO NATURAL WELLNESS START HERE</h2>
-              <p className="text-xl mb-6">FUEL YOUR DAY</p>
-              <button className="bg-slate-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors">
-                MYURA'S HERE!
-              </button>
-            </div>
-            <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-0">
-              <div className="flex space-x-4">
-                <div className="w-16 h-24 bg-white rounded-lg"></div>
-                <div className="w-16 h-24 bg-blue-200 rounded-lg"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Product Benefits Diagram */}
-        <section className="mt-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {[1, 2].map((item) => (
-              <div key={item} className="text-center">
-                <div className="relative inline-block">
-                  <div className="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg"></div>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full"></div>
-                  <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-purple-500 rounded-full"></div>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">WOMEN'S HEALTH PLUS</h3>
-                <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto">
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-purple-200 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      <Heart className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <p className="text-sm font-semibold text-slate-900">Immunity</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-purple-200 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      <Heart className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <p className="text-sm font-semibold text-slate-900">Hormonal Balance</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-purple-200 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      <Heart className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <p className="text-sm font-semibold text-slate-900">Strength</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-purple-200 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      <Heart className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <p className="text-sm font-semibold text-slate-900">Energy Control</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Related Products */}
-        <section className="mt-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Related products</h2>
-            <p className="text-lg text-slate-700 max-w-4xl mx-auto">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg"></div>
-                  </div>
-                  <p className="text-sm text-slate-500 mb-1">MYURA</p>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">{product.name}</h3>
-                  <div className="flex justify-center space-x-1 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <div className="flex justify-center items-center space-x-2 mb-4">
-                    <span className="text-xl font-bold text-slate-900">₹{product.price}</span>
-                    <span className="text-lg text-slate-400 line-through">₹{product.originalPrice}</span>
-                  </div>
-                  <button className="w-full bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-700 transition-colors">
-                    Add to cart
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      {/* Floating Cart */}
-      {showCart && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-slate-900">CART</h3>
-              <button
-                onClick={() => setShowCart(false)}
-                className="text-slate-500 hover:text-slate-700"
-              >
-                <Minus className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded"></div>
-              </div>
-              <div className="flex-1">
-                <h4 className="font-semibold text-slate-900">{product.name}</h4>
-                <div className="flex items-center space-x-4 mt-2">
-                  <div className="flex items-center border border-gray-300 rounded">
-                    <button className="px-2 py-1 hover:bg-gray-100">
-                      <Minus className="h-3 w-3" />
-                    </button>
-                    <span className="px-2 py-1 text-sm">3</span>
-                    <button className="px-2 py-1 hover:bg-gray-100">
-                      <Plus className="h-3 w-3" />
-                    </button>
-                  </div>
-                  <span className="font-semibold text-slate-900">₹2,397.00</span>
-                </div>
-              </div>
-              <button className="text-red-500 text-sm">Remove</button>
-            </div>
-            
-            <button className="w-full bg-slate-600 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors">
-              Checkout - ₹2,397.00
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Floating Chat Button */}
-      <div className="fixed bottom-8 right-8 z-40">
-        <div className="flex flex-col items-end space-y-4">
-          <div className="relative">
-            <button className="w-12 h-12 bg-slate-600 text-white rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors">
-              <MessageCircle className="h-6 w-6" />
-            </button>
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              1
-            </span>
-          </div>
-          <button className="bg-gray-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">
-            Contact us
-          </button>
-        </div>
+          </section>
+        )}
       </div>
     </div>
   );
