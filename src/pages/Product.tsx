@@ -15,7 +15,6 @@ const Product: React.FC = () => {
         data-aos="fade-down"
         data-aos-duration="900"
         data-aos-easing="ease-out-cubic"
-        data-aos-once="true"
       >
         <div
           className="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-0.5 sm:space-y-2"
@@ -23,7 +22,6 @@ const Product: React.FC = () => {
           data-aos-delay="120"
           data-aos-duration="900"
           data-aos-easing="ease-out-cubic"
-          data-aos-once="true"
         >
           <h1 className="text-lg sm:text-4xl font-bold text-white leading-tight tracking-[0.3em]">
             PRODUCT
@@ -43,7 +41,6 @@ const Product: React.FC = () => {
             data-aos="fade-up"
             data-aos-duration="850"
             data-aos-easing="ease-out-quart"
-            data-aos-once="true"
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1 w-full">
@@ -79,7 +76,6 @@ const Product: React.FC = () => {
         data-aos-duration="900"
         data-aos-delay="180"
         data-aos-easing="ease-out-cubic"
-        data-aos-once="true"
           >
         {products.map((product, index) => {
               const discountPercent = Math.round(
@@ -89,12 +85,11 @@ const Product: React.FC = () => {
               return (
                 <div
                   key={product.id}
-                  className="group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-100 bg-slate-950 text-white shadow-xl transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] hover:-translate-y-1.5 hover:scale-[1.01]"
+                  className="group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-100 bg-slate-950 text-white shadow-xl transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_35px_65px_rgba(15,23,42,0.55)]"
                   data-aos="fade-up"
                   data-aos-delay={160 + index * 80}
                   data-aos-duration="850"
                   data-aos-easing="ease-out-cubic"
-                  data-aos-once="true"
                 >
                   <div
                     className="absolute right-3 top-3 sm:right-4 sm:top-4 z-20 rounded-full bg-rose-500/95 px-2.5 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.3em] text-white shadow-lg backdrop-blur transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-1 group-hover:bg-rose-400/95"
@@ -102,14 +97,20 @@ const Product: React.FC = () => {
                     data-aos-delay="220"
                     data-aos-duration="700"
                     data-aos-easing="ease-out-cubic"
-                    data-aos-once="true"
                   >
                     Sale
                   </div>
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${product.accentGradient} opacity-90 transition-opacity duration-500 group-hover:opacity-100`}
+                    className={`absolute inset-0 z-0 bg-gradient-to-br ${product.accentGradient} opacity-90 transition-opacity duration-500 group-hover:opacity-100`}
                     aria-hidden="true"
                   ></div>
+                  <div className="pointer-events-none absolute inset-0 z-[1]">
+                    <div className="absolute -inset-px rounded-[28px] border border-white/5 opacity-0 transition-all duration-700 group-hover:opacity-80 group-hover:border-white/20"></div>
+                    <div className="absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-80">
+                      <div className="absolute -top-10 left-1/2 h-32 w-48 -translate-x-1/2 rotate-6 rounded-full bg-white/30 blur-3xl"></div>
+                      <div className="absolute bottom-0 left-1/2 h-40 w-40 -translate-x-1/2 bg-gradient-to-tr from-white/10 via-white/0 to-transparent blur-2xl animate-pulse"></div>
+                    </div>
+                  </div>
                   <div className="absolute inset-x-8 top-10 hidden sm:block h-32 rounded-full bg-white/20 blur-3xl" aria-hidden="true"></div>
                   <div className="relative z-10 flex h-full flex-col gap-3 p-3 sm:p-4">
                     <div className="relative">
@@ -190,7 +191,6 @@ const Product: React.FC = () => {
             data-aos-duration="850"
             data-aos-delay="220"
             data-aos-easing="ease-out-cubic"
-            data-aos-once="true"
           >
             <button className="rounded-full bg-slate-900 px-10 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-colors hover:bg-slate-700">
               Discover More Blends
@@ -205,7 +205,6 @@ const Product: React.FC = () => {
         data-aos="fade-up"
         data-aos-duration="900"
         data-aos-easing="ease-out-cubic"
-        data-aos-once="true"
       >
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -216,7 +215,6 @@ const Product: React.FC = () => {
               data-aos-delay="140"
               data-aos-duration="900"
               data-aos-easing="ease-out-cubic"
-              data-aos-once="true"
             >
               <p className="text-sm text-slate-600 font-medium">Discover now Magical benefits of nature.</p>
               <h2 className="text-4xl font-bold text-slate-900 font-display">Your best health is waiting - are you?</h2>
@@ -285,7 +283,6 @@ const Product: React.FC = () => {
               data-aos-delay="220"
               data-aos-duration="900"
               data-aos-easing="ease-out-cubic"
-              data-aos-once="true"
             >
               <div className="pointer-events-none absolute -inset-6 bg-gradient-to-br from-slate-300 via-white to-slate-200 blur-3xl" />
               <div className="relative overflow-hidden rounded-3xl bg-white/90 p-8 shadow-2xl backdrop-blur">
