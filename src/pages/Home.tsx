@@ -30,6 +30,7 @@ type ProductSpotlight = {
 
 type ProductDefinition = {
   id: number;
+  slug: string;
   name: string;
   price: number;
   originalPrice: number;
@@ -164,6 +165,7 @@ const Home: React.FC = () => {
     const baseProducts: ProductDefinition[] = [
       {
         id: 1,
+        slug: 'dia-care',
         name: "Dia Care",
         price: 1190,
         originalPrice: 1499,
@@ -192,6 +194,7 @@ const Home: React.FC = () => {
       },
       {
         id: 2,
+        slug: 'liver-detox',
         name: "Liver Detox",
         price: 1320,
         originalPrice: 1990,
@@ -219,6 +222,7 @@ const Home: React.FC = () => {
       },
       {
         id: 3,
+        slug: 'bone-joint-support',
         name: "Bones & Joints",
         price: 1299,
         originalPrice: 1499,
@@ -246,6 +250,7 @@ const Home: React.FC = () => {
       },
       {
         id: 4,
+        slug: 'gut-and-digestion',
         name: "Gut & Digestion",
         price: 980,
         originalPrice: 1199,
@@ -273,6 +278,7 @@ const Home: React.FC = () => {
       },
       {
         id: 5,
+        slug: 'womens-health-plus',
         name: "Women's Health Plus",
         price: 1260,
         originalPrice: 1699,
@@ -304,6 +310,7 @@ const Home: React.FC = () => {
       },
       {
         id: 6,
+        slug: 'mens-vitality-booster',
         name: "Men's Vitality Boost",
         price: 1599,
         originalPrice: 2150,
@@ -922,13 +929,17 @@ const Home: React.FC = () => {
                               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                             </span>
                           </button>
-                          <button className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-slate-200/60 bg-white/90 px-5 py-2 text-sm font-semibold text-slate-900 shadow-[0_18px_36px_-20px_rgba(15,23,42,0.3)] transition-all duration-300 hover:border-slate-400/60 hover:bg-white max-w-[220px] whitespace-nowrap">
+                          <Link
+                            to={`/product/${product.slug}`}
+                            className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-slate-200/60 bg-white/90 px-5 py-2 text-sm font-semibold text-slate-900 shadow-[0_18px_36px_-20px_rgba(15,23,42,0.3)] transition-all duration-300 hover:border-slate-400/60 hover:bg-white max-w-[220px] whitespace-nowrap"
+                            aria-label={`View details for ${product.name}`}
+                          >
                             <span className="absolute inset-0 rounded-full bg-gradient-to-r from-white/80 via-white/70 to-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
                             <span className="relative inline-flex items-center gap-2">
                               View details
                               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                             </span>
-                          </button>
+                          </Link>
                         </div>
                       </div>
                     </div>

@@ -88,26 +88,26 @@ export const productCatalog: ProductRecord[] = [
     reviews: 128,
     inStock: true,
     accentGradient: 'from-purple-500/60 via-fuchsia-400/40 to-slate-900/90',
-    notes: ['Low GI botanical matrix', 'Chromium + adaptogenic herbs'],
+    notes: [],
     summary:
-      'Support balanced blood sugar and sustained daytime energy without the crash.',
+      'A natural botanical blend that supports healthy blood sugar balance, boosts energy and metabolism, and promotes overall metabolic wellness—gently and effectively.',
     description:
-      'Dia Care is a ritual-led formula that helps support healthy glucose metabolism and soften post-meal spikes. Crafted with clinically studied botanicals, it keeps you grounded, clear, and energised throughout your day.',
+      'MYURA Diabetes Management is a nutritional wellness formula for anyone who wants steady glucose rhythms without harsh synthetics. Whether you are managing early signs of imbalance or striving to maintain consistent energy throughout the day, this 15-herb blend works in harmony with your body to keep pancreatic health, digestion, and sugar regulation in check.',
     benefits: [
-      'Helps maintain healthy blood sugar rhythms',
-      'Reduces cravings triggered by glycemic swings',
-      'Supports pancreatic and hepatic wellness',
-      'Delivers steady, sustained energy levels',
-      'Fortified with antioxidants that protect vascular integrity',
+      'Supports balanced blood sugar levels naturally',
+      'Improves daily energy, metabolism, and sugar control',
+      'Helps curb cravings and reduces fatigue after meals',
+      'Aids pancreatic, liver, and cardiovascular health',
+      'Promotes a steady, non-spiking energy flow',
     ],
     keyIngredients:
-      'Gymnema sylvestre leaf, Jamun seed, Cinnamon bark, Fenugreek seed, Chromium picolinate, and adaptogenic Ashwagandha harmonise to stabilise sugar absorption and improve insulin sensitivity.',
+      'Each 500 mg capsule features Neem, Vijaysar, Amla, Kutki, Giloy, Karela, Jamun, Gudmar, Methi, Turmeric, Jamun seed, Kalmegh, Shilajit, and other classical botanicals chosen for comprehensive metabolic support.',
     suitableFor:
-      'Ideal for individuals managing erratic energy, sugar cravings, or early metabolic warning signs and seeking a nature-first approach to metabolic balance.',
+      'Ideal for adults seeking natural support in managing blood sugar levels, individuals with a family history of diabetes or pre-diabetic symptoms, and anyone who experiences fatigue or cravings after meals.',
     howToUse:
-      'Take two capsules twice daily with water after meals. Pair with mindful eating and daily movement for enhanced outcomes.',
+      'Take 1–2 capsules, twice or thrice daily, with warm water or milk—preferably after meals.',
     faqs:
-      'You can pair Dia Care with other Myura blends. We suggest consistent use for at least 6-8 weeks to experience full benefits. Always consult your practitioner if you are on prescription medication.',
+      'Designed for routine wellness use. Consult your healthcare provider if you are pregnant, nursing, or on prescription medication.',
     image: buildImageDescriptor(
       'Dia Care',
       'main',
@@ -120,7 +120,7 @@ export const productCatalog: ProductRecord[] = [
       { name: '3', altSuffix: 'with measuring spoon of powder' },
       { name: '4', altSuffix: 'flat lay with fresh ingredients' },
     ]),
-    heroTagline: 'Metabolic clarity in every capsule',
+    heroTagline: 'Support balanced blood sugar without compromise',
   },
   {
     id: 'liver-detox',
@@ -132,7 +132,7 @@ export const productCatalog: ProductRecord[] = [
     reviews: 95,
     inStock: true,
     accentGradient: 'from-emerald-400/60 via-teal-300/40 to-slate-900/90',
-    notes: ['Milk thistle powered', 'Supports gentle daily detox'],
+    notes: [],
     summary:
       'Revitalise the body’s master filter with botanicals that restore clarity from within.',
     description:
@@ -176,7 +176,7 @@ export const productCatalog: ProductRecord[] = [
     reviews: 67,
     inStock: true,
     accentGradient: 'from-blue-500/60 via-indigo-400/40 to-slate-900/90',
-    notes: ['Advanced collagen boosters', 'Joint comfort botanicals'],
+    notes: [],
     summary:
       'Strengthen movement and cushion every step with collagen-smart nourishment.',
     description:
@@ -208,7 +208,7 @@ export const productCatalog: ProductRecord[] = [
       { name: '3', altSuffix: 'on textured stone surface' },
       { name: '4', altSuffix: 'flat lay with joint-friendly herbs' },
     ]),
-    heroTagline: 'Movement without compromise',
+    heroTagline: '',
   },
   {
     id: 'gut-and-digestion',
@@ -220,7 +220,7 @@ export const productCatalog: ProductRecord[] = [
     reviews: 89,
     inStock: true,
     accentGradient: 'from-amber-500/60 via-orange-400/40 to-slate-900/90',
-    notes: ['Pre + probiotic synergy', 'Calms and nurtures digestion'],
+    notes: [],
     summary:
       'Soothe the gut, rebalance the microbiome, and glow from improved nutrient absorption.',
     description:
@@ -264,7 +264,7 @@ export const productCatalog: ProductRecord[] = [
     reviews: 156,
     inStock: true,
     accentGradient: 'from-rose-500/60 via-pink-400/40 to-slate-900/90',
-    notes: ['Cycle-supportive adaptogens', 'Beauty-from-within nutrients'],
+    notes: [],
     summary:
       'Bring rhythm back to your cycle, skin, and mood with plant wisdom tailored for women.',
     description:
