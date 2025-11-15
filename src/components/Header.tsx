@@ -109,21 +109,26 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const measureTopBar = useCallback(() => {
+    if (topBarRef.current) {
+      setTopBarHeight(topBarRef.current.scrollHeight);
+    }
+  }, []);
+
   // Measure top bar height for smooth collapsing
   useEffect(() => {
-    const measureTopBar = () => {
-      if (topBarRef.current) {
-        setTopBarHeight(topBarRef.current.scrollHeight);
-      }
-    };
-
     measureTopBar();
     window.addEventListener('resize', measureTopBar);
 
     return () => {
       window.removeEventListener('resize', measureTopBar);
     };
-  }, []);
+  }, [measureTopBar]);
+
+  // Recalculate top bar height when location state updates
+  useEffect(() => {
+    measureTopBar();
+  }, [address, loading, error, measureTopBar]);
 
   const updateHeaderHeight = useCallback(() => {
     if (typeof window === 'undefined') return;
