@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { Plus, Minus, Star, Heart, Activity, Sparkles, Droplets, ShieldCheck, HeartPulse, X, ZoomIn } from 'lucide-react';
 import ResponsiveProductImage from '../components/ResponsiveProductImage';
 import { getProductById, getRelatedProducts } from '../data/products';
+import WomensHealthPlus from './WomensHealthPlus';
 
 type ProductTheme = {
   heroGradient: string;
@@ -187,6 +188,8 @@ const productThemes: Record<string, ProductTheme> = {
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  
+  // Always call hooks first, even if we'll return early
   const product = getProductById(id ?? '');
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>('benefits');
@@ -195,19 +198,29 @@ const ProductDetail: React.FC = () => {
   const thumbnailRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const touchStartXRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
-  const discountPercent = Math.round(
-    (((product?.originalPrice ?? 0) - (product?.price ?? 0)) / (product?.originalPrice ?? 1)) * 100
-  );
-  const keyIngredientHighlights =
-    product?.keyIngredients
+  
+  const discountPercent = useMemo(() => {
+    if (!product) return 0;
+    return Math.round(
+      ((product.originalPrice - product.price) / product.originalPrice) * 100
+    );
+  }, [product]);
+  
+  const keyIngredientHighlights = useMemo(() => {
+    if (!product) return [];
+    return product.keyIngredients
       .split('.')
       .map((item) => item.trim())
-      .filter(Boolean) ?? [];
-  const suitableForHighlights =
-    product?.suitableFor
+      .filter(Boolean);
+  }, [product]);
+  
+  const suitableForHighlights = useMemo(() => {
+    if (!product) return [];
+    return product.suitableFor
       .split('.')
       .map((item) => item.trim())
-      .filter(Boolean) ?? [];
+      .filter(Boolean);
+  }, [product]);
 
   useEffect(() => {
     setActiveImageIndex(0);
@@ -260,6 +273,7 @@ const ProductDetail: React.FC = () => {
     touchStartXRef.current = null;
     touchCurrentXRef.current = null;
   }, [handleGalleryNav]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.innerWidth >= 640) return;
@@ -287,6 +301,11 @@ const ProductDetail: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isZoomed]);
+
+  // Render unique page for womens-health-plus after all hooks are called
+  if (id === 'womens-health-plus') {
+    return <WomensHealthPlus />;
+  }
 
   if (!product) {
     return <Navigate to="/product" replace />;
