@@ -277,7 +277,7 @@ export const productCatalog: ProductRecord[] = [
       'Fortifies iron stores and micronutrient reserves',
     ],
     keyIngredients:
-      'Shatavari, Dong Quai, Evening primrose, Iron bisglycinate, Vitamins B6 & B12, and Zinc cultivate hormonal harmony and radiance.',
+      'Shatavari nourishes estrogen balance and soothes the nervous system. Dong Quai supports circulation and eases cyclical discomfort. Evening primrose oil delivers GLA to hydrate skin and calm inflammation. Iron bisglycinate rebuilds iron stores without upsetting the gut. Vitamins B6 & B12 steady mood and energy metabolism. Zinc keeps hormones converting smoothly and fortifies skin resilience.',
     suitableFor:
       'Ideal for women seeking cycle balance, perimenopause support, or a daily ritual for mood and beauty resilience.',
     howToUse:

@@ -1,0 +1,204 @@
+.womens-health-theme {
+  --wh-base: #ec789b;
+  --wh-dark: #c2567b;
+  --wh-darker: #8c2f4c;
+  --wh-light: #f7b4c9;
+  --wh-lighter: #fde1ea;
+  --wh-muted: #fff1f5;
+  --wh-border: rgba(236, 120, 155, 0.35);
+  --wh-border-strong: rgba(194, 86, 123, 0.55);
+  --wh-contrast: #ffffff;
+  --wh-base-rgb: 236, 120, 155;
+  --wh-accent-rgb: 247, 180, 201;
+  --wh-hero-gradient: linear-gradient(135deg, rgba(253, 225, 234, 0.95) 0%, rgba(247, 180, 201, 0.9) 48%, rgba(194, 86, 123, 0.95) 100%);
+  --wh-soft-gradient: linear-gradient(130deg, rgba(253, 225, 234, 0.75) 0%, #ffffff 65%, rgba(247, 180, 201, 0.7) 100%);
+  --wh-card-gradient: linear-gradient(140deg, rgba(253, 225, 234, 0.7) 0%, #ffffff 80%);
+  --wh-cta-gradient: linear-gradient(90deg, #d65280 0%, #ec789b 50%, #b83d67 100%);
+  --wh-page-gradient: linear-gradient(180deg, rgba(253, 225, 234, 0.55) 0%, #ffffff 45%, rgba(247, 180, 201, 0.35) 100%);
+  --wh-chip-bg: rgba(253, 225, 234, 0.4);
+  --wh-chip-text: #8c2f4c;
+  --wh-shadow: 0 35px 85px -45px rgba(194, 86, 123, 0.55);
+  --wh-glow: radial-gradient(circle, rgba(247, 180, 201, 0.35) 0%, transparent 70%);
+  --wh-highlight: rgba(247, 180, 201, 0.25);
+}
+
+.womens-health-theme .text-rose-900,
+.womens-health-theme .text-rose-800,
+.womens-health-theme .text-pink-900 {
+  color: var(--wh-darker) !important;
+}
+
+.womens-health-theme .text-rose-700,
+.womens-health-theme .text-rose-600,
+.womens-health-theme .text-rose-500,
+.womens-health-theme .text-rose-400,
+.womens-health-theme .text-pink-600 {
+  color: var(--wh-dark) !important;
+}
+
+.womens-health-theme .text-rose-300,
+.womens-health-theme .text-rose-200,
+.womens-health-theme .text-rose-100 {
+  color: var(--wh-light) !important;
+}
+
+.womens-health-theme .bg-rose-50,
+.womens-health-theme .bg-pink-50 {
+  background-color: var(--wh-muted) !important;
+}
+
+.womens-health-theme .bg-rose-100,
+.womens-health-theme .bg-pink-100 {
+  background-color: var(--wh-light) !important;
+}
+
+.womens-health-theme .bg-rose-200,
+.womens-health-theme .bg-pink-200 {
+  background-color: var(--wh-lighter) !important;
+}
+
+.womens-health-theme .bg-rose-50\/30,
+.womens-health-theme .bg-rose-50\/40,
+.womens-health-theme .bg-rose-50\/50,
+.womens-health-theme .bg-rose-50\/80,
+.womens-health-theme .bg-rose-100\/80,
+.womens-health-theme .bg-pink-100\/80 {
+  background-color: rgba(var(--wh-base-rgb), 0.15) !important;
+}
+
+.womens-health-theme .border-rose-100,
+.womens-health-theme .border-rose-200,
+.womens-health-theme .border-rose-200\/80,
+.womens-health-theme .border-rose-200\/60,
+.womens-health-theme .border-rose-300,
+.womens-health-theme .border-pink-200,
+.womens-health-theme .border-pink-100 {
+  border-color: var(--wh-border) !important;
+}
+
+.womens-health-theme .hover\:border-rose-300:hover,
+.womens-health-theme .hover\:border-rose-200:hover {
+  border-color: var(--wh-border-strong) !important;
+}
+
+.womens-health-theme .ring-rose-400,
+.womens-health-theme .ring-rose-300,
+.womens-health-theme .focus-visible\:ring-rose-300:focus-visible {
+  --tw-ring-color: rgba(var(--wh-base-rgb), 0.4) !important;
+}
+
+.womens-health-theme .text-rose-700 svg,
+.womens-health-theme .text-rose-600 svg,
+.womens-health-theme .text-pink-600 svg {
+  color: currentColor;
+}
+
+.womens-health-theme .from-rose-50\/30 {
+  --tw-gradient-from: rgba(var(--wh-base-rgb), 0.18) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
+}
+
+.womens-health-theme .to-pink-50\/20 {
+  --tw-gradient-to: rgba(var(--wh-accent-rgb), 0.2) !important;
+}
+
+.womens-health-theme .from-rose-100 {
+  --tw-gradient-from: var(--wh-light) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+
+.womens-health-theme .to-rose-50 {
+  --tw-gradient-to: var(--wh-muted) !important;
+}
+
+.womens-health-theme .via-pink-50\/80 {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-accent-rgb), 0.8), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
+}
+
+.womens-health-theme .from-rose-200\/40 {
+  --tw-gradient-from: rgba(var(--wh-base-rgb), 0.4) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
+}
+
+.womens-health-theme .to-rose-400\/40 {
+  --tw-gradient-to: rgba(var(--wh-base-rgb), 0.4) !important;
+}
+
+.womens-health-theme .via-pink-300\/30,
+.womens-health-theme .via-pink-200\/30,
+.womens-health-theme .via-pink-200\/20 {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-accent-rgb), 0.3), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
+}
+
+.womens-health-theme .from-rose-300\/25,
+.womens-health-theme .from-rose-300\/30 {
+  --tw-gradient-from: rgba(var(--wh-base-rgb), 0.25) !important;
+}
+
+.womens-health-theme .from-rose-300\/40,
+.womens-health-theme .from-rose-200\/20 {
+  --tw-gradient-from: rgba(var(--wh-base-rgb), 0.4) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
+}
+
+.womens-health-theme .to-pink-300\/20,
+.womens-health-theme .to-pink-200\/10 {
+  --tw-gradient-to: rgba(var(--wh-accent-rgb), 0.2) !important;
+}
+
+.womens-health-theme .from-rose-600,
+.womens-health-theme .via-pink-600,
+.womens-health-theme .to-rose-600 {
+  --tw-gradient-from: var(--wh-darker) !important;
+  --tw-gradient-to: var(--wh-darker) !important;
+  --tw-gradient-stops: var(--wh-darker), var(--wh-dark), var(--wh-darker);
+}
+
+.womens-health-theme .bg-gradient-to-b,
+.womens-health-theme .bg-gradient-to-br,
+.womens-health-theme .bg-gradient-to-tr,
+.womens-health-theme .bg-gradient-to-r {
+  background-size: cover;
+}
+
+.womens-health-theme .from-rose-50 {
+  --tw-gradient-from: var(--wh-muted) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+
+.womens-health-theme .to-pink-50 {
+  --tw-gradient-to: var(--wh-light) !important;
+}
+
+.womens-health-theme .to-pink-50\/40 {
+  --tw-gradient-to: rgba(var(--wh-accent-rgb), 0.4) !important;
+}
+
+.womens-health-theme .via-pink-100\/80 {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-accent-rgb), 0.8), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
+}
+
+.womens-health-theme .via-rose-50\/30,
+.womens-health-theme .via-rose-50\/20,
+.womens-health-theme .via-rose-200\/20 {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-base-rgb), 0.2), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
+}
+
+.womens-health-theme .from-pink-200\/30 {
+  --tw-gradient-from: rgba(var(--wh-accent-rgb), 0.3) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
+}
+
+.womens-health-theme .hover\:bg-rose-50:hover,
+.womens-health-theme .hover\:bg-rose-50\/50:hover {
+  background-color: var(--wh-muted) !important;
+}
+
+.womens-health-theme .text-rose-600 .lucide {
+  color: currentColor;
+}
+
+.womens-health-theme .shadow-[0_35px_85px_-45px_rgba(15,23,42,0.35)] {
+  box-shadow: var(--wh-shadow), 0 0 0 0 transparent;
+}
+

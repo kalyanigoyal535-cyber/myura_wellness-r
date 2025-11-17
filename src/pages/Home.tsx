@@ -5,7 +5,6 @@ import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Play, Pause } from 'lucide-react';
 import ResponsiveProductImage, { type ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
-import ProductLuxuryModal, { type LuxuryModalContext } from '../components/ProductLuxuryModal';
 
 const PRODUCT_IMAGE_WIDTHS = [320, 640, 960] as const;
 
@@ -54,7 +53,6 @@ const Home: React.FC = () => {
   const [transitionStage, setTransitionStage] = useState<'idle' | 'entering'>('idle');
   const manualResumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [productImageIndices, setProductImageIndices] = useState<number[]>(() => new Array(6).fill(0));
-  const [modalContext, setModalContext] = useState<LuxuryModalContext | null>(null);
   const promoVideoRef = useRef<HTMLVideoElement | null>(null);
   const promoVideoSectionRef = useRef<HTMLDivElement | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -469,33 +467,6 @@ const Home: React.FC = () => {
     [products]
   );
 
-  const handleOpenProductModal = useCallback(
-    (product: Product, image: ResponsiveImageDescriptor) => {
-      setModalContext({
-        product: {
-          name: product.name,
-          price: product.price,
-          originalPrice: product.originalPrice,
-          discountPercent: product.discountPercent,
-          spotlight: {
-            badge: product.spotlight.badge,
-            headline: product.spotlight.headline ?? product.name,
-            subheadline: product.spotlight.subheadline,
-            highlights: product.spotlight.highlights,
-            callouts: product.spotlight.callouts,
-          },
-        },
-        image,
-        spotlightImage: product.spotlight.image,
-      });
-    },
-    [],
-  );
-
-  const handleCloseProductModal = useCallback(() => {
-    setModalContext(null);
-  }, []);
-
   useEffect(() => {
     const sectionEl = promoVideoSectionRef.current;
     const videoEl = promoVideoRef.current;
@@ -826,10 +797,10 @@ const Home: React.FC = () => {
                       <div className={`relative flex flex-col items-center gap-4 p-5 sm:p-6 pb-6 sm:pb-7 rounded-[2.25rem] m-2 sm:m-3 bg-gradient-to-br ${product.pedestalColor}`}>
                         <div className="relative w-full">
                           <div className="overflow-hidden rounded-[1.75rem] border border-white/60 bg-white">
-                            <button
-                              type="button"
-                              onClick={() => handleOpenProductModal(product, currentImage)}
+                            <Link
+                              to={`/product/${product.slug}`}
                               className="relative block w-full focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-200/70 focus-visible:ring-offset-4 focus-visible:ring-offset-white"
+                              aria-label={`View details for ${product.name}`}
                             >
                               <ResponsiveProductImage
                                 key={`${product.id}-${productImageIndices[productIndex]}`}
@@ -840,7 +811,7 @@ const Home: React.FC = () => {
                               <span className="pointer-events-none absolute bottom-4 left-1/2 w-[82%] -translate-x-1/2 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 px-4 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-white shadow-[0_26px_58px_-30px_rgba(236,72,153,0.55)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                                 Discover Ritual
                               </span>
-                            </button>
+                            </Link>
                           </div>
                           {product.images.length > 1 && (
                             <>
@@ -1168,7 +1139,6 @@ const Home: React.FC = () => {
         </div>
       </section>
       </div>
-      <ProductLuxuryModal context={modalContext} onClose={handleCloseProductModal} />
     </>
   );
 };
