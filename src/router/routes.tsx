@@ -9,6 +9,11 @@ import Contact from "../pages/Contact";
 import MyAccount from "../pages/MyAccount";
 import Cart from "../pages/Cart";
 import BlogPost from "../blogPost/BlogPost";
+import { LogIn } from "lucide-react";
+import Login from "../pages/login/Login";
+import Signup from "../pages/signup/Signup";
+import Checkout from "../pages/checkout/Checkout";
+import Profile from "../pages/profile/Profile";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -20,30 +25,44 @@ const router = createBrowserRouter([
       },
       {
         path: "/about",
-        element: <About/>,
+        element: <About />,
       },
       {
         path: "/product",
-        element: <Product/>,
+        element: <Product />,
       },
       {
         path: "/blog",
         element: <Blog />,
       },
-      { path: "/blog/:slug",
-       element: <BlogPost />
-       },
+      { path: "/blog/:slug", element: <BlogPost /> },
       {
         path: "/contact",
-        element: <Contact/>,
+        element: <Contact />,
       },
       {
         path: "/my-account",
-        element: <MyAccount/>,
+        element: <MyAccount />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/signup",
+        element: <Signup />,
       },
       {
         path: "/cart",
-        element: <Cart/>,
+        element: <Cart />,
+      },
+      {
+        path:"/checkout",
+        element: <Checkout/>
+      },
+      {
+        path:"/profile ",
+        element: <Profile/>
       },
     ],
   },

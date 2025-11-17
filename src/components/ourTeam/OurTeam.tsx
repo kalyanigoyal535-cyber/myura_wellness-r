@@ -66,7 +66,11 @@ export default function TeamEmbla() {
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl p-10 px-6">
       {/* Heading */}
-      <h2 className="text-center text-3xl font-bold">Meet Our Team</h2>
+      <h2 className="text-center text-3xl font-bold underline mb-4">Meet Our Team</h2>
+      <p>
+      We are a passionate team of experts—wellness enthusiasts, product developers, and creatives—all driven by one mission: to make holistic health simple, accessible, and highly effective. We pour our expertise and heart into every part of the brand, from the sourcing of our herbs to the personalized support we offer you.
+
+      </p>
 
       {/* Blue dots */}
       {/* <div className="flex justify-center gap-2 mt-3">
