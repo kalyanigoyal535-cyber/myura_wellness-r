@@ -121,7 +121,6 @@ const PRODUCT_DEFAULT_COLORS: Record<string, RGB> = {
 };
 
 const DEFAULT_COLOR: RGB = { r: 236, g: 120, b: 155 };
-const DEFAULT_PALETTE = buildPalette(DEFAULT_COLOR);
 
 const extractAverageColor = (img: HTMLImageElement): RGB => {
   const canvas = document.createElement('canvas');
