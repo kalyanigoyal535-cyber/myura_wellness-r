@@ -283,7 +283,7 @@ const Header: React.FC = () => {
         </div>
         
         {/* Subtle shimmer effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_4s_ease-in-out_infinite] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer-4s pointer-events-none"></div>
       </div>
 
       {/* Professional Top Bar */}
@@ -384,7 +384,7 @@ const Header: React.FC = () => {
                   </button>
                 ) : (
                   // Search Input (Mobile - when open) - Expands to the right
-                  <div className="relative max-w-[calc(100vw-200px)] sm:max-w-[240px] w-[140px] sm:w-[180px] animate-[slideIn_0.5s_cubic-bezier(0.4,0,0.2,1)]">
+                  <div className="relative max-w-[calc(100vw-200px)] sm:max-w-[240px] w-[140px] sm:w-[180px] animate-slideIn-cubic">
                     <input
                       type="text"
                       placeholder="Search..."
