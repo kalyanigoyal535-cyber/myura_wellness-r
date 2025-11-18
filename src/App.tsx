@@ -1,21 +1,22 @@
-import React, { useEffect, Suspense, lazy } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import LoadingScreen from './components/LoadingScreen';
-
+import React, { useEffect, Suspense, lazy } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import LoadingScreen from "./components/LoadingScreen";
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
 // Lazy load routes for code splitting
-const Home = lazy(() => import('./pages/Home'));
-const About = lazy(() => import('./pages/About'));
-const Product = lazy(() => import('./pages/Product'));
-const ProductDetail = lazy(() => import('./pages/ProductDetail'));
-const Blog = lazy(() => import('./pages/Blog'));
-const Contact = lazy(() => import('./pages/Contact'));
-const MyAccount = lazy(() => import('./pages/MyAccount'));
-const Cart = lazy(() => import('./pages/Cart'));
-
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Product = lazy(() => import("./pages/Product"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Blog = lazy(() => import("./pages/Blog"));
+const Contact = lazy(() => import("./pages/Contact"));
+const MyAccount = lazy(() => import("./pages/MyAccount"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Profile = lazy(() => import("./pages/Profile"));
 // Loading component
 const LoadingFallback = () => (
   <div className="min-h-screen bg-stone-50 flex items-center justify-center">
@@ -32,7 +33,7 @@ const ScrollToTop = () => {
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'auto' // 'auto' provides instant scroll (default behavior)
+      behavior: "auto", // 'auto' provides instant scroll (default behavior)
     });
   }, [pathname]);
 
@@ -58,52 +59,61 @@ const AOSRefresher = () => {
 function App() {
   useEffect(() => {
     // Prevent browser from restoring scroll position on refresh
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
     }
 
     // Scroll to top on initial page load/refresh
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'auto' // 'auto' provides instant scroll (default behavior)
+      behavior: "auto", // 'auto' provides instant scroll (default behavior)
     });
 
     // Initialize AOS
-    if (typeof window !== 'undefined') {
-    AOS.init({
-      duration: 1000,
-      easing: 'ease-in-out',
+    if (typeof window !== "undefined") {
+      AOS.init({
+        duration: 1000,
+        easing: "ease-in-out",
         once: false,
         mirror: true,
-      offset: 100,
-    });
+        offset: 100,
+      });
     }
   }, []);
 
   return (
     <>
-        <LoadingScreen />
-        <ScrollToTop />
+      <LoadingScreen />
+      <ScrollToTop />
       <AOSRefresher />
+      <MantineProvider>
         <div className="min-h-screen bg-stone-50 overflow-x-hidden">
           <Header />
-          <div style={{ paddingTop: 'var(--header-height, 0px)', transition: 'padding-top 0.45s ease' }}>
-          <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/product" element={<Product />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/my-account" element={<MyAccount />} />
-          <Route path="/cart" element={<Cart />} />
-          </Routes>
-          </Suspense>
+          <div
+            style={{
+              paddingTop: "var(--header-height, 0px)",
+              transition: "padding-top 0.45s ease",
+            }}
+          >
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/product" element={<Product />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/my-account" element={<MyAccount />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/profile" element={<Profile />} />
+              </Routes>
+            </Suspense>
           </div>
+
           <Footer />
         </div>
+      </MantineProvider>
     </>
   );
 }

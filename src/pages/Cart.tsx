@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, ArrowLeft, Plus, Minus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-
+import Upselling from '../components/Upselling';
 const Cart: React.FC = () => {
   const { items, updateQty, removeItem, subtotal } = useCart();
   const shipping = subtotal > 799 || subtotal === 0 ? 0 : 49;
@@ -10,8 +10,8 @@ const Cart: React.FC = () => {
 
   return (
     <main className="min-h-[70vh] bg-stone-50">
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <div className="flex items-center justify-between mb-6 sm:mb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <div className="flex items-center justify-between mb-6 sm:mb-10"  >
           <div className="flex items-center space-x-3">
             <Link to="/" className="inline-flex items-center text-slate-600 hover:text-slate-900 transition-colors">
               <ArrowLeft className="h-4 w-4" />
@@ -79,6 +79,7 @@ const Cart: React.FC = () => {
               <p className="mt-3 text-xs text-slate-500 text-center font-minimal">Free shipping on orders over ₹799</p>
             </div>
           </aside>
+          <Upselling/>
         </div>
       </div>
     </main>
