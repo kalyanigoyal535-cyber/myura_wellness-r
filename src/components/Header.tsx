@@ -296,9 +296,22 @@ const Header: React.FC = () => {
   }, []);
 
   const measureTopBar = useCallback(() => {
-    if (topBarRef.current) {
-      setTopBarHeight(topBarRef.current.scrollHeight);
-    }
+    const topBarEl = topBarRef.current;
+    if (!topBarEl) return;
+
+    const previousTransition = topBarEl.style.transition;
+    const previousMaxHeight = topBarEl.style.maxHeight;
+
+    // Temporarily disable transition and max-height constraint so we can measure the actual size
+    topBarEl.style.transition = 'none';
+    topBarEl.style.maxHeight = 'none';
+
+    const measuredHeight = topBarEl.scrollHeight;
+    setTopBarHeight(measuredHeight);
+
+    // Restore inline styles so React retains control
+    topBarEl.style.maxHeight = previousMaxHeight;
+    topBarEl.style.transition = previousTransition;
   }, []);
 
   // Measure top bar height for smooth collapsing
