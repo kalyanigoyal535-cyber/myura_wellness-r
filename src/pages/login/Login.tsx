@@ -17,7 +17,6 @@ const Login = () => {
         <img
           src={images.offerImage}
           alt="Offer"
-          className="w-10/12 md:w-full object-cover h-48 md:h-full mt-20 md:mt-0 "
         />
       </div>
 
