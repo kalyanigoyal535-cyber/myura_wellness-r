@@ -110,6 +110,16 @@ const buildPalette = (color: RGB): ImagePalette => {
   };
 };
 
+// Product-specific default colors based on their accent gradients
+const PRODUCT_DEFAULT_COLORS: Record<string, RGB> = {
+  'dia-care': { r: 244, g: 114, b: 182 }, // rose-400
+  'liver-detox': { r: 45, g: 212, b: 191 }, // teal-400
+  'bone-joint-support': { r: 99, g: 102, b: 241 }, // indigo-500
+  'gut-and-digestion': { r: 251, g: 191, b: 36 }, // amber-400
+  'womens-health-plus': { r: 236, g: 72, b: 153 }, // pink-500
+  'mens-vitality-booster': { r: 14, g: 165, b: 233 }, // sky-500
+};
+
 const DEFAULT_COLOR: RGB = { r: 236, g: 120, b: 155 };
 const DEFAULT_PALETTE = buildPalette(DEFAULT_COLOR);
 
@@ -152,41 +162,51 @@ const extractAverageColor = (img: HTMLImageElement): RGB => {
   };
 };
 
-const useImagePalette = (image?: ResponsiveImageDescriptor | null): ImagePalette => {
-  const [palette, setPalette] = useState<ImagePalette>(DEFAULT_PALETTE);
+const useImagePalette = (image?: ResponsiveImageDescriptor | null, productId?: string): ImagePalette => {
+  // Use product-specific default color if available, otherwise use generic default
+  const defaultColor = productId && PRODUCT_DEFAULT_COLORS[productId] 
+    ? PRODUCT_DEFAULT_COLORS[productId] 
+    : DEFAULT_COLOR;
+  const [palette, setPalette] = useState<ImagePalette>(buildPalette(defaultColor));
 
   useEffect(() => {
     if (!image?.fallback) {
-      setPalette(DEFAULT_PALETTE);
+      setPalette(buildPalette(defaultColor));
       return;
     }
 
     let isActive = true;
+    
+    // Preload image immediately with eager loading
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.decoding = 'async';
-    img.src = image.fallback;
-
+    img.decoding = 'sync'; // Sync decoding for faster processing
+    img.loading = 'eager'; // Eager loading priority
+    
+    // Set src after setting up handlers
     img.onload = () => {
       if (!isActive) return;
       try {
         const average = extractAverageColor(img);
         setPalette(buildPalette(average));
       } catch {
-        setPalette(DEFAULT_PALETTE);
+        setPalette(buildPalette(defaultColor));
       }
     };
 
     img.onerror = () => {
       if (isActive) {
-        setPalette(DEFAULT_PALETTE);
+        setPalette(buildPalette(defaultColor));
       }
     };
+
+    // Start loading immediately
+    img.src = image.fallback;
 
     return () => {
       isActive = false;
     };
-  }, [image?.fallback]);
+  }, [image?.fallback, defaultColor]);
 
   return useMemo(() => palette, [palette]);
 };

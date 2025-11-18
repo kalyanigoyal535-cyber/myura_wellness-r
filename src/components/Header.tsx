@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw, Sparkles, Gift, Star, Truck } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw, Sparkles, Gift, Star, Truck, X, TrendingUp, ArrowRight } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaYoutube, FaPinterestP, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 import { useLocation as useUserLocation } from '../hooks/useLocation';
 import { useCart } from '../context/CartContext';
+import { productCatalog } from '../data/products';
+import ResponsiveProductImage from './ResponsiveProductImage';
 
 const FacebookIcon = FaFacebookF as React.ComponentType<{ className?: string }>;
 const InstagramIcon = FaInstagram as React.ComponentType<{ className?: string }>;
@@ -21,9 +23,21 @@ const Header: React.FC = () => {
   const topBarRef = React.useRef<HTMLDivElement>(null);
   const [topBarHeight, setTopBarHeight] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
   const { address, loading, error, refreshLocation } = useUserLocation();
   const { count } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
+  
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<typeof productCatalog>([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showResults, setShowResults] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+  const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [mobileDropdownPosition, setMobileDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
   const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
   
@@ -40,7 +54,179 @@ const Header: React.FC = () => {
   
   const handleSearchClose = useCallback(() => {
     setIsSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowResults(false);
   }, []);
+
+  // Search function - searches through name, headline, description, benefits, etc.
+  const performSearch = useCallback((query: string) => {
+    const trimmedQuery = query.trim();
+    
+    if (!trimmedQuery) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    const lowerQuery = trimmedQuery.toLowerCase();
+    const results = productCatalog.filter((product) => {
+      const searchableText = [
+        product.name,
+        product.headline,
+        product.summary,
+        product.description,
+        product.heroTagline,
+        ...product.benefits,
+        product.keyIngredients,
+        product.suitableFor,
+        product.howToUse,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return searchableText.includes(lowerQuery);
+    });
+
+    // Sort by relevance (exact name match first, then headline, then others)
+    const sortedResults = results.sort((a, b) => {
+      const aNameMatch = a.name.toLowerCase().includes(lowerQuery);
+      const bNameMatch = b.name.toLowerCase().includes(lowerQuery);
+      if (aNameMatch && !bNameMatch) return -1;
+      if (!aNameMatch && bNameMatch) return 1;
+
+      const aHeadlineMatch = a.headline.toLowerCase().includes(lowerQuery);
+      const bHeadlineMatch = b.headline.toLowerCase().includes(lowerQuery);
+      if (aHeadlineMatch && !bHeadlineMatch) return -1;
+      if (!aHeadlineMatch && bHeadlineMatch) return 1;
+
+      return 0;
+    });
+
+    const limitedResults = sortedResults.slice(0, 6);
+    setSearchResults(limitedResults);
+    // Always show dropdown when there's a query
+    setShowResults(true);
+    setSelectedIndex(-1);
+  }, []);
+
+  // Update dropdown position for desktop
+  useEffect(() => {
+    const updatePosition = () => {
+      if (desktopSearchInputRef.current) {
+        const rect = desktopSearchInputRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + window.scrollY + 12,
+          left: rect.left + window.scrollX,
+          width: rect.width
+        });
+      }
+    };
+    
+    if (searchQuery.trim().length > 0 && window.innerWidth >= 1024) {
+      updatePosition();
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+    }
+    
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [searchQuery]);
+
+  // Update dropdown position for mobile
+  useEffect(() => {
+    const updateMobilePosition = () => {
+      if (searchInputRef.current && isSearchOpen) {
+        const rect = searchInputRef.current.getBoundingClientRect();
+        setMobileDropdownPosition({
+          top: rect.bottom + window.scrollY + 12,
+          left: rect.left + window.scrollX,
+          width: rect.width
+        });
+      }
+    };
+    
+    if (searchQuery.trim().length > 0 && isSearchOpen && window.innerWidth < 1024) {
+      updateMobilePosition();
+      window.addEventListener('scroll', updateMobilePosition, true);
+      window.addEventListener('resize', updateMobilePosition);
+    }
+    
+    return () => {
+      window.removeEventListener('scroll', updateMobilePosition, true);
+      window.removeEventListener('resize', updateMobilePosition);
+    };
+  }, [searchQuery, isSearchOpen]);
+
+  // Handle search input change
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    // Perform search immediately - no delay
+    if (value.trim().length > 0) {
+      performSearch(value);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  }, [performSearch]);
+
+  // Handle search result click
+  const handleResultClick = useCallback((productId: string) => {
+    navigate(`/product/${productId}`);
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowResults(false);
+    setIsSearchOpen(false);
+    if (searchInputRef.current) searchInputRef.current.blur();
+    if (desktopSearchInputRef.current) desktopSearchInputRef.current.blur();
+  }, [navigate]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showResults || searchResults.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      handleResultClick(searchResults[selectedIndex].id);
+    } else if (e.key === 'Escape') {
+      setShowResults(false);
+      setSearchQuery('');
+      setSearchResults([]);
+      if (searchInputRef.current) searchInputRef.current.blur();
+      if (desktopSearchInputRef.current) desktopSearchInputRef.current.blur();
+    }
+  }, [showResults, searchResults, selectedIndex, handleResultClick]);
+
+  // Close search results on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchResultsRef.current &&
+        !searchResultsRef.current.contains(event.target as Node) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target as Node) &&
+        desktopSearchInputRef.current &&
+        !desktopSearchInputRef.current.contains(event.target as Node)
+      ) {
+        setShowResults(false);
+      }
+    };
+
+    if (showResults) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showResults]);
   
   const handleMenuClose = useCallback(() => {
     setIsMenuOpen(false);
@@ -384,22 +570,47 @@ const Header: React.FC = () => {
                   </button>
                 ) : (
                   // Search Input (Mobile - when open) - Expands to the right
-                  <div className="relative max-w-[calc(100vw-200px)] sm:max-w-[240px] w-[140px] sm:w-[180px] animate-slideIn-cubic">
+                  <div className="relative max-w-[calc(100vw-180px)] sm:max-w-[280px] w-[160px] sm:w-[220px] animate-slideIn-cubic">
+                    <div className="relative group">
                     <input
+                        ref={searchInputRef}
                       type="text"
-                      placeholder="Search..."
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onKeyDown={handleKeyDown}
+                        onFocus={() => {
+                      if (searchQuery.trim()) {
+                        performSearch(searchQuery);
+                      }
+                    }}
                       autoFocus
-                      className="w-full px-3 py-1.5 pl-7 pr-8 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all duration-300 bg-white hover:border-slate-400 font-premium placeholder:text-slate-400 shadow-sm"
-                    />
-                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                        className="w-full px-4 py-2 pl-9 pr-9 text-xs sm:text-sm border-2 border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 transition-all duration-300 bg-white/95 backdrop-blur-sm hover:bg-white hover:border-slate-300 hover:shadow-md font-medium placeholder:text-slate-400 placeholder:font-normal shadow-sm"
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                        <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                      </div>
+                      {searchQuery && (
+                        <button
+                          onClick={() => {
+                            setSearchQuery('');
+                            setSearchResults([]);
+                            setShowResults(false);
+                          }}
+                          className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-all duration-200"
+                        >
+                          <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </button>
+                      )}
+                      {!searchQuery && (
                     <button
                       onClick={handleSearchClose}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-0.5"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+                          className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-all duration-200"
+                        >
+                          <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -455,13 +666,138 @@ const Header: React.FC = () => {
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
               {/* Desktop Search - Always visible */}
               <div className="hidden lg:block relative">
+                <div className="relative group">
                 <input
+                    ref={desktopSearchInputRef}
                   type="text"
-                  placeholder="Search products..."
-                  className="w-40 md:w-48 lg:w-56 xl:w-64 px-4 py-2.5 pl-10 pr-4 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all duration-200 bg-white hover:border-slate-400 font-premium placeholder:text-slate-400"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    placeholder="Search products, benefits, ingredients..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => {
+                      if (searchQuery.trim()) {
+                        performSearch(searchQuery);
+                      }
+                    }}
+                    className="w-48 md:w-56 lg:w-64 xl:w-72 px-5 py-2.5 pl-11 pr-11 text-sm border-2 border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-400 transition-all duration-300 bg-white/90 backdrop-blur-sm hover:bg-white hover:border-slate-300 hover:shadow-md font-medium placeholder:text-slate-400 placeholder:font-normal shadow-sm"
+                  />
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <Search className="h-4 w-4 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                  </div>
+                  {searchQuery && (
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchResults([]);
+                        setShowResults(false);
+                      }}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-all duration-200"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </div>
+              
+              {/* Desktop Search Results Dropdown - Portal to render above everything */}
+              {searchQuery.trim().length > 0 && typeof document !== 'undefined' && createPortal(
+                <div
+                  ref={searchResultsRef}
+                  className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[520px] overflow-y-auto"
+                  style={{ 
+                    zIndex: 99999,
+                    position: 'fixed',
+                    top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
+                    left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left + window.scrollX}px` : '50%'),
+                    width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 320)}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.offsetWidth}px` : '400px'),
+                    maxWidth: '600px',
+                    pointerEvents: 'auto'
+                  } as React.CSSProperties}
+                >
+                  <div className="p-3">
+                    {searchResults.length > 0 ? (
+                      <>
+                        <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-lg">
+                          <TrendingUp className="h-4 w-4 text-slate-600" />
+                          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            {searchResults.length} {searchResults.length === 1 ? 'Result Found' : 'Results Found'}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          {searchResults.map((product, idx) => (
+                            <button
+                              key={product.id}
+                              onClick={() => handleResultClick(product.id)}
+                              className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 text-left group border-2 ${
+                                selectedIndex === idx
+                                  ? 'bg-gradient-to-r from-slate-50 via-white to-slate-50 scale-[1.02] shadow-lg border-slate-300'
+                                  : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:via-white hover:to-slate-50 border-transparent hover:border-slate-200 hover:shadow-md'
+                              }`}
+                            >
+                              <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-md transition-all duration-300">
+                                <ResponsiveProductImage
+                                  image={product.image}
+                                  className="w-full h-full"
+                                  imgClassName="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-base font-bold text-slate-900 truncate group-hover:text-slate-800 transition-colors">
+                                  {product.name}
+                                </p>
+                                <p className="text-sm text-slate-600 truncate mt-1 font-medium">{product.headline}</p>
+                                <p className="text-xs text-slate-500 line-clamp-1 mt-1.5">{product.summary}</p>
+                                <div className="flex items-center gap-4 mt-3">
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="flex items-center gap-0.5">
+                                      {[...Array(product.rating)].map((_, i) => (
+                                        <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                                      ))}
+                                    </div>
+                                    <span className="text-xs text-slate-500 font-medium">({product.reviews})</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-base font-bold text-slate-900">₹{product.price}</span>
+                                    {product.originalPrice > product.price && (
+                                      <span className="text-xs text-slate-400 line-through font-medium">
+                                        ₹{product.originalPrice}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
+                            </button>
+                          ))}
+                        </div>
+                        {searchResults.length >= 6 && (
+                          <div className="mt-3 pt-3 border-t-2 border-slate-200">
+                            <Link
+                              to={`/product?search=${encodeURIComponent(searchQuery)}`}
+                              onClick={() => {
+                                setSearchQuery('');
+                                setSearchResults([]);
+                                setShowResults(false);
+                              }}
+                              className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 rounded-xl transition-all duration-300 border-2 border-slate-200 hover:border-slate-300 hover:shadow-md"
+                            >
+                              <span>View All Results</span>
+                              <ArrowRight className="h-4 w-4" />
+                            </Link>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="py-8 px-4 text-center">
+                        <Search className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                        <p className="text-sm font-semibold text-slate-700 mb-1">No products found</p>
+                        <p className="text-xs text-slate-500">Try searching for product names, benefits, or ingredients</p>
+                      </div>
+                    )}
+                  </div>
+                </div>,
+                document.body
+              )}
 
               <Link to="/my-account" className="inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 flex-shrink-0">
                 <User className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -539,11 +875,363 @@ const Header: React.FC = () => {
   // Render header via portal if available, otherwise render directly
   // Don't return null - always render something
   if (typeof document !== 'undefined' && portalContainer && mounted) {
-    return createPortal(headerContent, portalContainer);
+    return (
+      <>
+        {createPortal(headerContent, portalContainer)}
+        {/* Mobile Search Results Dropdown - Portal to render above everything */}
+        {searchQuery.trim().length > 0 && isSearchOpen && createPortal(
+          <div
+            ref={searchResultsRef}
+            className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[70vh] overflow-y-auto"
+            style={{ 
+              zIndex: 99999,
+              position: 'fixed',
+              top: mobileDropdownPosition.top > 0 ? `${mobileDropdownPosition.top}px` : (searchInputRef.current ? `${searchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
+              left: '10px',
+              right: '10px',
+              width: 'calc(100vw - 20px)',
+              maxWidth: 'calc(100vw - 20px)',
+              pointerEvents: 'auto'
+            } as React.CSSProperties}
+          >
+            <div className="p-3">
+              {searchResults.length > 0 ? (
+                <>
+                  <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-lg">
+                    <TrendingUp className="h-3.5 w-3.5 text-slate-600" />
+                    <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">
+                      {searchResults.length} {searchResults.length === 1 ? 'Result' : 'Results'}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {searchResults.map((product, idx) => (
+                      <button
+                        key={product.id}
+                        onClick={() => handleResultClick(product.id)}
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 text-left group border-2 ${
+                          selectedIndex === idx
+                            ? 'bg-gradient-to-r from-slate-50 to-white scale-[1.02] shadow-lg border-slate-300'
+                            : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:to-white border-transparent hover:border-slate-200 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 transition-all duration-300">
+                          <ResponsiveProductImage
+                            image={product.image}
+                            className="w-full h-full"
+                            imgClassName="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-900 truncate group-hover:text-slate-800">
+                            {product.name}
+                          </p>
+                          <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">{product.headline}</p>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <div className="flex items-center gap-0.5">
+                              {[...Array(product.rating)].map((_, i) => (
+                                <Star key={i} className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                              ))}
+                            </div>
+                            <span className="text-xs font-bold text-slate-900">₹{product.price}</span>
+                          </div>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="py-6 px-4 text-center">
+                  <Search className="h-10 w-10 text-slate-300 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-slate-700 mb-1">No products found</p>
+                  <p className="text-[10px] text-slate-500">Try different keywords</p>
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
+        {/* Desktop Search Results Dropdown - Portal */}
+        {searchQuery.trim().length > 0 && createPortal(
+          <div
+            ref={searchResultsRef}
+            className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[520px] overflow-y-auto"
+            style={{ 
+              zIndex: 99999,
+              position: 'fixed',
+              top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
+              left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left + window.scrollX}px` : '50%'),
+              width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 320)}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.offsetWidth}px` : '400px'),
+              maxWidth: '600px',
+              pointerEvents: 'auto'
+            } as React.CSSProperties}
+          >
+            <div className="p-3">
+              {searchResults.length > 0 ? (
+                <>
+                  <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-lg">
+                    <TrendingUp className="h-4 w-4 text-slate-600" />
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      {searchResults.length} {searchResults.length === 1 ? 'Result Found' : 'Results Found'}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {searchResults.map((product, idx) => (
+                      <button
+                        key={product.id}
+                        onClick={() => handleResultClick(product.id)}
+                        className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 text-left group border-2 ${
+                          selectedIndex === idx
+                            ? 'bg-gradient-to-r from-slate-50 via-white to-slate-50 scale-[1.02] shadow-lg border-slate-300'
+                            : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:via-white hover:to-slate-50 border-transparent hover:border-slate-200 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-md transition-all duration-300">
+                          <ResponsiveProductImage
+                            image={product.image}
+                            className="w-full h-full"
+                            imgClassName="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-base font-bold text-slate-900 truncate group-hover:text-slate-800 transition-colors">
+                            {product.name}
+                          </p>
+                          <p className="text-sm text-slate-600 truncate mt-1 font-medium">{product.headline}</p>
+                          <p className="text-xs text-slate-500 line-clamp-1 mt-1.5">{product.summary}</p>
+                          <div className="flex items-center gap-4 mt-3">
+                            <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-0.5">
+                                {[...Array(product.rating)].map((_, i) => (
+                                  <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                                ))}
+                              </div>
+                              <span className="text-xs text-slate-500 font-medium">({product.reviews})</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-base font-bold text-slate-900">₹{product.price}</span>
+                              {product.originalPrice > product.price && (
+                                <span className="text-xs text-slate-400 line-through font-medium">
+                                  ₹{product.originalPrice}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                  {searchResults.length >= 6 && (
+                    <div className="mt-3 pt-3 border-t-2 border-slate-200">
+                      <Link
+                        to={`/product?search=${encodeURIComponent(searchQuery)}`}
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSearchResults([]);
+                          setShowResults(false);
+                        }}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 rounded-xl transition-all duration-300 border-2 border-slate-200 hover:border-slate-300 hover:shadow-md"
+                      >
+                        <span>View All Results</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="py-8 px-4 text-center">
+                  <Search className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                  <p className="text-sm font-semibold text-slate-700 mb-1">No products found</p>
+                  <p className="text-xs text-slate-500">Try searching for product names, benefits, or ingredients</p>
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
+      </>
+    );
   }
   
   // Fallback: render directly if portal not ready (for SSR or initial render)
-  return headerContent;
+  return (
+    <>
+      {headerContent}
+      {/* Mobile Search Results Dropdown - Portal */}
+      {searchQuery.trim().length > 0 && isSearchOpen && typeof document !== 'undefined' && createPortal(
+        <div
+          ref={searchResultsRef}
+          className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[70vh] overflow-y-auto"
+          style={{ 
+            zIndex: 99999,
+            position: 'fixed',
+            top: mobileDropdownPosition.top > 0 ? `${mobileDropdownPosition.top}px` : (searchInputRef.current ? `${searchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
+            left: '10px',
+            right: '10px',
+            width: 'calc(100vw - 20px)',
+            maxWidth: 'calc(100vw - 20px)',
+            pointerEvents: 'auto'
+          } as React.CSSProperties}
+        >
+          <div className="p-3">
+            {searchResults.length > 0 ? (
+              <>
+                <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-lg">
+                  <TrendingUp className="h-3.5 w-3.5 text-slate-600" />
+                  <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">
+                    {searchResults.length} {searchResults.length === 1 ? 'Result' : 'Results'}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {searchResults.map((product, idx) => (
+                    <button
+                      key={product.id}
+                      onClick={() => handleResultClick(product.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 text-left group border-2 ${
+                        selectedIndex === idx
+                          ? 'bg-gradient-to-r from-slate-50 to-white scale-[1.02] shadow-lg border-slate-300'
+                          : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:to-white border-transparent hover:border-slate-200 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 transition-all duration-300">
+                        <ResponsiveProductImage
+                          image={product.image}
+                          className="w-full h-full"
+                          imgClassName="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-900 truncate group-hover:text-slate-800">
+                          {product.name}
+                        </p>
+                        <p className="text-xs text-slate-600 truncate mt-0.5 font-medium">{product.headline}</p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <div className="flex items-center gap-0.5">
+                            {[...Array(product.rating)].map((_, i) => (
+                              <Star key={i} className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                            ))}
+                          </div>
+                          <span className="text-xs font-bold text-slate-900">₹{product.price}</span>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="py-6 px-4 text-center">
+                <Search className="h-10 w-10 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs font-semibold text-slate-700 mb-1">No products found</p>
+                <p className="text-[10px] text-slate-500">Try different keywords</p>
+              </div>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
+      {/* Desktop Search Results Dropdown - Portal */}
+      {searchQuery.trim().length > 0 && typeof document !== 'undefined' && createPortal(
+        <div
+          ref={searchResultsRef}
+          className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[520px] overflow-y-auto"
+          style={{ 
+            zIndex: 99999,
+            position: 'fixed',
+            top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
+            left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left + window.scrollX}px` : '50%'),
+            width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 320)}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.offsetWidth}px` : '400px'),
+            maxWidth: '600px',
+            pointerEvents: 'auto'
+          } as React.CSSProperties}
+        >
+          <div className="p-3">
+            {searchResults.length > 0 ? (
+              <>
+                <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-slate-600" />
+                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    {searchResults.length} {searchResults.length === 1 ? 'Result Found' : 'Results Found'}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {searchResults.map((product, idx) => (
+                    <button
+                      key={product.id}
+                      onClick={() => handleResultClick(product.id)}
+                      className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 text-left group border-2 ${
+                        selectedIndex === idx
+                          ? 'bg-gradient-to-r from-slate-50 via-white to-slate-50 scale-[1.02] shadow-lg border-slate-300'
+                          : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:via-white hover:to-slate-50 border-transparent hover:border-slate-200 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-md transition-all duration-300">
+                        <ResponsiveProductImage
+                          image={product.image}
+                          className="w-full h-full"
+                          imgClassName="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-bold text-slate-900 truncate group-hover:text-slate-800 transition-colors">
+                          {product.name}
+                        </p>
+                        <p className="text-sm text-slate-600 truncate mt-1 font-medium">{product.headline}</p>
+                        <p className="text-xs text-slate-500 line-clamp-1 mt-1.5">{product.summary}</p>
+                        <div className="flex items-center gap-4 mt-3">
+                          <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-0.5">
+                              {[...Array(product.rating)].map((_, i) => (
+                                <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                              ))}
+                            </div>
+                            <span className="text-xs text-slate-500 font-medium">({product.reviews})</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-base font-bold text-slate-900">₹{product.price}</span>
+                            {product.originalPrice > product.price && (
+                              <span className="text-xs text-slate-400 line-through font-medium">
+                                ₹{product.originalPrice}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
+                    </button>
+                  ))}
+                </div>
+                {searchResults.length >= 6 && (
+                  <div className="mt-3 pt-3 border-t-2 border-slate-200">
+                    <Link
+                      to={`/product?search=${encodeURIComponent(searchQuery)}`}
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchResults([]);
+                        setShowResults(false);
+                      }}
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 rounded-xl transition-all duration-300 border-2 border-slate-200 hover:border-slate-300 hover:shadow-md"
+                    >
+                      <span>View All Results</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="py-8 px-4 text-center">
+                <Search className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-sm font-semibold text-slate-700 mb-1">No products found</p>
+                <p className="text-xs text-slate-500">Try searching for product names, benefits, or ingredients</p>
+              </div>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
+  );
 };
 
 export default React.memo(Header);

@@ -69,7 +69,7 @@ const WomensHealthPlus: React.FC = () => {
   
   const heroImage = gallery[activeImageIndex] ?? product?.image;
   const galleryLength = gallery.length;
-  const palette = useImagePalette(heroImage);
+  const palette = useImagePalette(heroImage, product?.id);
   type CSSCustomProperties = React.CSSProperties & Record<`--${string}`, string>;
   const themeVars = useMemo<CSSCustomProperties>(
     () => ({
@@ -97,6 +97,22 @@ const WomensHealthPlus: React.FC = () => {
     }) as CSSCustomProperties,
     [palette],
   );
+
+  // Preload the hero image for faster color extraction (must be before early return)
+  useEffect(() => {
+    if (heroImage?.fallback) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = heroImage.fallback;
+      document.head.appendChild(link);
+      return () => {
+        if (document.head.contains(link)) {
+          document.head.removeChild(link);
+        }
+      };
+    }
+  }, [heroImage?.fallback]);
 
   const handleGalleryNav = useCallback(
     (delta: number) => {
@@ -158,26 +174,22 @@ const WomensHealthPlus: React.FC = () => {
     };
   }, [isZoomed]);
 
-  if (!product) {
-    return <Navigate to="/product" replace />;
-  }
-
   const toggleSection = (sectionId: string) => {
     setExpandedSection((current) => (current === sectionId ? null : sectionId));
   };
 
+  if (!product) {
+    return <Navigate to="/product" replace />;
+  }
+
   return (
     <>
       <div
-        className="min-h-screen bg-gradient-to-b from-rose-50/30 via-white to-pink-50/20 womens-health-theme"
+        className="min-h-screen bg-gradient-to-b from-rose-50/30 via-white to-pink-50/20 womens-health-theme transition-colors duration-300"
         style={themeVars}
       >
         {/* Hero Section with Elegant Floral Design */}
-        <section
-          className="relative overflow-hidden bg-gradient-to-br from-rose-100 via-pink-50/80 to-rose-50 pt-12 pb-12 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20"
-          data-aos="fade-up"
-          data-aos-duration="900"
-        >
+        <section className="relative overflow-hidden bg-gradient-to-br from-rose-100 via-pink-50/80 to-rose-50 pt-12 pb-12 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20">
           {/* Decorative Elements */}
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <div className="absolute -top-20 -right-20 h-96 w-96 rounded-full bg-gradient-to-br from-rose-200/40 via-pink-200/30 to-transparent blur-3xl" />
@@ -201,11 +213,7 @@ const WomensHealthPlus: React.FC = () => {
           <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12 max-w-7xl mx-auto">
               {/* Image Card - First on mobile, Right on desktop */}
-              <div
-                className="flex-1 max-w-lg mx-auto lg:mx-0 order-1 lg:order-2"
-                data-aos="fade-left"
-                data-aos-delay="150"
-              >
+              <div className="flex-1 max-w-lg mx-auto lg:mx-0 order-1 lg:order-2">
                 <div className="relative">
                   {/* Glow Effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-rose-300/40 via-pink-300/30 to-rose-400/40 rounded-3xl blur-2xl -z-10" />
@@ -269,11 +277,7 @@ const WomensHealthPlus: React.FC = () => {
               </div>
 
               {/* Price Section - Second on mobile, hidden on desktop (will be inside left content) */}
-              <div
-                className="flex-1 order-2 lg:hidden"
-                data-aos="fade-up"
-                data-aos-delay="200"
-              >
+              <div className="flex-1 order-2 lg:hidden">
                 <div className="w-full mb-6">
                   <div className="relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/90 shadow-[0_28px_60px_-45px_rgba(15,23,42,0.45)]">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,0.65),transparent_55%),radial-gradient(circle_at_88%_18%,rgba(236,120,155,0.18),transparent_65%)]" />
@@ -345,11 +349,7 @@ const WomensHealthPlus: React.FC = () => {
               </div>
 
               {/* Left Content - Product Name + Price - Third on mobile, First on desktop */}
-              <div
-                className="flex-1 space-y-6 text-center lg:text-left mb-0 order-3 lg:order-1"
-                data-aos="fade-right"
-                data-aos-delay="100"
-              >
+              <div className="flex-1 space-y-6 text-center lg:text-left mb-0 order-3 lg:order-1">
                 <div className="inline-flex items-center gap-2 rounded-full border border-rose-200/80 bg-white/70 backdrop-blur-sm px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.4em] text-rose-700 shadow-lg">
                   <Moon className="h-3.5 w-3.5" />
                   Lunar-Aligned Wellness
@@ -377,11 +377,7 @@ const WomensHealthPlus: React.FC = () => {
                   </div>
                 </div>
                 {/* Price Section - Desktop only */}
-                <div
-                  className="w-full hidden lg:block"
-                  data-aos="fade-up"
-                  data-aos-delay="250"
-                >
+                <div className="w-full hidden lg:block">
                   <div className="relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/90 shadow-[0_28px_60px_-45px_rgba(15,23,42,0.45)]">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,0.65),transparent_55%),radial-gradient(circle_at_88%_18%,rgba(236,120,155,0.18),transparent_65%)]" />
                     <div className="relative flex flex-col gap-3.5 p-3.5 sm:gap-4 sm:p-4 lg:p-5">
@@ -458,11 +454,7 @@ const WomensHealthPlus: React.FC = () => {
         {/* Main Content */}
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
           {/* Wellness Journey Section */}
-          <section
-            className="relative max-w-6xl mx-auto"
-            data-aos="fade-up"
-            data-aos-duration="900"
-          >
+          <section className="relative max-w-6xl mx-auto">
             <div className="relative rounded-3xl border-2 border-rose-100 bg-gradient-to-br from-white via-rose-50/30 to-pink-50/40 p-4 sm:p-6 shadow-xl overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-rose-200/20 to-pink-200/10 rounded-full blur-3xl -mr-32 -mt-32" />
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-pink-200/20 to-rose-200/10 rounded-full blur-3xl -ml-32 -mb-32" />
@@ -503,11 +495,7 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* Ingredients & Usage Section */}
-          <section
-            className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto">
             {/* Key Ingredients */}
             <div className="rounded-2xl border-2 border-rose-100 bg-gradient-to-br from-white via-rose-50/20 to-white p-4 sm:p-5 shadow-xl">
               <div className="flex items-center gap-2.5 mb-4">
@@ -571,11 +559,7 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* Benefits Section */}
-          <section
-            className="max-w-6xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="150"
-          >
+          <section className="max-w-6xl mx-auto">
             <div className="mb-6 text-left">
               <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-white mb-3">
                 <HeartPulse className="h-3.5 w-3.5 text-rose-700" />
@@ -597,8 +581,6 @@ const WomensHealthPlus: React.FC = () => {
                   <div
                     key={benefit}
                     className="group relative rounded-2xl border border-rose-100 bg-gradient-to-br from-white to-rose-50/30 p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
-                    data-aos="zoom-in"
-                    data-aos-delay={idx * 80}
                   >
                     <div className="absolute top-3 right-3 w-14 h-14 bg-gradient-to-br from-rose-200/30 to-pink-200/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative flex items-center gap-3">
@@ -616,11 +598,7 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* FAQs Section */}
-          <section
-            className="max-w-4xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
+          <section className="max-w-4xl mx-auto">
             <div className="rounded-2xl border-2 border-rose-100 bg-gradient-to-br from-white via-rose-50/20 to-pink-50/30 p-5 sm:p-6 shadow-xl">
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-white mb-3">
@@ -664,11 +642,7 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* CTA Section */}
-          <section
-            className="relative max-w-6xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="250"
-          >
+          <section className="relative max-w-6xl mx-auto">
             <div className="relative rounded-2xl border-2 border-rose-200 bg-gradient-to-br from-rose-100 via-pink-100/80 to-rose-50 p-6 sm:p-8 shadow-2xl overflow-hidden">
               <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-pink-300/30 to-rose-300/20 rounded-full blur-3xl -mr-40 -mt-40" />
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-rose-300/30 to-pink-300/20 rounded-full blur-3xl -ml-40 -mb-40" />
@@ -697,11 +671,7 @@ const WomensHealthPlus: React.FC = () => {
 
           {/* Related Products */}
           {relatedProducts.length > 0 && (
-            <section
-              className="max-w-6xl mx-auto space-y-8"
-              data-aos="fade-up"
-              data-aos-delay="300"
-            >
+            <section className="max-w-6xl mx-auto space-y-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-3xl sm:text-4xl font-bold text-slate-900">You may also love</h3>
@@ -722,8 +692,6 @@ const WomensHealthPlus: React.FC = () => {
                       key={related.id}
                       to={`/product/${related.id}`}
                       className="group flex flex-col gap-5 overflow-hidden rounded-3xl border-2 border-rose-100 bg-white/80 backdrop-blur-sm p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-rose-200"
-                      data-aos="fade-up"
-                      data-aos-delay="150"
                     >
                       <div className={`overflow-hidden rounded-2xl bg-gradient-to-br ${cardStyle.gradient} p-4`}>
                         <ResponsiveProductImage

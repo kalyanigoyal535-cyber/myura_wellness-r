@@ -7,13 +7,11 @@ const MyAccount: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login form submitted');
     // Handle login logic here
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Register form submitted');
     // Handle registration logic here
   };
 

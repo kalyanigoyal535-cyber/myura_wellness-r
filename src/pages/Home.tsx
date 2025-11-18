@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import type { KeenSliderInstance } from 'keen-slider';
 import { useKeenSlider } from 'keen-slider/react';
-// import 'keen-slider/keen-slider.min.css';
+import 'keen-slider/keen-slider.min.css';
 import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Play, Pause } from 'lucide-react';
 import ResponsiveProductImage, { type ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
 
@@ -806,7 +806,7 @@ const Home: React.FC = () => {
                                 key={`${product.id}-${productImageIndices[productIndex]}`}
                                 image={currentImage}
                                 className="w-full"
-                                imgClassName="w-full h-full object-cover animate-productFade-cubic transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                                imgClassName="w-full h-full object-cover animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                               />
                               <span className="pointer-events-none absolute bottom-4 left-1/2 w-[82%] -translate-x-1/2 rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 px-4 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-white shadow-[0_26px_58px_-30px_rgba(236,72,153,0.55)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                                 Discover Ritual

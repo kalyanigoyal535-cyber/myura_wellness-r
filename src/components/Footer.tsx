@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Mail as MailIcon } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaYoutube, FaPinterestP, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 
 // Type assertion for FontAwesome icons
@@ -53,7 +53,7 @@ const Footer: React.FC = React.memo(() => {
                   { Icon: PinterestIcon, color: 'from-black to-black/80', hover: 'hover:from-black/80 hover:to-black/60' },
                   { Icon: TwitterIcon, color: 'from-black to-black/80', hover: 'hover:from-black/80 hover:to-black/60' },
                   { Icon: LinkedinIcon, color: 'from-black to-black/80', hover: 'hover:from-black/80 hover:to-black/60' },
-                  { Icon: MailIcon, color: 'from-black to-black/80', hover: 'hover:from-black/80 hover:to-black/60' }
+                  { Icon: Mail, color: 'from-black to-black/80', hover: 'hover:from-black/80 hover:to-black/60' }
                 ].map(({ Icon, color, hover }, index) => (
                   <div
                     key={index}

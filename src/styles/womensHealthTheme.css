@@ -57,22 +57,27 @@
   background-color: var(--wh-lighter) !important;
 }
 
-.womens-health-theme .bg-rose-50\/30,
-.womens-health-theme .bg-rose-50\/40,
-.womens-health-theme .bg-rose-50\/50,
-.womens-health-theme .bg-rose-50\/80,
-.womens-health-theme .bg-rose-100\/80,
-.womens-health-theme .bg-pink-100\/80 {
-  background-color: rgba(var(--wh-base-rgb), 0.15) !important;
+/* Escaped class names for CSS minifier compatibility */
+.womens-health-theme [class*="bg-rose-50/30"],
+.womens-health-theme [class*="bg-rose-50/40"],
+.womens-health-theme [class*="bg-rose-50/50"],
+.womens-health-theme [class*="bg-rose-50/80"],
+.womens-health-theme [class*="bg-rose-100/80"],
+.womens-health-theme [class*="bg-pink-100/80"] {
+  background-color: rgb(236, 120, 155, 0.15) !important;
 }
 
 .womens-health-theme .border-rose-100,
 .womens-health-theme .border-rose-200,
-.womens-health-theme .border-rose-200\/80,
-.womens-health-theme .border-rose-200\/60,
 .womens-health-theme .border-rose-300,
 .womens-health-theme .border-pink-200,
 .womens-health-theme .border-pink-100 {
+  border-color: var(--wh-border) !important;
+}
+
+/* Escaped class names for CSS minifier compatibility */
+.womens-health-theme [class*="border-rose-200/80"],
+.womens-health-theme [class*="border-rose-200/60"] {
   border-color: var(--wh-border) !important;
 }
 
@@ -93,12 +98,13 @@
   color: currentColor;
 }
 
-.womens-health-theme .from-rose-50\/30 {
+/* Escaped class names for CSS minifier compatibility */
+.womens-health-theme [class*="from-rose-50/30"] {
   --tw-gradient-from: rgba(var(--wh-base-rgb), 0.18) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
 }
 
-.womens-health-theme .to-pink-50\/20 {
+.womens-health-theme [class*="to-pink-50/20"] {
   --tw-gradient-to: rgba(var(--wh-accent-rgb), 0.2) !important;
 }
 
@@ -111,38 +117,39 @@
   --tw-gradient-to: var(--wh-muted) !important;
 }
 
-.womens-health-theme .via-pink-50\/80 {
+/* Escaped class names for CSS minifier compatibility */
+.womens-health-theme [class*="via-pink-50/80"] {
   --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-accent-rgb), 0.8), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
 }
 
-.womens-health-theme .from-rose-200\/40 {
+.womens-health-theme [class*="from-rose-200/40"] {
   --tw-gradient-from: rgba(var(--wh-base-rgb), 0.4) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
 }
 
-.womens-health-theme .to-rose-400\/40 {
+.womens-health-theme [class*="to-rose-400/40"] {
   --tw-gradient-to: rgba(var(--wh-base-rgb), 0.4) !important;
 }
 
-.womens-health-theme .via-pink-300\/30,
-.womens-health-theme .via-pink-200\/30,
-.womens-health-theme .via-pink-200\/20 {
+.womens-health-theme [class*="via-pink-300/30"],
+.womens-health-theme [class*="via-pink-200/30"],
+.womens-health-theme [class*="via-pink-200/20"] {
   --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-accent-rgb), 0.3), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
 }
 
-.womens-health-theme .from-rose-300\/25,
-.womens-health-theme .from-rose-300\/30 {
+.womens-health-theme [class*="from-rose-300/25"],
+.womens-health-theme [class*="from-rose-300/30"] {
   --tw-gradient-from: rgba(var(--wh-base-rgb), 0.25) !important;
 }
 
-.womens-health-theme .from-rose-300\/40,
-.womens-health-theme .from-rose-200\/20 {
+.womens-health-theme [class*="from-rose-300/40"],
+.womens-health-theme [class*="from-rose-200/20"] {
   --tw-gradient-from: rgba(var(--wh-base-rgb), 0.4) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
 }
 
-.womens-health-theme .to-pink-300\/20,
-.womens-health-theme .to-pink-200\/10 {
+.womens-health-theme [class*="to-pink-300/20"],
+.womens-health-theme [class*="to-pink-200/10"] {
   --tw-gradient-to: rgba(var(--wh-accent-rgb), 0.2) !important;
 }
 
@@ -170,27 +177,32 @@
   --tw-gradient-to: var(--wh-light) !important;
 }
 
-.womens-health-theme .to-pink-50\/40 {
+/* Escaped class names for CSS minifier compatibility */
+.womens-health-theme [class*="to-pink-50/40"] {
   --tw-gradient-to: rgba(var(--wh-accent-rgb), 0.4) !important;
 }
 
-.womens-health-theme .via-pink-100\/80 {
+.womens-health-theme [class*="via-pink-100/80"] {
   --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-accent-rgb), 0.8), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
 }
 
-.womens-health-theme .via-rose-50\/30,
-.womens-health-theme .via-rose-50\/20,
-.womens-health-theme .via-rose-200\/20 {
+.womens-health-theme [class*="via-rose-50/30"],
+.womens-health-theme [class*="via-rose-50/20"],
+.womens-health-theme [class*="via-rose-200/20"] {
   --tw-gradient-stops: var(--tw-gradient-from), rgba(var(--wh-base-rgb), 0.2), var(--tw-gradient-to, rgba(var(--wh-base-rgb), 0));
 }
 
-.womens-health-theme .from-pink-200\/30 {
+.womens-health-theme [class*="from-pink-200/30"] {
   --tw-gradient-from: rgba(var(--wh-accent-rgb), 0.3) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(var(--wh-accent-rgb), 0));
 }
 
-.womens-health-theme .hover\:bg-rose-50:hover,
-.womens-health-theme .hover\:bg-rose-50\/50:hover {
+.womens-health-theme .hover\:bg-rose-50:hover {
+  background-color: var(--wh-muted) !important;
+}
+
+/* Escaped class names for CSS minifier compatibility */
+.womens-health-theme [class*="hover:bg-rose-50/50"]:hover {
   background-color: var(--wh-muted) !important;
 }
 
