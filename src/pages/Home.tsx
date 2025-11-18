@@ -5,6 +5,7 @@ import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Play, Pause } from 'lucide-react';
 import ResponsiveProductImage, { type ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
+import { useCart } from '../context/CartContext';
 
 const PRODUCT_IMAGE_WIDTHS = [320, 640, 960] as const;
 
@@ -158,6 +159,9 @@ const Home: React.FC = () => {
       }
     };
   }, []);
+
+  const { addItem } = useCart();
+  const [addingProduct, setAddingProduct] = useState<string | null>(null);
 
   const products = useMemo<Product[]>(() => {
     const baseProducts: ProductDefinition[] = [
@@ -893,10 +897,24 @@ const Home: React.FC = () => {
                         </div>
 
                         <div className="flex items-center justify-center gap-2 w-full">
-                          <button className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(15,23,42,0.55)] transition-all duration-300 hover:shadow-[0_24px_44px_-18px_rgba(15,23,42,0.65)] max-w-[220px] whitespace-nowrap">
+                          <button
+                            onClick={async () => {
+                              if (addingProduct === product.slug) return;
+                              setAddingProduct(product.slug);
+                              addItem({
+                                id: product.slug,
+                                name: product.name,
+                                price: product.price,
+                                image: currentImage?.fallback || '',
+                              }, 1);
+                              setTimeout(() => setAddingProduct(null), 800);
+                            }}
+                            disabled={addingProduct === product.slug}
+                            className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(15,23,42,0.55)] transition-all duration-300 hover:shadow-[0_24px_44px_-18px_rgba(15,23,42,0.65)] max-w-[220px] whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                          >
                             <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
                             <span className="relative inline-flex items-center gap-2">
-                              Add to cart
+                              {addingProduct === product.slug ? 'Added!' : 'Add to cart'}
                               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                             </span>
                           </button>

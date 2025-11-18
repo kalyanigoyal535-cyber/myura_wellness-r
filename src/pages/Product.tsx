@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Filter, Search, ShieldCheck, Award, CheckCircle2 } from 'lucide-react';
+import { Star, Filter, Search, ShieldCheck, Award, CheckCircle2, ShoppingCart, Sparkles } from 'lucide-react';
 import ResponsiveProductImage from '../components/ResponsiveProductImage';
 import { productCatalog } from '../data/products';
+import { useCart } from '../context/CartContext';
 
 const Product: React.FC = () => {
   const products = productCatalog;
+  const { addItem } = useCart();
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen">
@@ -170,13 +173,43 @@ const Product: React.FC = () => {
                       </span>
                     </div>
 
-                    <div className="mt-auto pt-1">
+                    <div className="mt-auto pt-1 flex gap-2">
                       <Link
                         to={`/product/${product.id}`}
-                        className="inline-flex w-full items-center justify-center rounded-full bg-white/15 px-4 py-1.5 text-[10px] sm:text-sm font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-white/25"
+                        className="inline-flex flex-1 items-center justify-center rounded-full bg-white/15 px-3 py-1.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] text-white transition-all duration-300 hover:bg-white/25 whitespace-nowrap"
                       >
                         Explore Ritual
                       </Link>
+                      <button
+                        onClick={async () => {
+                          if (addingToCart === product.id) return;
+                          setAddingToCart(product.id);
+                          addItem({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image?.fallback || '',
+                          }, 1);
+                          setTimeout(() => setAddingToCart(null), 1000);
+                        }}
+                        disabled={addingToCart === product.id || !product.inStock}
+                        className="group relative inline-flex flex-1 items-center justify-center gap-1 rounded-full bg-white/20 px-2.5 py-1.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] text-white transition-all duration-300 hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden whitespace-nowrap"
+                      >
+                        <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                        <span className="relative inline-flex items-center gap-1">
+                          {addingToCart === product.id ? (
+                            <>
+                              <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 animate-pulse" />
+                              <span>Added!</span>
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingCart className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                              <span>Add to Cart</span>
+                            </>
+                          )}
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>

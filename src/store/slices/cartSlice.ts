@@ -41,6 +41,16 @@ const initialState: CartState = {
   items: loadInitialItems(),
 };
 
+const saveToStorage = (items: CartItem[]) => {
+  if (typeof window !== 'undefined') {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Silently fail - cart will still work in memory
+    }
+  }
+};
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
@@ -60,9 +70,11 @@ const cartSlice = createSlice({
           qty: clampQty(qty),
         });
       }
+      saveToStorage(state.items);
     },
     removeItem: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
+      saveToStorage(state.items);
     },
     updateQty: (
       state,
@@ -72,9 +84,11 @@ const cartSlice = createSlice({
       if (target) {
         target.qty = clampQty(action.payload.qty);
       }
+      saveToStorage(state.items);
     },
     clearCart: (state) => {
       state.items = [];
+      saveToStorage(state.items);
     },
   },
 });

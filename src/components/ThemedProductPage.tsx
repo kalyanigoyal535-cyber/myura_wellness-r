@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Minus, Star, Heart, Sparkles, ShieldCheck, HeartPulse, X, ZoomIn, ArrowRight, Leaf, Activity, Droplets } from 'lucide-react';
 import ResponsiveProductImage from './ResponsiveProductImage';
 import type { ProductRecord } from '../data/products';
 import { getRelatedProducts } from '../data/products';
 import useImagePalette from '../hooks/useImagePalette';
+import { useCart } from '../context/CartContext';
 
 type CSSCustomProperties = React.CSSProperties & Record<`--${string}`, string>;
 
@@ -33,10 +34,13 @@ interface ThemedProductPageProps {
 }
 
 const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ product, themeClassName = 'themed-product', decorativeIcons = [] }) => {
+  const { addItem } = useCart();
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>('benefits');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const thumbnailRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const touchStartXRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
@@ -370,7 +374,20 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                           </div>
                           <div className="flex flex-1 gap-2">
                             <button 
-                              className="group relative inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white transition-all duration-300 hover:scale-[1.01]"
+                              onClick={async () => {
+                                if (isAddingToCart) return;
+                                setIsAddingToCart(true);
+                                addItem({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: product.image?.fallback || '',
+                                }, quantity);
+                                // Reset after animation
+                                setTimeout(() => setIsAddingToCart(false), 1000);
+                              }}
+                              disabled={isAddingToCart || !product.inStock}
+                              className="group relative inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white transition-all duration-300 hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ 
                                 background: `var(--product-cta-gradient)`,
                                 boxShadow: `var(--product-shadow)`
@@ -378,12 +395,26 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                             >
                               <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                               <span className="relative inline-flex items-center gap-1.5">
-                                Add to Cart
-                                <Heart className="h-3.5 w-3.5" />
+                                {isAddingToCart ? 'Added!' : 'Add to Cart'}
+                                {isAddingToCart ? (
+                                  <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+                                ) : (
+                                  <Heart className="h-3.5 w-3.5" />
+                                )}
                               </span>
                             </button>
                             <button 
-                              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border bg-white/95 px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] transition-all duration-300 hover:bg-white"
+                              onClick={() => {
+                                addItem({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: product.image?.fallback || '',
+                                }, quantity);
+                                navigate('/cart');
+                              }}
+                              disabled={!product.inStock}
+                              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border bg-white/95 px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] transition-all duration-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ 
                                 borderColor: 'var(--product-border)',
                                 color: 'var(--product-darker)',
@@ -435,33 +466,37 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                 data-aos-easing="ease-out-cubic"
               >
                 <div 
-                  className="inline-flex items-center gap-2 rounded-full border bg-white/70 backdrop-blur-sm px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.4em] shadow-lg"
-                  style={{ 
-                    borderColor: 'var(--product-border)',
-                    color: 'var(--product-darker)',
-                    boxShadow: `var(--product-shadow)`
-                  }}
-                  data-aos="fade-up"
-                  data-aos-delay="200"
-                  data-aos-duration="800"
+                  className="inline-flex flex-col items-center lg:items-start gap-2 text-center lg:text-left"
                 >
-                  <Icon1 className="h-3.5 w-3.5" />
-                  {product.headline}
-                  <Icon2 className="h-3.5 w-3.5" />
-                </div>
-                <h1 
-                  className="relative inline-flex items-center justify-center text-2xl sm:text-4xl lg:text-5xl font-bold leading-tight whitespace-nowrap drop-shadow-lg"
-                  style={{ color: 'var(--product-contrast)' }}
-                  data-aos="fade-up"
-                  data-aos-delay="250"
-                  data-aos-duration="900"
-                >
-                  <span
-                    className="relative px-4 py-1 rounded-full bg-white/10 backdrop-blur tracking-[0.08em]"
+                  <div
+                    className="inline-flex items-center gap-2 rounded-full border bg-white/70 backdrop-blur-sm px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.4em] shadow-lg"
+                    style={{ 
+                      borderColor: 'var(--product-border)',
+                      color: 'var(--product-darker)',
+                      boxShadow: `var(--product-shadow)`
+                    }}
+                    data-aos="fade-up"
+                    data-aos-delay="200"
+                    data-aos-duration="800"
                   >
-                    {product.name}
-                  </span>
-                </h1>
+                    <Icon1 className="h-3.5 w-3.5" />
+                    {product.headline}
+                    <Icon2 className="h-3.5 w-3.5" />
+                  </div>
+                  <h1 
+                    className="relative inline-flex items-center justify-center lg:justify-start text-2xl sm:text-4xl lg:text-5xl font-bold leading-tight drop-shadow-lg"
+                    style={{ color: 'var(--product-contrast)' }}
+                    data-aos="fade-up"
+                    data-aos-delay="250"
+                    data-aos-duration="900"
+                  >
+                    <span
+                      className="relative px-4 py-1 rounded-full bg-white/10 backdrop-blur tracking-[0.08em]"
+                    >
+                      {product.name}
+                    </span>
+                  </h1>
+                </div>
                 <p 
                   className="text-base sm:text-lg font-display font-semibold tracking-wide max-w-xl mx-auto lg:mx-0 leading-relaxed" 
                   style={{ color: 'var(--product-contrast)' }}
@@ -557,7 +592,20 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                           </div>
                           <div className="flex flex-1 gap-2">
                             <button 
-                              className="group relative inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white transition-all duration-300 hover:scale-[1.01]"
+                              onClick={async () => {
+                                if (isAddingToCart) return;
+                                setIsAddingToCart(true);
+                                addItem({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: product.image?.fallback || '',
+                                }, quantity);
+                                // Reset after animation
+                                setTimeout(() => setIsAddingToCart(false), 1000);
+                              }}
+                              disabled={isAddingToCart || !product.inStock}
+                              className="group relative inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-white transition-all duration-300 hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ 
                                 background: `var(--product-cta-gradient)`,
                                 boxShadow: `var(--product-shadow)`
@@ -565,12 +613,26 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                             >
                               <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                               <span className="relative inline-flex items-center gap-1.5">
-                                Add to Cart
-                                <Heart className="h-3.5 w-3.5" />
+                                {isAddingToCart ? 'Added!' : 'Add to Cart'}
+                                {isAddingToCart ? (
+                                  <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+                                ) : (
+                                  <Heart className="h-3.5 w-3.5" />
+                                )}
                               </span>
                             </button>
                             <button 
-                              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border bg-white/95 px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] transition-all duration-300 hover:bg-white"
+                              onClick={() => {
+                                addItem({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: product.image?.fallback || '',
+                                }, quantity);
+                                navigate('/cart');
+                              }}
+                              disabled={!product.inStock}
+                              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border bg-white/95 px-3 py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] transition-all duration-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ 
                                 borderColor: 'var(--product-border)',
                                 color: 'var(--product-darker)',
