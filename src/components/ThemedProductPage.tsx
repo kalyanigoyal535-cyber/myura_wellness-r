@@ -144,8 +144,13 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
     if (typeof window === 'undefined') return;
     if (window.innerWidth >= 640) return;
     const currentThumb = thumbnailRefs.current[activeImageIndex];
-    currentThumb?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  }, [activeImageIndex]);
+    if (!currentThumb) return;
+    
+    // Use 'nearest' for last image to prevent page shift, 'center' for others
+    const isLastImage = activeImageIndex === galleryLength - 1;
+    const scrollOption = isLastImage ? 'nearest' : 'center';
+    currentThumb.scrollIntoView({ behavior: 'smooth', inline: scrollOption, block: 'nearest' });
+  }, [activeImageIndex, galleryLength]);
 
   const handleOpenZoom = useCallback(() => {
     setIsZoomed(true);
@@ -276,7 +281,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
 
                   {/* Gallery Thumbnails */}
                   {gallery.length > 1 && (
-                    <div className="mt-5 flex gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:justify-center scroll-smooth snap-x snap-mandatory">
+                    <div className="mt-5 flex gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:justify-center scroll-smooth snap-x snap-mandatory pr-4 sm:pr-0">
                       {gallery.map((galleryImage, index) => (
                         <button
                           key={`${galleryImage.fallback}-${galleryImage.alt}`}
