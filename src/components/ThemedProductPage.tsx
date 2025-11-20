@@ -42,6 +42,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
   const [isZoomed, setIsZoomed] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const thumbnailRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const thumbnailContainerRef = useRef<HTMLDivElement | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
 
@@ -143,14 +144,21 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.innerWidth >= 640) return;
+    const container = thumbnailContainerRef.current;
     const currentThumb = thumbnailRefs.current[activeImageIndex];
-    if (!currentThumb) return;
-    
-    // Use 'nearest' for last image to prevent page shift, 'center' for others
-    const isLastImage = activeImageIndex === galleryLength - 1;
-    const scrollOption = isLastImage ? 'nearest' : 'center';
-    currentThumb.scrollIntoView({ behavior: 'smooth', inline: scrollOption, block: 'nearest' });
-  }, [activeImageIndex, galleryLength]);
+    if (!container || !currentThumb) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const thumbRect = currentThumb.getBoundingClientRect();
+    const deltaLeft = thumbRect.left - containerRect.left;
+    const targetScrollLeft =
+      container.scrollLeft + deltaLeft - (container.clientWidth - thumbRect.width) / 2;
+
+    container.scrollTo({
+      left: Math.max(0, targetScrollLeft),
+      behavior: 'smooth',
+    });
+  }, [activeImageIndex]);
 
   const handleOpenZoom = useCallback(() => {
     setIsZoomed(true);
@@ -281,7 +289,10 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
 
                   {/* Gallery Thumbnails */}
                   {gallery.length > 1 && (
-                    <div className="mt-5 flex gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:justify-center scroll-smooth snap-x snap-mandatory pr-4 sm:pr-0">
+                    <div
+                      ref={thumbnailContainerRef}
+                      className="mt-5 flex gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:justify-center scroll-smooth snap-x snap-mandatory"
+                    >
                       {gallery.map((galleryImage, index) => (
                         <button
                           key={`${galleryImage.fallback}-${galleryImage.alt}`}
@@ -319,13 +330,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
               </div>
 
               {/* Price Section - Mobile */}
-              <div 
-                className="flex-1 order-2 lg:hidden"
-                data-aos="fade-up"
-                data-aos-delay="200"
-                data-aos-duration="850"
-                data-aos-easing="ease-out-cubic"
-              >
+              <div className="flex-1 order-2 lg:hidden">
                 <div className="w-full mb-6">
                   <div 
                     className="relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/90 shadow-xl"
@@ -544,13 +549,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                   </div>
                 </div>
                 {/* Price Section - Desktop only */}
-                <div 
-                  className="w-full hidden lg:block"
-                  data-aos="fade-up"
-                  data-aos-delay="400"
-                  data-aos-duration="850"
-                  data-aos-easing="ease-out-cubic"
-                >
+                <div className="w-full hidden lg:block">
                   <div 
                     className="relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/90 shadow-xl"
                     style={{ 
@@ -698,13 +697,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
         {/* Main Content */}
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
           {/* Wellness Journey Section */}
-          <section 
-            className="relative max-w-6xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="100"
-            data-aos-duration="900"
-            data-aos-easing="ease-out-cubic"
-          >
+          <section className="relative max-w-6xl mx-auto">
             <div 
               className="relative rounded-3xl border-2 bg-gradient-to-br from-white via-white to-white p-4 sm:p-6 shadow-xl overflow-hidden"
               style={{ 
@@ -797,13 +790,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
               </div>
               <div className="space-y-2.5">
                 {keyIngredientHighlights.map((item, idx) => (
-                  <div 
-                    key={idx} 
-                    className="flex items-start gap-2.5 text-slate-700"
-                    data-aos="fade-up"
-                    data-aos-delay={300 + idx * 50}
-                    data-aos-duration="700"
-                  >
+                  <div key={idx} className="flex items-start gap-2.5 text-slate-700">
                     <div className="flex-shrink-0 mt-1.5">
                       <div 
                         className="w-1.5 h-1.5 rounded-full"
@@ -882,13 +869,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                 </div>
                 <ul className="space-y-2.5">
                   {suitableForHighlights.map((item, idx) => (
-                    <li 
-                      key={idx} 
-                      className="flex gap-2.5 text-slate-700"
-                      data-aos="fade-up"
-                      data-aos-delay={300 + idx * 50}
-                      data-aos-duration="700"
-                    >
+                    <li key={idx} className="flex gap-2.5 text-slate-700">
                       <div className="flex-shrink-0 mt-1.5">
                         <div 
                           className="w-1.5 h-1.5 rounded-full"
@@ -904,13 +885,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
           </section>
 
           {/* Benefits Section */}
-          <section 
-            className="max-w-6xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="150"
-            data-aos-duration="900"
-            data-aos-easing="ease-out-cubic"
-          >
+          <section className="max-w-6xl mx-auto">
             <div className="mb-6 text-left">
               <div 
                 className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 border text-[11px] font-semibold uppercase tracking-[0.35em] text-white mb-3"
@@ -918,27 +893,14 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                   backgroundColor: 'var(--product-base)',
                   borderColor: 'var(--product-border-strong)'
                 }}
-                data-aos="zoom-in"
-                data-aos-delay="200"
-                data-aos-duration="700"
               >
                 <HeartPulse className="h-3.5 w-3.5" />
                 Botanical Benefits
               </div>
-              <h2 
-                className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 leading-tight"
-                data-aos="fade-up"
-                data-aos-delay="250"
-                data-aos-duration="850"
-              >
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 leading-tight">
                 Feel the difference in every capsule
               </h2>
-              <p 
-                className="text-base sm:text-lg text-slate-600 max-w-2xl"
-                data-aos="fade-up"
-                data-aos-delay="300"
-                data-aos-duration="800"
-              >
+              <p className="text-base sm:text-lg text-slate-600 max-w-2xl">
                 A thoughtfully crafted blend designed specifically for your wellness needs
               </p>
             </div>
@@ -988,13 +950,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
           </section>
 
           {/* FAQs Section */}
-          <section 
-            className="max-w-4xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="200"
-            data-aos-duration="900"
-            data-aos-easing="ease-out-cubic"
-          >
+          <section className="max-w-4xl mx-auto">
             <div 
               className="rounded-2xl border-2 bg-gradient-to-br from-white via-white to-white p-5 sm:p-6 shadow-xl"
               style={{ 
@@ -1010,29 +966,14 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                     backgroundColor: 'var(--product-base)',
                     borderColor: 'var(--product-border-strong)'
                   }}
-                  data-aos="zoom-in"
-                  data-aos-delay="250"
-                  data-aos-duration="700"
                 >
                   <Sparkles className="h-3.5 w-3.5 text-white" />
                   Frequently Asked
                 </div>
-                <h2 
-                  className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2"
-                  data-aos="fade-up"
-                  data-aos-delay="300"
-                  data-aos-duration="850"
-                >
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
                   Your questions answered
                 </h2>
-                <p 
-                  className="text-base text-slate-600"
-                  data-aos="fade-up"
-                  data-aos-delay="350"
-                  data-aos-duration="800"
-                >
-                  Holistic answers for your wellness journey
-                </p>
+                <p className="text-base text-slate-600">Holistic answers for your wellness journey</p>
               </div>
               
               <div className="space-y-3">
@@ -1041,10 +982,6 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                     key={idx}
                     className="rounded-xl border-2 bg-white/80 backdrop-blur-sm overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
                     style={{ borderColor: 'var(--product-border)' }}
-                    data-aos="fade-up"
-                    data-aos-delay={350 + idx * 100}
-                    data-aos-duration="800"
-                    data-aos-easing="ease-out-cubic"
                   >
                     <button
                       onClick={() => toggleSection(`faq-${idx}`)}

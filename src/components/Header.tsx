@@ -21,6 +21,8 @@ const Header: React.FC = () => {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const headerRef = React.useRef<HTMLElement>(null);
   const topBarRef = React.useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const [topBarHeight, setTopBarHeight] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,6 +40,9 @@ const Header: React.FC = () => {
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [mobileDropdownPosition, setMobileDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [isDesktopViewport, setIsDesktopViewport] = useState(
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
 
   const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
   
@@ -57,6 +62,18 @@ const Header: React.FC = () => {
     setSearchQuery('');
     setSearchResults([]);
     setShowResults(false);
+  }, []);
+
+  // Track viewport breakpoint for desktop vs mobile rendering
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleResize = () => setIsDesktopViewport(window.innerWidth >= 1024);
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Search function - searches through name, headline, description, benefits, etc.
@@ -111,40 +128,50 @@ const Header: React.FC = () => {
     setSelectedIndex(-1);
   }, []);
 
-  // Update dropdown position for desktop - updates continuously as header moves
+  // Update dropdown position for desktop
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    let rafId: number | null = null;
+
     const updatePosition = () => {
       if (desktopSearchInputRef.current) {
         const rect = desktopSearchInputRef.current.getBoundingClientRect();
-        // Use viewport-relative coordinates (getBoundingClientRect already gives viewport coords)
-        // Make dropdown wider than search input for better visibility
+        const enhancedWidth = Math.max(rect.width * 1.35, 520);
         setDropdownPosition({
           top: rect.bottom + 12,
           left: rect.left,
-          width: Math.max(rect.width * 1.5, 500) // Make it 1.5x wider, minimum 500px
+          width: enhancedWidth
         });
       }
     };
-    
-    if (searchQuery.trim().length > 0 && window.innerWidth >= 1024) {
-      updatePosition();
-      // Update on scroll to keep it aligned with search input as header moves
-      window.addEventListener('scroll', updatePosition, { passive: true });
-      window.addEventListener('resize', updatePosition);
-      // Also update on animation frame for smooth tracking
-      const rafId = requestAnimationFrame(updatePosition);
-      const intervalId = setInterval(updatePosition, 100); // Update every 100ms for smooth tracking
-      
-      return () => {
-        window.removeEventListener('scroll', updatePosition, { passive: true } as EventListenerOptions);
-        window.removeEventListener('resize', updatePosition);
-        cancelAnimationFrame(rafId);
-        clearInterval(intervalId);
-      };
-    }
-  }, [searchQuery]);
 
-  // Update dropdown position for mobile - updates continuously as header moves
+    const startAnimationLoop = () => {
+      const loop = () => {
+        updatePosition();
+        rafId = requestAnimationFrame(loop);
+      };
+      loop();
+    };
+    
+    if (searchQuery.trim().length > 0 && showResults && window.innerWidth >= 1024) {
+      updatePosition();
+      // Update on scroll to keep it aligned with search input and while header animates
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+      startAnimationLoop();
+    }
+    
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+    };
+  }, [searchQuery, showResults]);
+
+  // Update dropdown position for mobile
   useEffect(() => {
     const updateMobilePosition = () => {
       if (searchInputRef.current && isSearchOpen) {
@@ -158,21 +185,18 @@ const Header: React.FC = () => {
       }
     };
     
-    if (searchQuery.trim().length > 0 && isSearchOpen && window.innerWidth < 1024) {
+    if (searchQuery.trim().length > 0 && isSearchOpen && showResults && window.innerWidth < 1024) {
       updateMobilePosition();
-      // Update on scroll to keep it aligned with search input as header moves
-      window.addEventListener('scroll', updateMobilePosition, { passive: true });
+      // Update on scroll to keep it aligned with search input
+      window.addEventListener('scroll', updateMobilePosition, true);
       window.addEventListener('resize', updateMobilePosition);
-      // Also update periodically for smooth tracking
-      const intervalId = setInterval(updateMobilePosition, 100);
-      
-      return () => {
-        window.removeEventListener('scroll', updateMobilePosition, { passive: true } as EventListenerOptions);
-        window.removeEventListener('resize', updateMobilePosition);
-        clearInterval(intervalId);
-      };
     }
-  }, [searchQuery, isSearchOpen]);
+    
+    return () => {
+      window.removeEventListener('scroll', updateMobilePosition, true);
+      window.removeEventListener('resize', updateMobilePosition);
+    };
+  }, [searchQuery, isSearchOpen, showResults]);
 
   // Handle search input change
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,7 +246,7 @@ const Header: React.FC = () => {
 
   // Close search results on outside click
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: PointerEvent) => {
       if (
         searchResultsRef.current &&
         !searchResultsRef.current.contains(event.target as Node) &&
@@ -231,19 +255,42 @@ const Header: React.FC = () => {
         desktopSearchInputRef.current &&
         !desktopSearchInputRef.current.contains(event.target as Node)
       ) {
-        setShowResults(false);
+        handleSearchClose();
       }
     };
 
     if (showResults) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener('pointerdown', handleClickOutside);
+      return () => document.removeEventListener('pointerdown', handleClickOutside);
     }
-  }, [showResults]);
+  }, [showResults, handleSearchClose]);
   
   const handleMenuClose = useCallback(() => {
     setIsMenuOpen(false);
   }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(target) &&
+        menuButtonRef.current &&
+        !menuButtonRef.current.contains(target)
+      ) {
+        handleMenuClose();
+      }
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [isMenuOpen, handleMenuClose]);
+
+  useEffect(() => {
+    if (isDesktopViewport && isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+  }, [isDesktopViewport, isMenuOpen]);
 
   // Banner data - Premium & Attractive
   const banners = useMemo(() => [
@@ -400,6 +447,12 @@ const Header: React.FC = () => {
   ], []);
 
   const currentBanner = banners[currentBannerIndex];
+
+  const trimmedSearchQuery = searchQuery.trim();
+  const shouldShowMobileResults = trimmedSearchQuery.length > 0 && isSearchOpen && showResults;
+  const shouldShowDesktopResults = trimmedSearchQuery.length > 0 && isDesktopViewport && showResults;
+  const shouldShowMenuOverlay = isMenuOpen && !isDesktopViewport;
+  const shouldShowSearchOverlay = shouldShowMobileResults || shouldShowDesktopResults;
 
   const headerContent = (
     <header
@@ -725,106 +778,6 @@ const Header: React.FC = () => {
                 </div>
               </div>
               
-              {/* Desktop Search Results Dropdown - Portal to render above everything */}
-              {searchQuery.trim().length > 0 && typeof document !== 'undefined' && createPortal(
-                <div
-                  ref={searchResultsRef}
-                  className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[520px] overflow-y-auto"
-                  style={{ 
-                    zIndex: 99999,
-                    position: 'fixed',
-                    top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
-                    left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left}px` : '50%'),
-                    width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 500)}px` : '500px',
-                    maxWidth: '800px',
-                    pointerEvents: 'auto'
-                  } as React.CSSProperties}
-                >
-                  <div className="p-3">
-                    {searchResults.length > 0 ? (
-                      <>
-                        <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-lg">
-                          <TrendingUp className="h-4 w-4 text-slate-600" />
-                          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                            {searchResults.length} {searchResults.length === 1 ? 'Result Found' : 'Results Found'}
-                          </span>
-                        </div>
-                        <div className="space-y-2">
-                          {searchResults.map((product, idx) => (
-                            <button
-                              key={product.id}
-                              onClick={() => handleResultClick(product.id)}
-                              className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 text-left group border-2 ${
-                                selectedIndex === idx
-                                  ? 'bg-gradient-to-r from-slate-50 via-white to-slate-50 scale-[1.02] shadow-lg border-slate-300'
-                                  : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:via-white hover:to-slate-50 border-transparent hover:border-slate-200 hover:shadow-md'
-                              }`}
-                            >
-                              <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-md transition-all duration-300">
-                                <ResponsiveProductImage
-                                  image={product.image}
-                                  className="w-full h-full"
-                                  imgClassName="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-base font-bold text-slate-900 truncate group-hover:text-slate-800 transition-colors">
-                                  {product.name}
-                                </p>
-                                <p className="text-sm text-slate-600 truncate mt-1 font-medium">{product.headline}</p>
-                                <p className="text-xs text-slate-500 line-clamp-1 mt-1.5">{product.summary}</p>
-                                <div className="flex items-center gap-4 mt-3">
-                                  <div className="flex items-center gap-1.5">
-                                    <div className="flex items-center gap-0.5">
-                                      {[...Array(product.rating)].map((_, i) => (
-                                        <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                                      ))}
-                                    </div>
-                                    <span className="text-xs text-slate-500 font-medium">({product.reviews})</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-base font-bold text-slate-900">₹{product.price}</span>
-                                    {product.originalPrice > product.price && (
-                                      <span className="text-xs text-slate-400 line-through font-medium">
-                                        ₹{product.originalPrice}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
-                            </button>
-                          ))}
-                        </div>
-                        {searchResults.length >= 6 && (
-                          <div className="mt-3 pt-3 border-t-2 border-slate-200">
-                            <Link
-                              to={`/product?search=${encodeURIComponent(searchQuery)}`}
-                              onClick={() => {
-                                setSearchQuery('');
-                                setSearchResults([]);
-                                setShowResults(false);
-                              }}
-                              className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 rounded-xl transition-all duration-300 border-2 border-slate-200 hover:border-slate-300 hover:shadow-md"
-                            >
-                              <span>View All Results</span>
-                              <ArrowRight className="h-4 w-4" />
-                            </Link>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="py-8 px-4 text-center">
-                        <Search className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                        <p className="text-sm font-semibold text-slate-700 mb-1">No products found</p>
-                        <p className="text-xs text-slate-500">Try searching for product names, benefits, or ingredients</p>
-                      </div>
-                    )}
-                  </div>
-                </div>,
-                document.body
-              )}
-
               <Link to="/my-account" className="inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 flex-shrink-0">
                 <User className="h-4 w-4 sm:h-5 sm:w-5" />
               </Link>
@@ -838,6 +791,7 @@ const Header: React.FC = () => {
               </div>
               {/* Professional Mobile menu button */}
               <button
+                ref={menuButtonRef}
                 onClick={handleMenuToggle}
                 className="lg:hidden p-2 sm:p-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 flex-shrink-0 flex items-center justify-center"
               >
@@ -851,7 +805,7 @@ const Header: React.FC = () => {
 
         {/* Professional Mobile menu */}
         {isMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-slate-200 shadow-sm">
+          <div ref={mobileMenuRef} className="lg:hidden bg-white border-t border-slate-200 shadow-sm">
             <div className="px-4 py-3 space-y-1">
               {/* Mobile Navigation Links */}
               {navLinks.map((link) => (
@@ -905,7 +859,16 @@ const Header: React.FC = () => {
       <>
         {createPortal(headerContent, portalContainer)}
         {/* Mobile Search Results Dropdown - Portal to render above everything */}
-        {searchQuery.trim().length > 0 && isSearchOpen && createPortal(
+        {(shouldShowSearchOverlay || shouldShowMenuOverlay) && createPortal(
+          <div
+            className="fixed inset-0 z-[9990] bg-slate-950/25 backdrop-blur-[1px]"
+            style={{ pointerEvents: 'auto' }}
+            aria-hidden="true"
+            onPointerDown={shouldShowSearchOverlay ? handleSearchClose : handleMenuClose}
+          />,
+          document.body
+        )}
+        {shouldShowMobileResults && createPortal(
           <div
             ref={searchResultsRef}
             className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[70vh] overflow-y-auto"
@@ -978,7 +941,7 @@ const Header: React.FC = () => {
           document.body
         )}
         {/* Desktop Search Results Dropdown - Portal */}
-        {searchQuery.trim().length > 0 && createPortal(
+        {shouldShowDesktopResults && createPortal(
           <div
             ref={searchResultsRef}
             className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[520px] overflow-y-auto"
@@ -987,8 +950,8 @@ const Header: React.FC = () => {
               position: 'fixed',
               top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
               left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left}px` : '50%'),
-              width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 500)}px` : '500px',
-              maxWidth: '800px',
+              width: dropdownPosition.width > 0 ? `${dropdownPosition.width}px` : '520px',
+              maxWidth: '760px',
               pointerEvents: 'auto'
             } as React.CSSProperties}
           >
@@ -1085,7 +1048,16 @@ const Header: React.FC = () => {
     <>
       {headerContent}
       {/* Mobile Search Results Dropdown - Portal */}
-      {searchQuery.trim().length > 0 && isSearchOpen && typeof document !== 'undefined' && createPortal(
+      {(shouldShowSearchOverlay || shouldShowMenuOverlay) && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[9990] bg-slate-950/25 backdrop-blur-[1px]"
+          style={{ pointerEvents: 'auto' }}
+          aria-hidden="true"
+          onPointerDown={shouldShowSearchOverlay ? handleSearchClose : handleMenuClose}
+        />,
+        document.body
+      )}
+      {shouldShowMobileResults && typeof document !== 'undefined' && createPortal(
         <div
           ref={searchResultsRef}
           className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[70vh] overflow-y-auto"
@@ -1158,19 +1130,19 @@ const Header: React.FC = () => {
         document.body
       )}
       {/* Desktop Search Results Dropdown - Portal */}
-      {searchQuery.trim().length > 0 && typeof document !== 'undefined' && createPortal(
+      {shouldShowDesktopResults && typeof document !== 'undefined' && createPortal(
         <div
           ref={searchResultsRef}
           className="bg-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.25)] border-2 border-slate-300 overflow-hidden max-h-[520px] overflow-y-auto"
-          style={{ 
-            zIndex: 99999,
-            position: 'fixed',
-            top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
-            left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left}px` : '50%'),
-            width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 500)}px` : '500px',
-            maxWidth: '800px',
-            pointerEvents: 'auto'
-          } as React.CSSProperties}
+            style={{ 
+              zIndex: 99999,
+              position: 'fixed',
+              top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
+              left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left}px` : '50%'),
+              width: dropdownPosition.width > 0 ? `${dropdownPosition.width}px` : '520px',
+              maxWidth: '760px',
+              pointerEvents: 'auto'
+            } as React.CSSProperties}
         >
           <div className="p-3">
             {searchResults.length > 0 ? (
