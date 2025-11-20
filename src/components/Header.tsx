@@ -111,39 +111,48 @@ const Header: React.FC = () => {
     setSelectedIndex(-1);
   }, []);
 
-  // Update dropdown position for desktop
+  // Update dropdown position for desktop - updates continuously as header moves
   useEffect(() => {
     const updatePosition = () => {
       if (desktopSearchInputRef.current) {
         const rect = desktopSearchInputRef.current.getBoundingClientRect();
+        // Use viewport-relative coordinates (getBoundingClientRect already gives viewport coords)
+        // Make dropdown wider than search input for better visibility
         setDropdownPosition({
-          top: rect.bottom + window.scrollY + 12,
-          left: rect.left + window.scrollX,
-          width: rect.width
+          top: rect.bottom + 12,
+          left: rect.left,
+          width: Math.max(rect.width * 1.5, 500) // Make it 1.5x wider, minimum 500px
         });
       }
     };
     
     if (searchQuery.trim().length > 0 && window.innerWidth >= 1024) {
       updatePosition();
-      window.addEventListener('scroll', updatePosition, true);
+      // Update on scroll to keep it aligned with search input as header moves
+      window.addEventListener('scroll', updatePosition, { passive: true });
       window.addEventListener('resize', updatePosition);
+      // Also update on animation frame for smooth tracking
+      const rafId = requestAnimationFrame(updatePosition);
+      const intervalId = setInterval(updatePosition, 100); // Update every 100ms for smooth tracking
+      
+      return () => {
+        window.removeEventListener('scroll', updatePosition, { passive: true } as EventListenerOptions);
+        window.removeEventListener('resize', updatePosition);
+        cancelAnimationFrame(rafId);
+        clearInterval(intervalId);
+      };
     }
-    
-    return () => {
-      window.removeEventListener('scroll', updatePosition, true);
-      window.removeEventListener('resize', updatePosition);
-    };
   }, [searchQuery]);
 
-  // Update dropdown position for mobile
+  // Update dropdown position for mobile - updates continuously as header moves
   useEffect(() => {
     const updateMobilePosition = () => {
       if (searchInputRef.current && isSearchOpen) {
         const rect = searchInputRef.current.getBoundingClientRect();
+        // Use viewport-relative coordinates (getBoundingClientRect already gives viewport coords)
         setMobileDropdownPosition({
-          top: rect.bottom + window.scrollY + 12,
-          left: rect.left + window.scrollX,
+          top: rect.bottom + 12,
+          left: rect.left,
           width: rect.width
         });
       }
@@ -151,14 +160,18 @@ const Header: React.FC = () => {
     
     if (searchQuery.trim().length > 0 && isSearchOpen && window.innerWidth < 1024) {
       updateMobilePosition();
-      window.addEventListener('scroll', updateMobilePosition, true);
+      // Update on scroll to keep it aligned with search input as header moves
+      window.addEventListener('scroll', updateMobilePosition, { passive: true });
       window.addEventListener('resize', updateMobilePosition);
+      // Also update periodically for smooth tracking
+      const intervalId = setInterval(updateMobilePosition, 100);
+      
+      return () => {
+        window.removeEventListener('scroll', updateMobilePosition, { passive: true } as EventListenerOptions);
+        window.removeEventListener('resize', updateMobilePosition);
+        clearInterval(intervalId);
+      };
     }
-    
-    return () => {
-      window.removeEventListener('scroll', updateMobilePosition, true);
-      window.removeEventListener('resize', updateMobilePosition);
-    };
   }, [searchQuery, isSearchOpen]);
 
   // Handle search input change
@@ -720,10 +733,10 @@ const Header: React.FC = () => {
                   style={{ 
                     zIndex: 99999,
                     position: 'fixed',
-                    top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
-                    left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left + window.scrollX}px` : '50%'),
-                    width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 320)}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.offsetWidth}px` : '400px'),
-                    maxWidth: '600px',
+                    top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
+                    left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left}px` : '50%'),
+                    width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 500)}px` : '500px',
+                    maxWidth: '800px',
                     pointerEvents: 'auto'
                   } as React.CSSProperties}
                 >
@@ -899,7 +912,7 @@ const Header: React.FC = () => {
             style={{ 
               zIndex: 99999,
               position: 'fixed',
-              top: mobileDropdownPosition.top > 0 ? `${mobileDropdownPosition.top}px` : (searchInputRef.current ? `${searchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
+              top: mobileDropdownPosition.top > 0 ? `${mobileDropdownPosition.top}px` : (searchInputRef.current ? `${searchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
               left: '10px',
               right: '10px',
               width: 'calc(100vw - 20px)',
@@ -972,10 +985,10 @@ const Header: React.FC = () => {
             style={{ 
               zIndex: 99999,
               position: 'fixed',
-              top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
-              left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left + window.scrollX}px` : '50%'),
-              width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 320)}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.offsetWidth}px` : '400px'),
-              maxWidth: '600px',
+              top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
+              left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left}px` : '50%'),
+              width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 500)}px` : '500px',
+              maxWidth: '800px',
               pointerEvents: 'auto'
             } as React.CSSProperties}
           >
@@ -1079,7 +1092,7 @@ const Header: React.FC = () => {
           style={{ 
             zIndex: 99999,
             position: 'fixed',
-            top: mobileDropdownPosition.top > 0 ? `${mobileDropdownPosition.top}px` : (searchInputRef.current ? `${searchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
+            top: mobileDropdownPosition.top > 0 ? `${mobileDropdownPosition.top}px` : (searchInputRef.current ? `${searchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
             left: '10px',
             right: '10px',
             width: 'calc(100vw - 20px)',
@@ -1152,10 +1165,10 @@ const Header: React.FC = () => {
           style={{ 
             zIndex: 99999,
             position: 'fixed',
-            top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + window.scrollY + 12}px` : '100px'),
-            left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left + window.scrollX}px` : '50%'),
-            width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 320)}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.offsetWidth}px` : '400px'),
-            maxWidth: '600px',
+            top: dropdownPosition.top > 0 ? `${dropdownPosition.top}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().bottom + 12}px` : '100px'),
+            left: dropdownPosition.left > 0 ? `${dropdownPosition.left}px` : (desktopSearchInputRef.current ? `${desktopSearchInputRef.current.getBoundingClientRect().left}px` : '50%'),
+            width: dropdownPosition.width > 0 ? `${Math.max(dropdownPosition.width, 500)}px` : '500px',
+            maxWidth: '800px',
             pointerEvents: 'auto'
           } as React.CSSProperties}
         >

@@ -1,14 +1,95 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Star, Filter, Search, ShieldCheck, Award, CheckCircle2, ShoppingCart, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Star, Filter, Search, ShieldCheck, Award, CheckCircle2, ShoppingCart, Sparkles, X } from 'lucide-react';
 import ResponsiveProductImage from '../components/ResponsiveProductImage';
 import { productCatalog } from '../data/products';
 import { useCart } from '../context/CartContext';
 
 const Product: React.FC = () => {
-  const products = productCatalog;
+  const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useCart();
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Initialize search query from URL parameter
+  useEffect(() => {
+    const urlSearch = searchParams.get('search');
+    if (urlSearch) {
+      setSearchQuery(urlSearch);
+    }
+  }, [searchParams]);
+
+  // Search function - same logic as Header component
+  const performSearch = useCallback((query: string) => {
+    const trimmedQuery = query.trim();
+    
+    if (!trimmedQuery) {
+      return productCatalog;
+    }
+
+    const lowerQuery = trimmedQuery.toLowerCase();
+    const results = productCatalog.filter((product) => {
+      const searchableText = [
+        product.name,
+        product.headline,
+        product.summary,
+        product.description,
+        product.heroTagline,
+        ...product.benefits,
+        product.keyIngredients,
+        product.suitableFor,
+        product.howToUse,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return searchableText.includes(lowerQuery);
+    });
+
+    // Sort by relevance (exact name match first, then headline, then others)
+    const sortedResults = results.sort((a, b) => {
+      const aNameMatch = a.name.toLowerCase().includes(lowerQuery);
+      const bNameMatch = b.name.toLowerCase().includes(lowerQuery);
+      if (aNameMatch && !bNameMatch) return -1;
+      if (!aNameMatch && bNameMatch) return 1;
+
+      const aHeadlineMatch = a.headline.toLowerCase().includes(lowerQuery);
+      const bHeadlineMatch = b.headline.toLowerCase().includes(lowerQuery);
+      if (aHeadlineMatch && !bHeadlineMatch) return -1;
+      if (!aHeadlineMatch && bHeadlineMatch) return 1;
+
+      return 0;
+    });
+
+    return sortedResults;
+  }, []);
+
+  // Filter products based on search query
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return productCatalog;
+    }
+    return performSearch(searchQuery);
+  }, [searchQuery, performSearch]);
+
+  // Handle search input change
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    // Update URL parameter
+    if (value.trim()) {
+      setSearchParams({ search: value });
+    } else {
+      setSearchParams({});
+    }
+  }, [setSearchParams]);
+
+  // Handle clear search
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+    setSearchParams({});
+  }, [setSearchParams]);
 
   return (
     <div className="min-h-screen">
@@ -51,9 +132,20 @@ const Product: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Search products..."
-                    className="w-full rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 pl-12 text-xs sm:text-sm text-slate-600 shadow-[0_15px_35px_-28px_rgba(15,23,42,0.4)] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500/70"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="w-full rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 pl-12 pr-12 text-xs sm:text-sm text-slate-600 shadow-[0_15px_35px_-28px_rgba(15,23,42,0.4)] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500/70"
                   />
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  {searchQuery && (
+                    <button
+                      onClick={handleClearSearch}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-all duration-200"
+                      aria-label="Clear search"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="flex w-full sm:w-auto items-center gap-2 sm:gap-4">
@@ -72,15 +164,30 @@ const Product: React.FC = () => {
             </div>
           </div>
 
+          {/* Search Results Info */}
+          {searchQuery.trim() && (
+            <div className="mb-4 text-sm text-slate-600">
+              <span className="font-semibold">
+                {filteredProducts.length} {filteredProducts.length === 1 ? 'product found' : 'products found'}
+              </span>
+              {searchQuery.trim() && (
+                <span className="ml-2">
+                  for "<span className="font-bold text-slate-900">{searchQuery}</span>"
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Products Grid */}
-          <div
-            className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
-            data-aos="fade-up"
-        data-aos-duration="900"
-        data-aos-delay="180"
-        data-aos-easing="ease-out-cubic"
-          >
-        {products.map((product, index) => {
+          {filteredProducts.length > 0 ? (
+            <div
+              className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
+              data-aos="fade-up"
+              data-aos-duration="900"
+              data-aos-delay="180"
+              data-aos-easing="ease-out-cubic"
+            >
+              {filteredProducts.map((product, index) => {
               const discountPercent = Math.round(
                 ((product.originalPrice - product.price) / product.originalPrice) * 100
               );
@@ -214,21 +321,38 @@ const Product: React.FC = () => {
                   </div>
                 </div>
               );
-            })}
-          </div>
+              })}
+            </div>
+          ) : (
+            <div className="py-16 text-center">
+              <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+              <p className="text-lg font-semibold text-slate-700 mb-2">No products found</p>
+              <p className="text-sm text-slate-500 mb-6">Try searching for product names, benefits, or ingredients</p>
+              {searchQuery.trim() && (
+                <button
+                  onClick={handleClearSearch}
+                  className="rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-700"
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
+          )}
 
-          {/* Load More Button */}
-          <div
-            className="mt-12 text-center"
-            data-aos="fade-up"
-            data-aos-duration="850"
-            data-aos-delay="220"
-            data-aos-easing="ease-out-cubic"
-          >
-            <button className="rounded-full bg-slate-900 px-10 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-colors hover:bg-slate-700">
-              Discover More Blends
-            </button>
-          </div>
+          {/* Load More Button - Only show when not searching */}
+          {!searchQuery.trim() && (
+            <div
+              className="mt-12 text-center"
+              data-aos="fade-up"
+              data-aos-duration="850"
+              data-aos-delay="220"
+              data-aos-easing="ease-out-cubic"
+            >
+              <button className="rounded-full bg-slate-900 px-10 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-colors hover:bg-slate-700">
+                Discover More Blends
+              </button>
+            </div>
+          )}
         </div>
       </section>
 

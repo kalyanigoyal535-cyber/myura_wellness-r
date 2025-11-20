@@ -189,7 +189,12 @@ const WomensHealthPlus: React.FC = () => {
         style={themeVars}
       >
         {/* Hero Section with Elegant Floral Design */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-rose-100 via-pink-50/80 to-rose-50 pt-12 pb-12 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20">
+        <section 
+          className="relative overflow-hidden bg-gradient-to-br from-rose-100 via-pink-50/80 to-rose-50 pt-12 pb-12 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20"
+          data-aos="fade-in"
+          data-aos-duration="1000"
+          data-aos-easing="ease-out-cubic"
+        >
           {/* Decorative Elements */}
           <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
             <div className="absolute -top-20 -right-20 h-96 w-96 rounded-full bg-gradient-to-br from-rose-200/40 via-pink-200/30 to-transparent blur-3xl" />
@@ -213,7 +218,13 @@ const WomensHealthPlus: React.FC = () => {
           <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:gap-12 max-w-7xl mx-auto">
               {/* Image Card - First on mobile, Right on desktop */}
-              <div className="flex-1 max-w-lg mx-auto lg:mx-0 order-1 lg:order-2">
+              <div 
+                className="flex-1 max-w-lg mx-auto lg:mx-0 order-1 lg:order-2"
+                data-aos="zoom-in"
+                data-aos-delay="100"
+                data-aos-duration="900"
+                data-aos-easing="ease-out-cubic"
+              >
                 <div className="relative">
                   {/* Glow Effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-rose-300/40 via-pink-300/30 to-rose-400/40 rounded-3xl blur-2xl -z-10" />
@@ -277,7 +288,13 @@ const WomensHealthPlus: React.FC = () => {
               </div>
 
               {/* Price Section - Second on mobile, hidden on desktop (will be inside left content) */}
-              <div className="flex-1 order-2 lg:hidden">
+              <div 
+                className="flex-1 order-2 lg:hidden"
+                data-aos="fade-up"
+                data-aos-delay="200"
+                data-aos-duration="850"
+                data-aos-easing="ease-out-cubic"
+              >
                 <div className="w-full mb-6">
                   <div className="relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/90 shadow-[0_28px_60px_-45px_rgba(15,23,42,0.45)]">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,0.65),transparent_55%),radial-gradient(circle_at_88%_18%,rgba(236,120,155,0.18),transparent_65%)]" />
@@ -349,23 +366,49 @@ const WomensHealthPlus: React.FC = () => {
               </div>
 
               {/* Left Content - Product Name + Price - Third on mobile, First on desktop */}
-              <div className="flex-1 space-y-6 text-center lg:text-left mb-0 order-3 lg:order-1">
-                <div className="inline-flex items-center gap-2 rounded-full border border-rose-200/80 bg-white/70 backdrop-blur-sm px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.4em] text-rose-700 shadow-lg">
+              <div 
+                className="flex-1 space-y-6 text-center lg:text-left mb-0 order-3 lg:order-1"
+                data-aos="fade-up"
+                data-aos-delay="150"
+                data-aos-duration="900"
+                data-aos-easing="ease-out-cubic"
+              >
+                <div 
+                  className="inline-flex items-center gap-2 rounded-full border border-rose-200/80 bg-white/70 backdrop-blur-sm px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.4em] text-rose-700 shadow-lg"
+                  data-aos="fade-up"
+                  data-aos-delay="200"
+                  data-aos-duration="800"
+                >
                   <Moon className="h-3.5 w-3.5" />
                   Lunar-Aligned Wellness
                   <Flower2 className="h-3.5 w-3.5" />
                 </div>
-                <h1 className="relative inline-flex items-center justify-center text-2xl sm:text-4xl lg:text-5xl font-bold leading-tight whitespace-nowrap text-white drop-shadow-[0_12px_30px_rgba(15,23,42,0.4)]">
+                <h1 
+                  className="relative inline-flex items-center justify-center text-2xl sm:text-4xl lg:text-5xl font-bold leading-tight whitespace-nowrap text-white drop-shadow-[0_12px_30px_rgba(15,23,42,0.4)]"
+                  data-aos="fade-up"
+                  data-aos-delay="250"
+                  data-aos-duration="900"
+                >
                   <span
                     className="relative px-4 py-1 rounded-full bg-white/10 backdrop-blur text-white tracking-[0.08em]"
                   >
                     {product.name}
                   </span>
                 </h1>
-                <p className="text-base sm:text-lg text-white font-display font-semibold tracking-wide max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                <p 
+                  className="text-base sm:text-lg text-white font-display font-semibold tracking-wide max-w-xl mx-auto lg:mx-0 leading-relaxed"
+                  data-aos="fade-up"
+                  data-aos-delay="300"
+                  data-aos-duration="850"
+                >
                   {product.summary}
                 </p>
-                <div className="flex flex-wrap sm:flex-nowrap justify-center lg:justify-start gap-2 pt-2">
+                <div 
+                  className="flex flex-wrap sm:flex-nowrap justify-center lg:justify-start gap-2 pt-2"
+                  data-aos="fade-up"
+                  data-aos-delay="350"
+                  data-aos-duration="800"
+                >
                   <div className="flex items-center gap-1.5 rounded-full bg-white/80 backdrop-blur-sm px-3 py-1.5 border border-rose-100 shadow-sm flex-shrink-0 text-[11px] sm:text-xs">
                     <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
                     <span className="font-semibold text-slate-900">{product.rating}.0</span>
@@ -377,7 +420,13 @@ const WomensHealthPlus: React.FC = () => {
                   </div>
                 </div>
                 {/* Price Section - Desktop only */}
-                <div className="w-full hidden lg:block">
+                <div 
+                  className="w-full hidden lg:block"
+                  data-aos="fade-up"
+                  data-aos-delay="400"
+                  data-aos-duration="850"
+                  data-aos-easing="ease-out-cubic"
+                >
                   <div className="relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/90 shadow-[0_28px_60px_-45px_rgba(15,23,42,0.45)]">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,0.65),transparent_55%),radial-gradient(circle_at_88%_18%,rgba(236,120,155,0.18),transparent_65%)]" />
                     <div className="relative flex flex-col gap-3.5 p-3.5 sm:gap-4 sm:p-4 lg:p-5">
@@ -454,24 +503,50 @@ const WomensHealthPlus: React.FC = () => {
         {/* Main Content */}
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
           {/* Wellness Journey Section */}
-          <section className="relative max-w-6xl mx-auto">
+          <section 
+            className="relative max-w-6xl mx-auto"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            data-aos-duration="900"
+            data-aos-easing="ease-out-cubic"
+          >
             <div className="relative rounded-3xl border-2 border-rose-100 bg-gradient-to-br from-white via-rose-50/30 to-pink-50/40 p-4 sm:p-6 shadow-xl overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-rose-200/20 to-pink-200/10 rounded-full blur-3xl -mr-32 -mt-32" />
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-pink-200/20 to-rose-200/10 rounded-full blur-3xl -ml-32 -mb-32" />
               
               <div className="relative space-y-3">
-                <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-xs font-semibold uppercase tracking-[0.4em] text-white">
+                <div 
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-xs font-semibold uppercase tracking-[0.4em] text-white"
+                  data-aos="zoom-in"
+                  data-aos-delay="150"
+                  data-aos-duration="700"
+                >
                   <Sparkles className="h-3.5 w-3.5 text-white" />
                   Your Wellness Journey
                 </div>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+                <h2 
+                  className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight"
+                  data-aos="fade-up"
+                  data-aos-delay="200"
+                  data-aos-duration="850"
+                >
                   Bring rhythm back to your cycle, skin, and mood
                 </h2>
-                <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-3xl">
+                <p 
+                  className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-3xl"
+                  data-aos="fade-up"
+                  data-aos-delay="250"
+                  data-aos-duration="800"
+                >
                   {product.description}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                  <div className="flex items-start gap-3 rounded-2xl bg-white/80 p-4 border border-rose-100 shadow-sm">
+                  <div 
+                    className="flex items-start gap-3 rounded-2xl bg-white/80 p-4 border border-rose-100 shadow-sm"
+                    data-aos="fade-up"
+                    data-aos-delay="300"
+                    data-aos-duration="800"
+                  >
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center">
                       <Calendar className="h-5 w-5 text-white" />
                     </div>
@@ -480,7 +555,12 @@ const WomensHealthPlus: React.FC = () => {
                       <p className="text-xs text-slate-600">Balance hormonal peaks and dips naturally throughout your monthly rhythm.</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3 rounded-2xl bg-white/80 p-4 border border-rose-100 shadow-sm">
+                  <div 
+                    className="flex items-start gap-3 rounded-2xl bg-white/80 p-4 border border-rose-100 shadow-sm"
+                    data-aos="fade-up"
+                    data-aos-delay="350"
+                    data-aos-duration="800"
+                  >
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
                       <TrendingUp className="h-5 w-5 text-white" />
                     </div>
@@ -495,9 +575,20 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* Ingredients & Usage Section */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto">
+          <section 
+            className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto"
+            data-aos="fade-up"
+            data-aos-delay="150"
+            data-aos-duration="900"
+            data-aos-easing="ease-out-cubic"
+          >
             {/* Key Ingredients */}
-            <div className="rounded-2xl border-2 border-rose-100 bg-gradient-to-br from-white via-rose-50/20 to-white p-4 sm:p-5 shadow-xl">
+            <div 
+              className="rounded-2xl border-2 border-rose-100 bg-gradient-to-br from-white via-rose-50/20 to-white p-4 sm:p-5 shadow-xl"
+              data-aos="slide-right"
+              data-aos-delay="200"
+              data-aos-duration="850"
+            >
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center">
                   <Leaf className="h-5 w-5 text-rose-600" />
@@ -509,7 +600,13 @@ const WomensHealthPlus: React.FC = () => {
               </div>
               <div className="space-y-2.5">
                 {keyIngredientHighlights.map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-slate-700">
+                  <div 
+                    key={idx} 
+                    className="flex items-start gap-2.5 text-slate-700"
+                    data-aos="fade-up"
+                    data-aos-delay={300 + idx * 50}
+                    data-aos-duration="700"
+                  >
                     <div className="flex-shrink-0 mt-1.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-br from-rose-400 to-pink-400" />
                     </div>
@@ -520,7 +617,12 @@ const WomensHealthPlus: React.FC = () => {
             </div>
 
             {/* How to Use & Suitable For */}
-            <div className="space-y-4">
+            <div 
+              className="space-y-4"
+              data-aos="slide-left"
+              data-aos-delay="250"
+              data-aos-duration="850"
+            >
               <div className="rounded-2xl border-2 border-rose-100 bg-gradient-to-br from-white to-pink-50/30 p-4 sm:p-5 shadow-xl">
                 <div className="flex items-center gap-2.5 mb-4">
                   <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
@@ -546,7 +648,13 @@ const WomensHealthPlus: React.FC = () => {
                 </div>
                 <ul className="space-y-2.5">
                   {suitableForHighlights.map((item, idx) => (
-                    <li key={idx} className="flex gap-2.5 text-slate-700">
+                    <li 
+                      key={idx} 
+                      className="flex gap-2.5 text-slate-700"
+                      data-aos="fade-up"
+                      data-aos-delay={300 + idx * 50}
+                      data-aos-duration="700"
+                    >
                       <div className="flex-shrink-0 mt-1.5">
                         <Flower2 className="h-3.5 w-3.5 text-rose-500" />
                       </div>
@@ -559,16 +667,37 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* Benefits Section */}
-          <section className="max-w-6xl mx-auto">
+          <section 
+            className="max-w-6xl mx-auto"
+            data-aos="fade-up"
+            data-aos-delay="150"
+            data-aos-duration="900"
+            data-aos-easing="ease-out-cubic"
+          >
             <div className="mb-6 text-left">
-              <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-white mb-3">
+              <div 
+                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-white mb-3"
+                data-aos="zoom-in"
+                data-aos-delay="200"
+                data-aos-duration="700"
+              >
                 <HeartPulse className="h-3.5 w-3.5 text-rose-700" />
                 Botanical Benefits
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 leading-tight">
+              <h2 
+                className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 leading-tight"
+                data-aos="fade-up"
+                data-aos-delay="250"
+                data-aos-duration="850"
+              >
                 Feel the difference in every capsule
               </h2>
-              <p className="text-base sm:text-lg text-slate-600 max-w-2xl">
+              <p 
+                className="text-base sm:text-lg text-slate-600 max-w-2xl"
+                data-aos="fade-up"
+                data-aos-delay="300"
+                data-aos-duration="800"
+              >
                 A thoughtfully crafted blend designed specifically for women's wellness needs
               </p>
             </div>
@@ -581,6 +710,10 @@ const WomensHealthPlus: React.FC = () => {
                   <div
                     key={benefit}
                     className="group relative rounded-2xl border border-rose-100 bg-gradient-to-br from-white to-rose-50/30 p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+                    data-aos="fade-up"
+                    data-aos-delay={400 + idx * 100}
+                    data-aos-duration="800"
+                    data-aos-easing="ease-out-cubic"
                   >
                     <div className="absolute top-3 right-3 w-14 h-14 bg-gradient-to-br from-rose-200/30 to-pink-200/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative flex items-center gap-3">
@@ -598,17 +731,40 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* FAQs Section */}
-          <section className="max-w-4xl mx-auto">
+          <section 
+            className="max-w-4xl mx-auto"
+            data-aos="fade-up"
+            data-aos-delay="200"
+            data-aos-duration="900"
+            data-aos-easing="ease-out-cubic"
+          >
             <div className="rounded-2xl border-2 border-rose-100 bg-gradient-to-br from-white via-rose-50/20 to-pink-50/30 p-5 sm:p-6 shadow-xl">
               <div className="text-center mb-6">
-                <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-white mb-3">
+                <div 
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-rose-100 border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-white mb-3"
+                  data-aos="zoom-in"
+                  data-aos-delay="250"
+                  data-aos-duration="700"
+                >
                   <Sparkles className="h-3.5 w-3.5 text-white" />
                   Frequently Asked
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+                <h2 
+                  className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2"
+                  data-aos="fade-up"
+                  data-aos-delay="300"
+                  data-aos-duration="850"
+                >
                   Your questions answered
                 </h2>
-                <p className="text-base text-slate-600">Holistic answers for your wellness journey</p>
+                <p 
+                  className="text-base text-slate-600"
+                  data-aos="fade-up"
+                  data-aos-delay="350"
+                  data-aos-duration="800"
+                >
+                  Holistic answers for your wellness journey
+                </p>
               </div>
               
               <div className="space-y-3">
@@ -616,6 +772,10 @@ const WomensHealthPlus: React.FC = () => {
                   <div
                     key={idx}
                     className="rounded-xl border-2 border-rose-100 bg-white/80 backdrop-blur-sm overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+                    data-aos="fade-up"
+                    data-aos-delay={350 + idx * 100}
+                    data-aos-duration="800"
+                    data-aos-easing="ease-out-cubic"
                   >
                     <button
                       onClick={() => toggleSection(`faq-${idx}`)}
@@ -642,25 +802,49 @@ const WomensHealthPlus: React.FC = () => {
           </section>
 
           {/* CTA Section */}
-          <section className="relative max-w-6xl mx-auto">
+          <section 
+            className="relative max-w-6xl mx-auto"
+            data-aos="zoom-in"
+            data-aos-delay="200"
+            data-aos-duration="1000"
+            data-aos-easing="ease-out-cubic"
+          >
             <div className="relative rounded-2xl border-2 border-rose-200 bg-gradient-to-br from-rose-100 via-pink-100/80 to-rose-50 p-6 sm:p-8 shadow-2xl overflow-hidden">
               <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-pink-300/30 to-rose-300/20 rounded-full blur-3xl -mr-40 -mt-40" />
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-rose-300/30 to-pink-300/20 rounded-full blur-3xl -ml-40 -mb-40" />
               
               <div className="relative text-center space-y-4">
-                <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-rose-700">
+                <div 
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-rose-200 text-[11px] font-semibold uppercase tracking-[0.35em] text-rose-700"
+                  data-aos="zoom-in"
+                  data-aos-delay="250"
+                  data-aos-duration="700"
+                >
                   <Heart className="h-3 w-3" />
                   Daily Devotion
                 </div>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+                <h2 
+                  className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight"
+                  data-aos="fade-up"
+                  data-aos-delay="300"
+                  data-aos-duration="900"
+                >
                   {product.heroTagline}
                 </h2>
-                <p className="text-base sm:text-lg text-slate-700 max-w-2xl mx-auto leading-relaxed">
+                <p 
+                  className="text-base sm:text-lg text-slate-700 max-w-2xl mx-auto leading-relaxed"
+                  data-aos="fade-up"
+                  data-aos-delay="350"
+                  data-aos-duration="850"
+                >
                   Build a mindful ritual and experience how consistent nourishment transforms the way you move, feel, and glow.
                 </p>
                 <Link
                   to="/contact"
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-rose-600 via-pink-600 to-rose-600 px-6 py-3 text-xs font-bold uppercase tracking-[0.3em] text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                  data-aos="zoom-in"
+                  data-aos-delay="400"
+                  data-aos-duration="800"
                 >
                   Talk to a specialist
                   <Sparkles className="h-3.5 w-3.5" />
@@ -671,26 +855,43 @@ const WomensHealthPlus: React.FC = () => {
 
           {/* Related Products */}
           {relatedProducts.length > 0 && (
-            <section className="max-w-6xl mx-auto space-y-8">
+            <section 
+              className="max-w-6xl mx-auto space-y-8"
+              data-aos="fade-up"
+              data-aos-delay="200"
+              data-aos-duration="900"
+              data-aos-easing="ease-out-cubic"
+            >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
+                <div
+                  data-aos="fade-up"
+                  data-aos-delay="250"
+                  data-aos-duration="850"
+                >
                   <h3 className="text-3xl sm:text-4xl font-bold text-slate-900">You may also love</h3>
                   <p className="text-lg text-slate-600 mt-2">Complete your wellness routine</p>
                 </div>
                 <Link
                   to="/product"
                   className="inline-flex items-center text-sm font-semibold uppercase tracking-[0.3em] text-rose-600 hover:text-rose-700 transition-colors"
+                  data-aos="fade-up"
+                  data-aos-delay="300"
+                  data-aos-duration="800"
                 >
                   View all products →
                 </Link>
               </div>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-                {relatedProducts.map((related) => {
+                {relatedProducts.map((related, idx) => {
                   const cardStyle = getRelatedCardStyle(related.id);
                   return (
                     <Link
                       key={related.id}
                       to={`/product/${related.id}`}
+                      data-aos="fade-up"
+                      data-aos-delay={350 + idx * 100}
+                      data-aos-duration="800"
+                      data-aos-easing="ease-out-cubic"
                       className="group flex flex-col gap-5 overflow-hidden rounded-3xl border-2 border-rose-100 bg-white/80 backdrop-blur-sm p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-rose-200"
                     >
                       <div className={`overflow-hidden rounded-2xl bg-gradient-to-br ${cardStyle.gradient} p-4`}>
