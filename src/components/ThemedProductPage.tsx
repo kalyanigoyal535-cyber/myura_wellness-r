@@ -1213,7 +1213,7 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex flex-1 items-center justify-center px-3 pb-8 pt-5 sm:px-10 sm:pt-8 lg:px-24 lg:pt-10">
+            <div className="flex flex-1 items-center justify-center px-3 py-6 sm:px-10 sm:py-8 lg:px-24 lg:py-10">
               <ZoomableImageViewer image={heroImage} onClose={handleCloseZoom} />
             </div>
             <div className="pb-6 text-center space-y-2 lg:hidden">
