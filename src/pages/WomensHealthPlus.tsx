@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { Plus, Minus, Star, Heart, Sparkles, Flower2, Moon, Sun, ShieldCheck, HeartPulse, X, ZoomIn, Calendar, TrendingUp, Leaf, ArrowRight } from 'lucide-react';
 import ResponsiveProductImage from '../components/ResponsiveProductImage';
+import ZoomableImageViewer from '../components/ZoomableImageViewer';
 import { getProductById, getRelatedProducts } from '../data/products';
 import useImagePalette from '../hooks/useImagePalette';
 import '../styles/womensHealthTheme.css';
@@ -174,6 +175,15 @@ const WomensHealthPlus: React.FC = () => {
     setIsZoomed(false);
   }, []);
 
+  const handleBackdropPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.target === event.currentTarget) {
+        handleCloseZoom();
+      }
+    },
+    [handleCloseZoom]
+  );
+
   useEffect(() => {
     if (!isZoomed) return undefined;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -184,6 +194,17 @@ const WomensHealthPlus: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isZoomed]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+    const eventName = 'myura:header-compact';
+    window.dispatchEvent(new CustomEvent(eventName, { detail: isZoomed }));
+    return () => {
+      window.dispatchEvent(new CustomEvent(eventName, { detail: false }));
     };
   }, [isZoomed]);
 
@@ -742,12 +763,22 @@ const WomensHealthPlus: React.FC = () => {
           role="dialog"
           aria-modal="true"
           onClick={handleCloseZoom}
+          onPointerDown={handleBackdropPointerDown}
         >
           <div
             className="relative flex h-full w-full flex-col"
             onClick={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between gap-3 px-4 py-4 sm:px-8 lg:hidden">
+            <button
+              type="button"
+              onClick={handleCloseZoom}
+              className="absolute right-4 top-4 z-20 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white text-slate-900 shadow-xl transition hover:scale-105 active:scale-95"
+              aria-label="Close zoomed image"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="flex items-center justify-between gap-3 px-4 pt-6 pb-4 sm:px-8 lg:hidden">
               <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-white/80">
                 <ZoomIn className="h-4 w-4" />
                 Product Detail View
@@ -755,18 +786,14 @@ const WomensHealthPlus: React.FC = () => {
               <button
                 type="button"
                 onClick={handleCloseZoom}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 text-white transition-all hover:bg-white/30 hover:scale-110 active:scale-95 shadow-lg"
-                aria-label="Close zoomed image"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-white/15 text-white shadow-lg transition hover:bg-white/25 active:scale-95"
+                aria-label="Close zoom overlay"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex flex-1 items-center justify-center px-3 pb-8 sm:px-10 lg:px-24">
-              <ResponsiveProductImage
-                image={heroImage}
-                className="w-full max-w-2xl lg:max-w-3xl"
-                imgClassName="object-contain w-full max-h-[80vh] rounded-[1.75rem] shadow-[0_40px_120px_-60px_rgba(0,0,0,0.65)]"
-              />
+            <div className="flex flex-1 items-center justify-center px-3 pb-8 pt-5 sm:px-10 sm:pt-8 lg:px-24 lg:pt-10">
+              <ZoomableImageViewer image={heroImage} onClose={handleCloseZoom} />
             </div>
             <div className="pb-6 text-center space-y-2 lg:hidden">
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/70">

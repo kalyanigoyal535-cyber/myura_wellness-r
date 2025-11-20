@@ -29,6 +29,7 @@ const Header: React.FC = () => {
   const { address, loading, error, refreshLocation } = useUserLocation();
   const { count } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isForcedCompact, setIsForcedCompact] = useState(false);
   
   // Search functionality
   const [searchQuery, setSearchQuery] = useState('');
@@ -355,6 +356,23 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Listen for global events to force header into compact mode (e.g., image zoom modals)
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const handleForceCompact = (event: Event) => {
+      const customEvent = event as CustomEvent<boolean>;
+      setIsForcedCompact(Boolean(customEvent.detail));
+    };
+
+    window.addEventListener('myura:header-compact', handleForceCompact as EventListener);
+    return () => {
+      window.removeEventListener('myura:header-compact', handleForceCompact as EventListener);
+    };
+  }, []);
+
+  const isHeaderCondensed = isScrolled || isForcedCompact;
+
   const measureTopBar = useCallback(() => {
     const topBarEl = topBarRef.current;
     if (!topBarEl) return;
@@ -402,7 +420,7 @@ const Header: React.FC = () => {
     updateHeaderHeight();
     const timeout = window.setTimeout(updateHeaderHeight, 520);
     return () => window.clearTimeout(timeout);
-  }, [updateHeaderHeight, currentBannerIndex, isScrolled, topBarHeight]);
+  }, [updateHeaderHeight, currentBannerIndex, isHeaderCondensed, topBarHeight]);
 
   useEffect(() => {
     window.addEventListener('resize', updateHeaderHeight);
@@ -554,15 +572,15 @@ const Header: React.FC = () => {
       {/* Professional Top Bar */}
       <div
         ref={topBarRef}
-        aria-hidden={isScrolled}
+        aria-hidden={isHeaderCondensed}
         className="bg-slate-50 border-b border-slate-200 py-2 sm:py-2.5 overflow-hidden"
         style={{
-          maxHeight: isScrolled ? 0 : topBarHeight || undefined,
-          opacity: isScrolled ? 0 : 1,
-          transform: isScrolled ? 'translateY(-12px)' : 'translateY(0)',
-          paddingTop: isScrolled ? '0px' : undefined,
-          paddingBottom: isScrolled ? '0px' : undefined,
-          pointerEvents: isScrolled ? 'none' : 'auto',
+          maxHeight: isHeaderCondensed ? 0 : topBarHeight || undefined,
+          opacity: isHeaderCondensed ? 0 : 1,
+          transform: isHeaderCondensed ? 'translateY(-12px)' : 'translateY(0)',
+          paddingTop: isHeaderCondensed ? '0px' : undefined,
+          paddingBottom: isHeaderCondensed ? '0px' : undefined,
+          pointerEvents: isHeaderCondensed ? 'none' : 'auto',
           transition: 'max-height 0.45s ease, opacity 0.45s ease, transform 0.45s ease, padding 0.45s ease'
         }}
       >
@@ -624,14 +642,14 @@ const Header: React.FC = () => {
 
       {/* Professional Main Navigation */}
       <div
-        className={`bg-white/90 backdrop-blur border-b border-slate-200 transition-shadow duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${isScrolled ? 'shadow-md' : 'shadow-sm'}`}
+        className={`bg-white/90 backdrop-blur border-b border-slate-200 transition-shadow duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${isHeaderCondensed ? 'shadow-md' : 'shadow-sm'}`}
       >
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
           <div
             className="flex items-center justify-between gap-2 sm:gap-3 min-w-0"
             style={{
-              paddingTop: isScrolled ? '0.45rem' : '0.75rem',
-              paddingBottom: isScrolled ? '0.45rem' : '0.75rem',
+              paddingTop: isHeaderCondensed ? '0.45rem' : '0.75rem',
+              paddingBottom: isHeaderCondensed ? '0.45rem' : '0.75rem',
               transition: 'padding 0.45s ease'
             }}
           >
@@ -701,7 +719,7 @@ const Header: React.FC = () => {
                   isSearchOpen 
                     ? 'scale-[0.88] translate-x-1 opacity-90' 
                     : 'scale-100 translate-x-0 opacity-100'
-                } ${isScrolled ? 'scale-[0.95]' : 'scale-100'}`}
+                } ${isHeaderCondensed ? 'scale-[0.95]' : 'scale-100'}`}
                 style={{
                   transition: 'transform 0.45s ease, opacity 0.45s ease'
                 }}
@@ -711,7 +729,7 @@ const Header: React.FC = () => {
                   alt="MYURA Logo" 
                   className="w-auto object-contain filter brightness-0 drop-shadow-md group-hover:drop-shadow-lg group-hover:scale-105 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                   style={{
-                    height: isScrolled ? '2.6rem' : '3.1rem',
+                    height: isHeaderCondensed ? '2.6rem' : '3.1rem',
                     transition: 'height 0.45s ease'
                   }}
                 />
