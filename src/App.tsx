@@ -2,9 +2,12 @@ import React, { useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { Gift } from 'lucide-react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
+import SpinWheelModal from './components/SpinWheelModal';
+import { SpinWheelProvider, useSpinWheel } from './context/SpinWheelContext';
 
 // Lazy load routes for code splitting
 const Home = lazy(() => import('./pages/Home'));
@@ -55,7 +58,9 @@ const AOSRefresher = () => {
   return null;
 };
 
-function App() {
+const AppContent: React.FC = () => {
+  const { isOpen, openSpinWheel, closeSpinWheel } = useSpinWheel();
+
   useEffect(() => {
     // Prevent browser from restoring scroll position on refresh
     if ('scrollRestoration' in window.history) {
@@ -104,7 +109,28 @@ function App() {
           </div>
           <Footer />
         </div>
+        {/* Floating Spin Wheel Button - Bottom Right */}
+        <button
+          onClick={openSpinWheel}
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-rose-500 via-pink-500 to-rose-600 text-white shadow-[0_8px_24px_rgba(236,72,153,0.4)] hover:shadow-[0_12px_32px_rgba(236,72,153,0.6)] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center group"
+          aria-label="Spin for discount"
+          title="Spin the wheel for exclusive discounts"
+        >
+          <Gift className="h-6 w-6 sm:h-7 sm:w-7 transition-transform group-hover:scale-110 group-hover:rotate-12" />
+          <span className="absolute -top-1 -right-1 h-3 w-3 bg-white rounded-full animate-pulse flex items-center justify-center">
+            <span className="h-2 w-2 bg-rose-500 rounded-full" />
+          </span>
+        </button>
+        <SpinWheelModal isOpen={isOpen} onClose={closeSpinWheel} />
     </>
+  );
+};
+
+function App() {
+  return (
+    <SpinWheelProvider>
+      <AppContent />
+    </SpinWheelProvider>
   );
 }
 
