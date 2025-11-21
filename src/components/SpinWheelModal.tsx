@@ -147,10 +147,18 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (!isOpen) return;
     const originalOverflow = document.body.style.overflow;
+    const originalOverflowY = document.body.style.overflowY;
+    const originalHeight = document.body.style.height;
+    
+    // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
+    document.body.style.overflowY = 'hidden';
+    document.body.style.height = '100vh';
 
     return () => {
       document.body.style.overflow = originalOverflow;
+      document.body.style.overflowY = originalOverflowY;
+      document.body.style.height = originalHeight;
     };
   }, [isOpen]);
 
@@ -281,13 +289,14 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed z-[9998] flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4"
+      className="fixed z-[9998] flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 overflow-hidden"
       style={{
         top: 'var(--header-height, 0px)',
         left: '0',
         right: '0',
         bottom: '0',
         height: 'calc(100vh - var(--header-height, 0px))',
+        maxHeight: 'calc(100vh - var(--header-height, 0px))',
       }}
     >
       <div
@@ -295,7 +304,7 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
         onClick={() => !isSpinning && onClose()}
       />
 
-      <div className="relative max-w-6xl w-full bg-gradient-to-br from-slate-50/95 via-white/90 to-blue-50/95 border border-slate-300/70 shadow-[0px_20px_80px_rgba(15,36,57,0.15)] rounded-2xl sm:rounded-[32px] p-3 sm:p-4 md:p-6 lg:p-7 overflow-hidden max-h-[95vh] sm:max-h-[92vh] overflow-y-auto">
+      <div className="relative max-w-6xl w-full bg-gradient-to-br from-slate-50/95 via-white/90 to-blue-50/95 border border-slate-300/70 shadow-[0px_20px_80px_rgba(15,36,57,0.15)] rounded-2xl sm:rounded-[32px] p-3 sm:p-4 md:p-6 lg:p-7 overflow-hidden max-h-[95vh] sm:max-h-[92vh]">
         {/* Close button for mobile */}
         <button
           onClick={onClose}
