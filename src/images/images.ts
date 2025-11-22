@@ -8,6 +8,8 @@ import IndianFlagIcon from "./flag-for-flag-india-svgrepo-com.svg"
 import HowWeAreDIfferentImage from "./Website image 1.png"
 import DeliveryImage from "./delivery.webp"
 import offerImage from "./OfferImage.png"
+import AboutUsImage from "./aboutUsImage/Images (1)_page-0001.jpg"
+import yourBestHealth from "./aboutUsImage/Images (1)_page-0004.jpg"
 const images = {
   BannerImageDesktop1,
   BannerImageDesktop2,
@@ -18,7 +20,9 @@ const images = {
   IndianFlagIcon,
   HowWeAreDIfferentImage,
   DeliveryImage,
-  offerImage
+  offerImage,
+  AboutUsImage,
+  yourBestHealth,
 };
 
 export default images;

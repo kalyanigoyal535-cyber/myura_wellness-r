@@ -30,7 +30,7 @@ const NewBrandAccordion = (props: Props) => {
 
   const items = data.map((item) => (
     <Accordion.Item key={item.value} value={item.value}>
-      <Accordion.Control icon={item.emoji}>{item.value}</Accordion.Control>
+      <Accordion.Control >{item.value}</Accordion.Control>
       <Accordion.Panel>{item.description}</Accordion.Panel>
     </Accordion.Item>
   ));

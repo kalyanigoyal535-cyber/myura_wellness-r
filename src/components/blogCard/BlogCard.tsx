@@ -14,7 +14,6 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
-  console.log("🚀 ~ BlogCard ~ blog:", blog)
   
   if (!blog) return null;
   return ( 

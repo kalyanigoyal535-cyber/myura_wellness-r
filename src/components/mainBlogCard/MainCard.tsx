@@ -10,7 +10,7 @@ console.log("blogs:",blogs);
       {/* MAIN GRID */}
       <div className="grid grid-cols-1 md:grid-cols-8 gap-6">
         {/* LEFT SECTION (Big Block) */}
-        <div className="md:col-span-6 rounded-xl flex flex-col text-black justify-center text-xl font-semibold min-h-[400px]">
+        <div className="md:col-span-6 rounded-xl flex flex-col text-black justify-center text-xl font-semibold min-h-[400px] shadow-md hover:shadow-lg">
           <Link to={`/blog/${mainBlog.slug}`}>
             <img
               src={mainBlog.thumbnail}
@@ -34,7 +34,7 @@ console.log("blogs:",blogs);
             <Link
               key={blog.id}
               to={`/blog/${blog.slug}`}
-              className="rounded-xl flex flex-col justify-center font-semibold min-h-[220px]"
+              className="rounded-xl flex flex-col justify-center font-semibold min-h-[220px] "
             >
               <img
                 src={blog.thumbnail}

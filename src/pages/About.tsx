@@ -4,6 +4,7 @@ import { Carousel } from "@mantine/carousel";
 import IconAboutUs from "../components/iconAboutUs/IconAboutUs";
 import images from "../images/images";
 import OurTeam from "../components/ourTeam/OurTeam";
+import HeroAboutSection from "../components/heroAboutSection/HeroAboutSection";
 
 type Props = {};
 
@@ -12,11 +13,11 @@ const About = (props: Props) => {
     <div>
       {/* about us  */}
       <div className="grid grid-cols-12 bg-[#F8F8F8] py-8 px-4 md:px-12 gap-6">
-       
         <div className="col-span-12 md:col-span-6 flex justify-center items-center">
-          <div className="bg-gray-700 w-full max-w-md h-48 md:h-64 rounded-xl"></div>
+          <div className="bg-gray-700 w-full max-w-md h-48 md:h-64 rounded-xl">
+            <img src={images.AboutUsImage} alt="" />
+          </div>
         </div>
-
 
         <div className="col-span-12 md:col-span-6 flex flex-col justify-center text-center md:text-left">
           <h1 className="text-2xl md:text-3xl tracking-wide font-semibold mb-2">
@@ -50,23 +51,25 @@ const About = (props: Props) => {
         {/* Right Section (Video) */}
         <div className="col-span-12 md:col-span-6 flex justify-center items-center rounded-xl">
           <div className="aspect-video w-full max-w-md">
-            <iframe
-              className="w-full h-full rounded-xl"
-              src="https://www.youtube.com/embed/tkZfN6ZPuBo"
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+            <div className="aspect-video w-full max-w-md">
+              <iframe
+                className="w-full h-full rounded-xl"
+                src="https://www.youtube.com/embed/zQHCDwjzGoY"
+                title="Myura Men’s Vitality Booster"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              ></iframe>
+            </div>
           </div>
         </div>
       </div>
       {/* <FoundersNote/> */}
-
+      <HeroAboutSection/>
 
       <NewBrandAccordion />
       {/* culture at myura  */}
-
 
       <IconAboutUs />
       <div className="grid grid-cols-1 md:grid-cols-12 h-auto md:h-[350px] gap-4  md:mb-52 m-4">
@@ -83,17 +86,15 @@ const About = (props: Props) => {
             balance hormones, aid digestion, and strengthen joints – so you can
             feel light, clear, and alive from the inside out.
             <br />
-
-             Every single
-            ingredient is clean, transparent, and purpose-driven – no fillers,
-            no gimmicks, just results you can feel.
+            Every single ingredient is clean, transparent, and purpose-driven –
+            no fillers, no gimmicks, just results you can feel.
           </p>
         </div>
 
         {/* Image Section */}
         <div className="md:col-span-6 flex justify-center items-center order-1 md:order-2">
           <img
-            src={images.HowWeAreDIfferentImage}
+            src={images.yourBestHealth}
             alt="How we are different image"
             className="w-full md:w-7/12 rounded-lg"
           />
@@ -101,11 +102,16 @@ const About = (props: Props) => {
       </div>
 
       {/* about our team  */}
-      <div>
-        {/* <OurTeam /> */}
-      </div>
+      <div>{/* <OurTeam /> */}</div>
     </div>
   );
 };
 
 export default About;
+
+
+export const NewSection  = () => {
+  return (
+    <div>NewSection</div>
+  )
+}
