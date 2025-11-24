@@ -74,23 +74,12 @@ interface SpinWheelModalProps {
   onClose: () => void;
 }
 
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  color: string;
-  life: number;
-}
-
 const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hasSpun, setHasSpun] = useState(false);
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const [showOffer, setShowOffer] = useState(false);
   const wheelRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
@@ -104,45 +93,6 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
     }).join(', ');
   }, [segmentAngle]);
 
-  // Particle animation effect
-  useEffect(() => {
-    if (!isSpinning) return;
-
-    const createParticle = (): Particle => {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 2 + Math.random() * 3;
-      return {
-        id: Math.random(),
-        x: 50,
-        y: 50,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        size: 3 + Math.random() * 4,
-        color: DISCOUNT_SEGMENTS[Math.floor(Math.random() * DISCOUNT_SEGMENTS.length)].accent,
-        life: 1,
-      };
-    };
-
-    const interval = setInterval(() => {
-      setParticles((prev) => {
-        const newParticles = [...prev, createParticle(), createParticle()];
-        return newParticles
-          .map((p) => ({
-            ...p,
-            x: p.x + p.vx * 0.5,
-            y: p.y + p.vy * 0.5,
-            life: p.life - 0.02,
-          }))
-          .filter((p) => p.life > 0)
-          .slice(-50);
-      });
-    }, 50);
-
-    return () => {
-      clearInterval(interval);
-      setParticles([]);
-    };
-  }, [isSpinning]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -217,6 +167,7 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
     setIsSpinning(true);
     setSelectedIndex(null);
     setHasSpun(true);
+    setShowOffer(false);
 
     // Random target rotation - let it land wherever it lands
     const randomExtra = Math.random() * segmentAngle * 0.6;
@@ -246,27 +197,10 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
         const finalSegmentIndex = getSegmentFromRotation(currentRotation);
         setSelectedIndex(finalSegmentIndex);
         setIsSpinning(false);
-        // Create celebration particles
-        setParticles([]);
+        // Show premium offer display after a brief delay
         setTimeout(() => {
-          for (let i = 0; i < 30; i++) {
-            setTimeout(() => {
-              setParticles((prev) => [
-                ...prev,
-                {
-                  id: Math.random(),
-                  x: 50,
-                  y: 50,
-                  vx: (Math.random() - 0.5) * 8,
-                  vy: (Math.random() - 0.5) * 8,
-                  size: 4 + Math.random() * 6,
-                  color: DISCOUNT_SEGMENTS[finalSegmentIndex].accent,
-                  life: 1,
-                },
-              ]);
-            }, i * 20);
-          }
-        }, 100);
+          setShowOffer(true);
+        }, 500);
       }
     };
 
@@ -321,25 +255,300 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
           <div className="absolute bottom-0 left-4 w-32 h-32 bg-blue-200/30 blur-3xl rounded-full" />
         </div>
 
-        {/* Particles overlay */}
-        {particles.length > 0 && (
-          <div className="absolute inset-0 pointer-events-none z-10">
-            {particles.map((particle) => (
-              <div
-                key={particle.id}
-                className="absolute rounded-full"
+        {/* Premium Offer Overlay - Full Modal Display */}
+        {showOffer && selectedDiscount && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center animate-fade-in max-h-[95vh] sm:max-h-[92vh]">
+            <div 
+              className="relative w-full h-full bg-gradient-to-br from-white via-slate-50/95 to-white overflow-hidden rounded-2xl sm:rounded-[32px]"
+              style={{
+                background: `linear-gradient(135deg, ${selectedDiscount.accent}08 0%, white 30%, white 70%, ${selectedDiscount.accent}08 100%)`,
+              }}
+            >
+              {/* Animated background glow */}
+              <div 
+                className="absolute inset-0 opacity-30"
                 style={{
-                  left: `${particle.x}%`,
-                  top: `${particle.y}%`,
-                  width: `${particle.size}px`,
-                  height: `${particle.size}px`,
-                  backgroundColor: particle.color,
-                  opacity: particle.life,
-                  transform: 'translate(-50%, -50%)',
-                  boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
+                  background: `radial-gradient(circle at 50% 50%, ${selectedDiscount.accent}20 0%, transparent 70%)`,
+                  animation: 'pulse-glow 3s ease-in-out infinite',
                 }}
               />
-            ))}
+              
+              {/* Decorative elements */}
+              <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+                <div 
+                  className="absolute -top-16 -right-16 w-48 h-48 rounded-full blur-3xl opacity-20"
+                  style={{ backgroundColor: selectedDiscount.accent }}
+                />
+                <div 
+                  className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full blur-3xl opacity-20"
+                  style={{ backgroundColor: selectedDiscount.accent }}
+                />
+              </div>
+
+              {/* Creative Myura Brand Celebration */}
+              {showOffer && (() => {
+                // Myura brand colors
+                const myuraColors = [
+                  '#22c55e', '#16a34a', // Myura Green
+                  '#a855f7', '#9333ea', // Myura Purple
+                  '#ec4899', '#db2777', // Myura Pink
+                  '#f43f5e', '#e11d48', // Myura Rose
+                  '#fbbf24', '#f59e0b', // Myura Amber
+                  selectedDiscount.accent
+                ];
+                
+                return (
+                  <div className="absolute inset-0 pointer-events-none overflow-hidden z-[5]">
+                    {/* Corner firecracker bursts with Myura colors */}
+                  {[
+                    { top: '8%', left: '8%', delay: 0, colorSet: 0 },
+                    { top: '8%', right: '8%', delay: 0.15, colorSet: 1 },
+                    { bottom: '8%', left: '8%', delay: 0.3, colorSet: 2 },
+                    { bottom: '8%', right: '8%', delay: 0.45, colorSet: 3 },
+                  ].map((position, idx) => {
+                    const baseColors = [
+                      ['#22c55e', '#16a34a', '#fbbf24'],
+                      ['#a855f7', '#9333ea', '#ec4899'],
+                      ['#f43f5e', '#e11d48', '#fbbf24'],
+                      ['#ec4899', '#db2777', '#22c55e'],
+                    ];
+                    const colors = baseColors[position.colorSet];
+                    return (
+                      <div
+                        key={`firecracker-${idx}`}
+                        className="absolute"
+                        style={{
+                          top: position.top,
+                          left: position.left,
+                          right: position.right,
+                          bottom: position.bottom,
+                        }}
+                      >
+                        {/* Outer ring particles */}
+                        {[...Array(12)].map((_, i) => {
+                          const angle = (i * 30) * (Math.PI / 180);
+                          const distance = 50;
+                          const x = Math.cos(angle) * distance;
+                          const y = Math.sin(angle) * distance;
+                          const color = colors[i % colors.length];
+                          const size = 2 + (i % 2) * 1;
+                          return (
+                            <div
+                              key={`outer-${idx}-${i}`}
+                              className="absolute rounded-full animate-firecracker"
+                              style={{
+                                width: `${size}px`,
+                                height: `${size}px`,
+                                background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+                                transform: 'translate(-50%, -50%)',
+                                animationDelay: `${position.delay + i * 0.03}s`,
+                                boxShadow: `0 0 10px ${color}, 0 0 15px ${color}80`,
+                                '--x': `${x}px`,
+                                '--y': `${y}px`,
+                              } as React.CSSProperties}
+                            />
+                          );
+                        })}
+                        {/* Inner sparkles */}
+                        {[...Array(6)].map((_, i) => {
+                          const angle = (i * 60) * (Math.PI / 180);
+                          const distance = 25;
+                          const x = Math.cos(angle) * distance;
+                          const y = Math.sin(angle) * distance;
+                          const color = colors[(i + 1) % colors.length];
+                          return (
+                            <div
+                              key={`inner-${idx}-${i}`}
+                              className="absolute w-1 h-1 rounded-full animate-firecracker-slow"
+                              style={{
+                                background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+                                transform: 'translate(-50%, -50%)',
+                                animationDelay: `${position.delay + 0.2 + i * 0.05}s`,
+                                boxShadow: `0 0 8px ${color}`,
+                                '--x': `${x}px`,
+                                '--y': `${y}px`,
+                              } as React.CSSProperties}
+                            />
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Center celebration burst with Myura colors */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    {/* Main burst */}
+                    {[...Array(16)].map((_, i) => {
+                      const angle = (i * 22.5) * (Math.PI / 180);
+                      const distance = 70;
+                      const x = Math.cos(angle) * distance;
+                      const y = Math.sin(angle) * distance;
+                      const centerColors = ['#22c55e', '#a855f7', '#ec4899', '#f43f5e', '#fbbf24', selectedDiscount.accent];
+                      const color = centerColors[i % centerColors.length];
+                      const size = 2.5 + (i % 3) * 0.5;
+                      return (
+                        <div
+                          key={`center-main-${i}`}
+                          className="absolute rounded-full animate-firecracker"
+                          style={{
+                            width: `${size}px`,
+                            height: `${size}px`,
+                            background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+                            transform: 'translate(-50%, -50%)',
+                            animationDelay: `${0.2 + i * 0.02}s`,
+                            boxShadow: `0 0 12px ${color}, 0 0 20px ${color}60`,
+                            '--x': `${x}px`,
+                            '--y': `${y}px`,
+                          } as React.CSSProperties}
+                        />
+                      );
+                    })}
+                    {/* Secondary sparkles */}
+                    {[...Array(8)].map((_, i) => {
+                      const angle = (i * 45) * (Math.PI / 180);
+                      const distance = 35;
+                      const x = Math.cos(angle) * distance;
+                      const y = Math.sin(angle) * distance;
+                      const sparkleColors = ['#fbbf24', '#22c55e', '#a855f7'];
+                      const color = sparkleColors[i % sparkleColors.length];
+                      return (
+                        <div
+                          key={`center-sparkle-${i}`}
+                          className="absolute w-1.5 h-1.5 rounded-full animate-firecracker-slow"
+                          style={{
+                            background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+                            transform: 'translate(-50%, -50%)',
+                            animationDelay: `${0.4 + i * 0.04}s`,
+                            boxShadow: `0 0 10px ${color}`,
+                            '--x': `${x}px`,
+                            '--y': `${y}px`,
+                          } as React.CSSProperties}
+                        />
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Floating particles with trailing effect */}
+                  {[...Array(20)].map((_, i) => {
+                    const colors = ['#22c55e', '#a855f7', '#ec4899', '#fbbf24', selectedDiscount.accent];
+                    const color = colors[i % colors.length];
+                    const startX = 20 + (i * 3.5);
+                    const startY = 15 + (i * 4);
+                    return (
+                      <div
+                        key={`float-${i}`}
+                        className="absolute animate-float-particle"
+                        style={{
+                          left: `${startX}%`,
+                          top: `${startY}%`,
+                          width: '2px',
+                          height: '2px',
+                          background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+                          animationDelay: `${0.5 + i * 0.1}s`,
+                          boxShadow: `0 0 8px ${color}`,
+                          borderRadius: '50%',
+                        }}
+                      />
+                    );
+                  })}
+                  </div>
+                );
+              })()}
+
+              {/* Content */}
+              <div className="relative z-10 p-3 sm:p-4 md:p-6 lg:p-7 h-full flex flex-col justify-center">
+                {/* Row 1: Success icon and Congratulations */}
+                <div className="flex flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
+                  <div 
+                    className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-xl flex-shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${selectedDiscount.accent} 0%, ${selectedDiscount.accent}dd 100%)`,
+                    }}
+                  >
+                    <svg className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-semibold" style={{ color: selectedDiscount.accent }}>
+                    Congratulations
+                  </p>
+                </div>
+
+                {/* Row 2: Discount label */}
+                <div className="text-center mb-3 sm:mb-4">
+                  <h2 
+                    className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight inline-block"
+                    style={{ 
+                      color: selectedDiscount.accent,
+                      textShadow: `0 4px 20px ${selectedDiscount.accent}40`,
+                    }}
+                  >
+                    {selectedDiscount.label}
+                  </h2>
+                </div>
+
+                {/* Row 3: Description */}
+                <div className="text-center mb-2 sm:mb-3">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 inline-block">
+                    {selectedDiscount.description}
+                  </h3>
+                </div>
+
+                {/* Row 4: Detail text */}
+                <div className="text-center mb-4 sm:mb-5">
+                  <p className="text-[10px] xs:text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed inline-block">
+                    {selectedDiscount.detail}
+                  </p>
+                </div>
+
+                {/* Row 5: Code label and code */}
+                <div className="flex flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 flex-wrap">
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.3em] text-slate-500 font-medium whitespace-nowrap">
+                    Your Exclusive Code
+                  </p>
+                  <div 
+                    className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border-2 backdrop-blur-sm"
+                    style={{
+                      background: `linear-gradient(135deg, ${selectedDiscount.accent}15 0%, white 50%, ${selectedDiscount.accent}15 100%)`,
+                      borderColor: `${selectedDiscount.accent}40`,
+                    }}
+                  >
+                    <span className="text-base sm:text-lg md:text-xl font-black tracking-wider" style={{ color: selectedDiscount.accent }}>
+                      {selectedDiscount.code}
+                    </span>
+                    <button
+                      onClick={handleCopy}
+                      className="p-1.5 sm:p-2 rounded-lg hover:bg-white/50 transition-all"
+                      style={{ color: selectedDiscount.accent }}
+                      aria-label="Copy code"
+                    >
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Row 6: Action buttons */}
+                <div className="flex flex-row gap-2 sm:gap-3 justify-center items-center flex-wrap">
+                  <button
+                    onClick={handleCopy}
+                    className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95"
+                    style={{
+                      background: `linear-gradient(135deg, ${selectedDiscount.accent} 0%, ${selectedDiscount.accent}dd 100%)`,
+                    }}
+                  >
+                    Copy Code
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold uppercase tracking-wider bg-white text-slate-700 border-2 border-slate-300 hover:border-slate-400 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95"
+                  >
+                    Continue Shopping
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -477,7 +686,7 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                 </p>
               </div>
 
-              <div className="bg-white/80 border border-slate-300 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 space-y-2 sm:space-y-2.5 shadow-[0_10px_30px_rgba(15,36,57,0.1)]">
+              <div className={`bg-white/80 border border-slate-300 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 space-y-2 sm:space-y-2.5 shadow-[0_10px_30px_rgba(15,36,57,0.1)] transition-opacity duration-300 ${showOffer ? 'opacity-0 pointer-events-none' : ''}`}>
                 {selectedDiscount ? (
                   <>
                     <p className="text-[10px] xs:text-[11px] sm:text-xs uppercase tracking-[0.25em] sm:tracking-[0.3em] text-slate-500">
@@ -566,8 +775,84 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
             transform: rotate(360deg);
           }
         }
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        @keyframes pulse-glow {
+          0%, 100% {
+            opacity: 0.2;
+          }
+          50% {
+            opacity: 0.4;
+          }
+        }
+        @keyframes firecracker {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) translateX(0) translateY(0) scale(1);
+          }
+          50% {
+            opacity: 0.9;
+            transform: translate(-50%, -50%) translateX(calc(var(--x) * 0.6)) translateY(calc(var(--y) * 0.6)) scale(1.5);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) translateX(var(--x)) translateY(var(--y)) scale(0);
+          }
+        }
+        @keyframes firecracker-slow {
+          0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) translateX(0) translateY(0) scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: translate(-50%, -50%) translateX(calc(var(--x) * 0.5)) translateY(calc(var(--y) * 0.5)) scale(1.3);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) translateX(var(--x)) translateY(var(--y)) scale(0);
+          }
+        }
+        @keyframes float-particle {
+          0% {
+            opacity: 0;
+            transform: translateY(0) scale(0) rotate(0deg);
+          }
+          20% {
+            opacity: 1;
+            transform: translateY(-30px) scale(1) rotate(90deg);
+          }
+          80% {
+            opacity: 0.8;
+            transform: translateY(-80px) scale(1) rotate(270deg);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-120px) scale(0.5) rotate(360deg);
+          }
+        }
         .animate-spin-slow {
           animation: spin-slow linear infinite;
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .animate-firecracker {
+          animation: firecracker 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .animate-firecracker-slow {
+          animation: firecracker-slow 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .animate-float-particle {
+          animation: float-particle 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
       `}</style>
     </div>
