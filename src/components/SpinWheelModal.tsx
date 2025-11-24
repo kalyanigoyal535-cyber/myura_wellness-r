@@ -130,36 +130,12 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
 
   // Calculate which segment the pointer is pointing to based on rotation
   const getSegmentFromRotation = (rot: number): number => {
-    // The wheel rotates with: rotate(rot - POINTER_ROTATION_OFFSET)
-    // The pointer is fixed at 0 degrees (top)
-    const visualRotation = ((rot - POINTER_ROTATION_OFFSET) % 360 + 360) % 360;
-    
-    // Find which segment center is closest to 0 degrees (pointer position) after rotation
-    // After clockwise rotation by 'r', a point at angle 'a' is now at (a - r) mod 360
-    // We want to find which segment center, after rotation, is closest to 0 degrees
-    
-    let minDistance = Infinity;
-    let closestIndex = 0;
-    
-    for (let i = 0; i < DISCOUNT_SEGMENTS.length; i++) {
-      // Each segment center is at: i * segmentAngle + segmentAngle / 2
-      const segmentCenter = i * segmentAngle + segmentAngle / 2;
-      
-      // After rotation, this center is at: (segmentCenter - visualRotation) mod 360
-      let rotatedCenter = (segmentCenter - visualRotation) % 360;
-      if (rotatedCenter < 0) rotatedCenter += 360;
-      
-      // Calculate angular distance from pointer (0 degrees)
-      // Consider both clockwise and counter-clockwise distances
-      let distance = Math.min(rotatedCenter, 360 - rotatedCenter);
-      
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestIndex = i;
-      }
-    }
-    
-    return closestIndex;
+    const cssRotation = ((rot - POINTER_ROTATION_OFFSET) % 360 + 360) % 360;
+    // Wheel rotates clockwise; pointer sees the opposite angle
+    const pointerAngle = (360 - cssRotation) % 360;
+    let segmentIndex = Math.floor(pointerAngle / segmentAngle);
+    if (segmentIndex < 0) segmentIndex += DISCOUNT_SEGMENTS.length;
+    return segmentIndex % DISCOUNT_SEGMENTS.length;
   };
 
   const handleSpin = () => {
@@ -193,9 +169,8 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
       if (progress < 1) {
         animationFrameRef.current = requestAnimationFrame(animate);
       } else {
-        // Calculate which segment the pointer is pointing to after spin stops
-        const finalSegmentIndex = getSegmentFromRotation(currentRotation);
-        setSelectedIndex(finalSegmentIndex);
+        const bestIdx = getSegmentFromRotation(currentRotation);
+        setSelectedIndex(bestIdx);
         setIsSpinning(false);
         // Show premium offer display after a brief delay
         setTimeout(() => {
@@ -594,6 +569,18 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                 {/* Outer ring with decorative pattern */}
                 <div className="absolute inset-0 rounded-full border-4 border-white/90 shadow-[0_0_60px_rgba(0,0,0,0.2)]">
                   <div className="absolute inset-0 rounded-full border border-white/50" />
+                </div>
+
+                {/* Fixed pointer arrow at top */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+                  <div className="relative">
+                    {/* Arrow triangle */}
+                    <div className="w-0 h-0 border-l-[10px] xs:border-l-[12px] sm:border-l-[14px] md:border-l-[16px] border-l-transparent border-r-[10px] xs:border-r-[12px] sm:border-r-[14px] md:border-r-[16px] border-r-transparent border-t-[18px] xs:border-t-[22px] sm:border-t-[26px] md:border-t-[30px] border-t-slate-800 drop-shadow-lg" />
+                    {/* Arrow stem */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 xs:w-1.5 sm:w-2 h-6 xs:h-8 sm:h-10 md:h-12 bg-gradient-to-b from-slate-800 via-slate-700 to-transparent" />
+                    {/* Highlight on arrow */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 xs:w-1 h-4 xs:h-5 sm:h-6 bg-white/40 rounded-full" />
+                  </div>
                 </div>
                 
                 {/* Main wheel with enhanced shadows */}
