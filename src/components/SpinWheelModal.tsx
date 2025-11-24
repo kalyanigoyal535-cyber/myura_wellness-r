@@ -223,7 +223,7 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed z-[9998] flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 overflow-hidden"
+      className="fixed z-[9998] flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 sm:py-4 md:py-6 overflow-hidden"
       style={{
         top: 'var(--header-height, 0px)',
         left: '0',
@@ -231,14 +231,17 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
         bottom: '0',
         height: 'calc(100vh - var(--header-height, 0px))',
         maxHeight: 'calc(100vh - var(--header-height, 0px))',
+        opacity: isOpen ? 1 : 0,
+        pointerEvents: isOpen ? 'auto' : 'none',
+        transition: 'opacity 0.3s ease-out',
       }}
     >
       <div
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity duration-300"
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity duration-500 ease-out"
         onClick={() => !isSpinning && onClose()}
       />
 
-      <div className="relative max-w-6xl w-full bg-gradient-to-br from-slate-50/95 via-white/90 to-blue-50/95 border border-slate-300/70 shadow-[0px_20px_80px_rgba(15,36,57,0.15)] rounded-2xl sm:rounded-[32px] p-3 sm:p-4 md:p-6 lg:p-7 overflow-hidden max-h-[95vh] sm:max-h-[92vh]">
+      <div className="relative max-w-6xl w-full bg-gradient-to-br from-slate-50/95 via-white/90 to-blue-50/95 border border-slate-300/70 shadow-[0px_20px_80px_rgba(15,36,57,0.15)] rounded-2xl sm:rounded-[32px] p-3 sm:p-4 md:p-6 lg:p-7 xl:p-8 overflow-hidden max-h-[95vh] sm:max-h-[92vh] transition-all duration-500 ease-out transform animate-modal-entrance">
         {/* Close button for mobile */}
         <button
           onClick={onClose}
@@ -456,31 +459,36 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
               })()}
 
               {/* Content */}
-              <div className="relative z-10 p-3 sm:p-4 md:p-6 lg:p-7 h-full flex flex-col justify-center">
+              <div className="relative z-10 p-3 xs:p-4 sm:p-5 md:p-6 lg:p-7 xl:p-8 h-full flex flex-col justify-center overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {/* Row 1: Success icon and Congratulations */}
-                <div className="flex flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
+                <div className="flex flex-row items-center justify-center gap-2 xs:gap-3 sm:gap-4 mb-3 xs:mb-4 sm:mb-5">
                   <div 
-                    className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-xl flex-shrink-0"
+                    className="w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-xl flex-shrink-0 transition-all duration-500 ease-out"
                     style={{
                       background: `linear-gradient(135deg, ${selectedDiscount.accent} 0%, ${selectedDiscount.accent}dd 100%)`,
+                      transform: 'scale(0)',
+                      animation: 'scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards',
                     }}
                   >
-                    <svg className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p className="text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-semibold" style={{ color: selectedDiscount.accent }}>
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm uppercase tracking-[0.3em] sm:tracking-[0.4em] font-semibold transition-all duration-300" style={{ color: selectedDiscount.accent }}>
                     Congratulations
                   </p>
                 </div>
 
                 {/* Row 2: Discount label */}
-                <div className="text-center mb-3 sm:mb-4">
+                <div className="text-center mb-2 xs:mb-3 sm:mb-4">
                   <h2 
-                    className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight inline-block"
+                    className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight inline-block transition-all duration-500 ease-out"
                     style={{ 
                       color: selectedDiscount.accent,
                       textShadow: `0 4px 20px ${selectedDiscount.accent}40`,
+                      opacity: 0,
+                      transform: 'translateY(20px)',
+                      animation: 'fade-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s forwards',
                     }}
                   >
                     {selectedDiscount.label}
@@ -488,41 +496,53 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Row 3: Description */}
-                <div className="text-center mb-2 sm:mb-3">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 inline-block">
+                <div className="text-center mb-2 xs:mb-2.5 sm:mb-3">
+                  <h3 className="text-base xs:text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 inline-block transition-all duration-500 ease-out" style={{
+                    opacity: 0,
+                    transform: 'translateY(15px)',
+                    animation: 'fade-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s forwards',
+                  }}>
                     {selectedDiscount.description}
                   </h3>
                 </div>
 
                 {/* Row 4: Detail text */}
-                <div className="text-center mb-4 sm:mb-5">
-                  <p className="text-[10px] xs:text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed inline-block">
+                <div className="text-center mb-3 xs:mb-4 sm:mb-5">
+                  <p className="text-[10px] xs:text-xs sm:text-sm md:text-base text-slate-600 max-w-xl mx-auto leading-relaxed inline-block transition-all duration-500 ease-out" style={{
+                    opacity: 0,
+                    transform: 'translateY(10px)',
+                    animation: 'fade-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards',
+                  }}>
                     {selectedDiscount.detail}
                   </p>
                 </div>
 
                 {/* Row 5: Code label and code */}
-                <div className="flex flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 flex-wrap">
-                  <p className="text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.3em] text-slate-500 font-medium whitespace-nowrap">
+                <div className="flex flex-row items-center justify-center gap-2 xs:gap-3 sm:gap-4 mb-3 xs:mb-4 sm:mb-6 flex-wrap transition-all duration-500 ease-out" style={{
+                  opacity: 0,
+                  transform: 'translateY(15px)',
+                  animation: 'fade-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s forwards',
+                }}>
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm uppercase tracking-[0.3em] text-slate-500 font-medium whitespace-nowrap">
                     Your Exclusive Code
                   </p>
                   <div 
-                    className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border-2 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-4 sm:px-6 py-2 xs:py-2.5 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg border-2 backdrop-blur-sm transition-all duration-300 hover:scale-105"
                     style={{
                       background: `linear-gradient(135deg, ${selectedDiscount.accent}15 0%, white 50%, ${selectedDiscount.accent}15 100%)`,
                       borderColor: `${selectedDiscount.accent}40`,
                     }}
                   >
-                    <span className="text-base sm:text-lg md:text-xl font-black tracking-wider" style={{ color: selectedDiscount.accent }}>
+                    <span className="text-sm xs:text-base sm:text-lg md:text-xl font-black tracking-wider transition-all duration-300" style={{ color: selectedDiscount.accent }}>
                       {selectedDiscount.code}
                     </span>
                     <button
                       onClick={handleCopy}
-                      className="p-1.5 sm:p-2 rounded-lg hover:bg-white/50 transition-all"
+                      className="p-1 xs:p-1.5 sm:p-2 rounded-lg hover:bg-white/50 active:scale-95 transition-all touch-manipulation"
                       style={{ color: selectedDiscount.accent }}
                       aria-label="Copy code"
                     >
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                     </button>
@@ -530,10 +550,14 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Row 6: Action buttons */}
-                <div className="flex flex-row gap-2 sm:gap-3 justify-center items-center flex-wrap">
+                <div className="flex flex-row gap-2 xs:gap-2.5 sm:gap-3 justify-center items-center flex-wrap transition-all duration-500 ease-out" style={{
+                  opacity: 0,
+                  transform: 'translateY(15px)',
+                  animation: 'fade-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s forwards',
+                }}>
                   <button
                     onClick={handleCopy}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95"
+                    className="px-5 xs:px-6 sm:px-8 py-2 xs:py-2.5 sm:py-3 rounded-full text-[10px] xs:text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95 touch-manipulation"
                     style={{
                       background: `linear-gradient(135deg, ${selectedDiscount.accent} 0%, ${selectedDiscount.accent}dd 100%)`,
                     }}
@@ -542,7 +566,7 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                   </button>
                   <button
                     onClick={onClose}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold uppercase tracking-wider bg-white text-slate-700 border-2 border-slate-300 hover:border-slate-400 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95"
+                    className="px-5 xs:px-6 sm:px-8 py-2 xs:py-2.5 sm:py-3 rounded-full text-[10px] xs:text-xs sm:text-sm font-semibold uppercase tracking-wider bg-white text-slate-700 border-2 border-slate-300 hover:border-slate-400 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95 touch-manipulation"
                   >
                     Continue Shopping
                   </button>
@@ -552,10 +576,10 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        <div className="relative flex flex-col gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-          <div className="flex flex-col md:flex-row gap-4 sm:gap-5 md:gap-6 lg:gap-8 items-center">
+        <div className="relative flex flex-col gap-3 xs:gap-4 sm:gap-5 md:gap-6 lg:gap-8">
+          <div className="flex flex-col md:flex-row gap-3 xs:gap-4 sm:gap-5 md:gap-6 lg:gap-8 items-center justify-center">
             <div className="relative flex items-center justify-center w-full md:w-auto flex-shrink-0">
-              <div className="relative w-[240px] h-[240px] xs:w-[260px] xs:h-[260px] sm:w-[300px] sm:h-[300px] md:w-[340px] md:h-[340px] lg:w-[380px] lg:h-[380px]">
+              <div className="relative w-[220px] h-[220px] xs:w-[240px] xs:h-[240px] sm:w-[280px] sm:h-[280px] md:w-[320px] md:h-[320px] lg:w-[360px] lg:h-[360px] xl:w-[400px] xl:h-[400px] transition-all duration-300 ease-out">
                 {/* Outer decorative ring */}
                 <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-slate-300/20 via-blue-300/20 to-indigo-300/20 blur-2xl" />
                 
@@ -579,7 +603,8 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                   style={{
                     backgroundImage: `conic-gradient(${gradientString})`,
                     transform: `rotate(${rotation - POINTER_ROTATION_OFFSET}deg)`,
-                    transition: isSpinning ? 'none' : 'transform 0.3s ease-out',
+                    transition: isSpinning ? 'none' : 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    willChange: isSpinning ? 'transform' : 'auto',
                   }}
                 >
                   {/* Segment dividers */}
@@ -615,10 +640,10 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                             transform: `translateY(15px)`,
                           }}
                         >
-                          <div className="text-[10px] xs:text-[11px] sm:text-[13px] md:text-[14px] font-bold text-white mb-0.5 whitespace-nowrap drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                          <div className="text-[9px] xs:text-[10px] sm:text-[12px] md:text-[13px] lg:text-[14px] font-bold text-white mb-0.5 xs:mb-1 whitespace-nowrap drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] transition-all duration-300">
                             {segment.label}
                           </div>
-                          <div className="text-[8px] xs:text-[8.5px] sm:text-[9px] md:text-[10px] font-medium text-white whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+                          <div className="text-[7px] xs:text-[8px] sm:text-[9px] md:text-[9.5px] lg:text-[10px] font-medium text-white whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] transition-all duration-300">
                             {segment.description}
                           </div>
                         </div>
@@ -632,11 +657,14 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
                   <button
                     onClick={handleSpin}
                     disabled={isSpinning}
-                    className={`relative w-24 h-24 xs:w-26 xs:h-26 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white uppercase tracking-[0.25em] text-[11px] xs:text-[12px] sm:text-[13px] md:text-[14px] font-bold shadow-[0_20px_50px_rgba(15,36,57,0.4),0_0_0_3px_rgba(255,255,255,0.3)] sm:shadow-[0_20px_50px_rgba(15,36,57,0.4),0_0_0_4px_rgba(255,255,255,0.3)] transition-all duration-300 pointer-events-auto ${
+                    className={`relative w-20 h-20 xs:w-24 xs:h-24 sm:w-26 sm:h-26 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white uppercase tracking-[0.25em] text-[10px] xs:text-[11px] sm:text-[12px] md:text-[13px] lg:text-[14px] font-bold shadow-[0_20px_50px_rgba(15,36,57,0.4),0_0_0_3px_rgba(255,255,255,0.3)] sm:shadow-[0_20px_50px_rgba(15,36,57,0.4),0_0_0_4px_rgba(255,255,255,0.3)] transition-all duration-300 ease-out pointer-events-auto touch-manipulation ${
                       isSpinning 
                         ? 'scale-95' 
-                        : 'hover:scale-110 hover:shadow-[0_25px_60px_rgba(15,36,57,0.5)] active:scale-95'
+                        : 'hover:scale-110 active:scale-95 hover:shadow-[0_25px_60px_rgba(15,36,57,0.5)]'
                     } disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden group z-20`}
+                    style={{
+                      willChange: 'transform',
+                    }}
                   >
                     {/* Button inner glow */}
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 to-transparent opacity-50" />
@@ -785,6 +813,36 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
             transform: scale(1) translateY(0);
           }
         }
+        @keyframes modal-entrance {
+          from {
+            opacity: 0;
+            transform: scale(0.9) translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        @keyframes scale-in {
+          from {
+            transform: scale(0) rotate(-180deg);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+          }
+        }
+        @keyframes fade-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
         @keyframes pulse-glow {
           0%, 100% {
             opacity: 0.2;
@@ -844,6 +902,9 @@ const SpinWheelModal: React.FC<SpinWheelModalProps> = ({ isOpen, onClose }) => {
         }
         .animate-fade-in {
           animation: fade-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .animate-modal-entrance {
+          animation: modal-entrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         .animate-firecracker {
           animation: firecracker 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
