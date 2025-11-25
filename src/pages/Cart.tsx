@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, ArrowLeft, Plus, Minus, ShoppingBag, Sparkles, ShieldCheck, Truck, Gift, ArrowRight, Heart, Star } from 'lucide-react';
+import { Trash2, ArrowLeft, Plus, Minus, ShoppingBag, Sparkles, ShieldCheck, Truck, Gift, ArrowRight, Heart, Star, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ResponsiveProductImage from '../components/ResponsiveProductImage';
 import { getProductById, productCatalog } from '../data/products';
@@ -10,6 +10,8 @@ const Cart: React.FC = () => {
   const navigate = useNavigate();
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [addingRecommendation, setAddingRecommendation] = useState<string | null>(null);
+  const [updatingQty, setUpdatingQty] = useState<string | null>(null);
+  const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   
   const shipping = subtotal > 799 || subtotal === 0 ? 0 : 49;
   const total = subtotal + shipping;
@@ -21,12 +23,47 @@ const Cart: React.FC = () => {
     return acc;
   }, 0);
 
+  // Track visible items for smooth entrance animations
+  useEffect(() => {
+    items.forEach((item) => {
+      if (!visibleItems.has(item.id)) {
+        // Delay each item's appearance for staggered effect
+        setTimeout(() => {
+          setVisibleItems((prev) => new Set(prev).add(item.id));
+        }, 50);
+      }
+    });
+    
+    // Clean up removed items from visible set
+    const itemIds = new Set(items.map((item) => item.id));
+    setVisibleItems((prev) => {
+      const next = new Set<string>();
+      prev.forEach((id) => {
+        if (itemIds.has(id)) next.add(id);
+      });
+      return next;
+    });
+  }, [items, visibleItems]);
+
   const handleRemove = async (id: string) => {
     setRemovingId(id);
-    // Add a small delay for smooth animation
-    await new Promise(resolve => setTimeout(resolve, 300));
+    setVisibleItems((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    // Wait for exit animation
+    await new Promise(resolve => setTimeout(resolve, 400));
     removeItem(id);
     setRemovingId(null);
+  };
+
+  const handleUpdateQty = async (id: string, newQty: number) => {
+    setUpdatingQty(id);
+    updateQty(id, newQty);
+    // Brief animation feedback
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setUpdatingQty(null);
   };
 
   const handleCheckout = () => {
@@ -43,21 +80,21 @@ const Cart: React.FC = () => {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 py-8 sm:py-12">
+      {/* Header - Minimalist */}
+      <section className="bg-white border-b border-slate-200 py-6 sm:py-8">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <Link 
               to="/" 
-              className="group inline-flex items-center gap-2 text-slate-200 hover:text-white transition-all duration-300"
+              className="group inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-all duration-300"
             >
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm sm:text-base font-medium">Continue Shopping</span>
             </Link>
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="h-5 w-5 text-slate-200" />
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight">
-                Your Cart
+            <div className="flex items-center gap-2.5">
+              <ShoppingBag className="h-5 w-5 text-slate-700" />
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 tracking-tight">
+                Cart ({items.length})
               </h1>
             </div>
           </div>
@@ -66,25 +103,28 @@ const Cart: React.FC = () => {
 
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {items.length === 0 ? (
-          /* Empty Cart State */
+          /* Empty Cart State - Minimalist */
           <div 
-            className="max-w-2xl mx-auto text-center py-16 sm:py-24"
-            data-aos="fade-up"
-            data-aos-duration="800"
+            className="max-w-lg mx-auto text-center py-20 sm:py-28"
+            style={{
+              animation: 'fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
           >
-            <div className="relative inline-flex items-center justify-center mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-200 to-slate-300 rounded-full blur-2xl opacity-50" />
-              <ShoppingBag className="relative h-20 w-20 sm:h-24 sm:w-24 text-slate-300" />
+            <div className="relative inline-flex items-center justify-center mb-8">
+              <div className="absolute inset-0 bg-slate-100 rounded-full blur-2xl opacity-60" />
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <ShoppingBag className="h-12 w-12 sm:h-14 sm:w-14 text-slate-300" />
+              </div>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 mb-3">
               Your cart is empty
             </h2>
-            <p className="text-slate-600 mb-8 max-w-md mx-auto">
+            <p className="text-slate-500 mb-10 max-w-md mx-auto text-sm sm:text-base">
               Looks like you haven't added anything to your cart yet. Start shopping to fill it up!
             </p>
             <Link 
               to="/product"
-              className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="group inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:bg-slate-800 transition-all duration-300 active:scale-[0.98]"
             >
               <span>Browse Products</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -93,45 +133,57 @@ const Cart: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Cart Items + Recommendations */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4">
               {items.map((item, index) => {
                 const product = getProductById(item.id);
                 const isRemoving = removingId === item.id;
+                const isVisible = visibleItems.has(item.id);
+                const isUpdating = updatingQty === item.id;
                 
                 return (
                   <div
                     key={item.id}
-                    className={`group relative overflow-hidden rounded-2xl border-2 bg-white shadow-lg transition-all duration-500 ${
+                    className={`cart-item group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-500 ease-out ${
                       isRemoving 
-                        ? 'opacity-0 scale-95 -translate-x-4' 
-                        : 'opacity-100 scale-100 translate-x-0 hover:shadow-2xl hover:border-slate-300'
-                    }`}
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100}
-                    data-aos-duration="600"
+                        ? 'cart-item-exit' 
+                        : isVisible
+                        ? 'cart-item-enter'
+                        : 'opacity-0 translate-y-4'
+                    } ${isUpdating ? 'ring-2 ring-blue-200' : ''}`}
+                    style={{
+                      animationDelay: `${index * 80}ms`,
+                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
                   >
-                    {/* Decorative Gradient Background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {/* Subtle hover glow */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-50/50 via-transparent to-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     
-                    <div className="relative flex flex-col sm:flex-row gap-4 p-4 sm:p-6">
-                      {/* Product Image */}
+                    <div className="relative flex flex-col sm:flex-row gap-4 p-4 sm:p-5">
+                      {/* Product Image with enhanced styling */}
                       <div className="flex-shrink-0">
-                        <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 transition-all duration-300 shadow-md group-hover:shadow-lg">
-                          {product?.image ? (
-                            <ResponsiveProductImage
-                              image={product.image}
-                              className="w-full h-full"
-                              imgClassName="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <img 
-                              src={item.image} 
-                              alt={item.name} 
-                              className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                          )}
-                        </div>
+                        <Link
+                          to={`/product/${item.id}`}
+                          className="block group/image"
+                        >
+                          <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/80 border border-slate-200/60 group-hover:border-slate-300 transition-all duration-300 shadow-sm group-hover:shadow-md">
+                            {product?.image ? (
+                              <ResponsiveProductImage
+                                image={product.image}
+                                className="w-full h-full"
+                                imgClassName="object-contain p-2 group-hover/image:scale-110 transition-transform duration-500"
+                              />
+                            ) : (
+                              <img 
+                                src={item.image} 
+                                alt={item.name} 
+                                className="w-full h-full object-contain p-2 group-hover/image:scale-110 transition-transform duration-500"
+                                loading="lazy"
+                              />
+                            )}
+                            {/* Hover overlay */}
+                            <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/5 transition-colors duration-300" />
+                          </div>
+                        </Link>
                       </div>
 
                       {/* Product Details */}
@@ -142,82 +194,85 @@ const Cart: React.FC = () => {
                               to={`/product/${item.id}`}
                               className="block group/link"
                             >
-                              <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1 group-hover/link:text-slate-700 transition-colors line-clamp-2">
+                              <h3 className="text-[15px] sm:text-base font-semibold text-slate-900 mb-1 group-hover/link:text-slate-700 transition-colors line-clamp-2 leading-snug">
                                 {item.name}
                               </h3>
                               {item.variant && (
-                                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                                <p className="text-xs text-slate-500 font-medium mt-0.5">
                                   {item.variant}
                                 </p>
                               )}
                             </Link>
-                            {product && product.originalPrice > product.price && (
-                              <div className="flex items-center gap-2 mt-2">
-                                <span className="text-lg sm:text-xl font-bold text-slate-900">
+                            
+                            {/* Price Display */}
+                            <div className="flex items-center gap-2.5 mt-2.5">
+                              {product && product.originalPrice > product.price ? (
+                                <>
+                                  <span className="text-base sm:text-lg font-bold text-slate-900">
+                                    ₹{item.price}
+                                  </span>
+                                  <span className="text-xs sm:text-sm text-slate-400 line-through">
+                                    ₹{product.originalPrice}
+                                  </span>
+                                  <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                    Save {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-base sm:text-lg font-bold text-slate-900">
                                   ₹{item.price}
                                 </span>
-                                <span className="text-sm text-slate-400 line-through">
-                                  ₹{product.originalPrice}
-                                </span>
-                                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                                  Save {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-                                </span>
-                              </div>
-                            )}
-                            {(!product || product.originalPrice <= product.price) && (
-                              <p className="text-lg sm:text-xl font-bold text-slate-900 mt-2">
-                                ₹{item.price}
-                              </p>
-                            )}
+                              )}
+                            </div>
                           </div>
                           
-                          {/* Remove Button */}
+                          {/* Remove Button - Minimalist style */}
                           <button 
                             onClick={() => handleRemove(item.id)}
-                            className="flex-shrink-0 p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-300 group/remove"
+                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50/50 transition-all duration-300 group/remove active:scale-95"
                             aria-label="Remove item"
                           >
-                            <Trash2 className="h-4 w-4 w-5 h-5 group-hover/remove:scale-110 transition-transform" />
+                            <X className="h-4 w-4 group-hover/remove:rotate-90 transition-transform duration-300" />
                           </button>
                         </div>
 
                         {/* Quantity Controls & Total */}
-                        <div className="flex items-center justify-between gap-4 pt-2 border-t border-slate-200">
-                          {/* Quantity Selector */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                              Quantity:
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                          {/* Quantity Selector - Enhanced */}
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider hidden sm:block">
+                              Qty:
                             </span>
-                            <div className="inline-flex items-center rounded-full border-2 border-slate-200 bg-white shadow-sm overflow-hidden">
+                            <div className="inline-flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden shadow-sm">
                               <button 
-                                onClick={() => updateQty(item.id, Math.max(1, item.qty - 1))}
-                                className="p-2 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={item.qty <= 1}
+                                onClick={() => handleUpdateQty(item.id, Math.max(1, item.qty - 1))}
+                                className="quantity-btn p-2 sm:p-2.5 hover:bg-slate-50 active:bg-slate-100 text-slate-600 hover:text-slate-900 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                                disabled={item.qty <= 1 || isUpdating}
                                 aria-label="Decrease quantity"
                               >
-                                <Minus className="h-4 w-4" />
+                                <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               </button>
-                              <span className="px-4 py-2 text-sm font-bold text-slate-900 min-w-[3rem] text-center border-x border-slate-200">
+                              <span className={`quantity-value px-4 py-2 text-sm font-semibold text-slate-900 min-w-[2.5rem] text-center border-x border-slate-200 transition-all duration-300 ${isUpdating ? 'scale-110 text-blue-600' : ''}`}>
                                 {item.qty}
                               </span>
                               <button 
-                                onClick={() => updateQty(item.id, Math.min(99, item.qty + 1))}
-                                className="p-2 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={item.qty >= 99}
+                                onClick={() => handleUpdateQty(item.id, Math.min(99, item.qty + 1))}
+                                className="quantity-btn p-2 sm:p-2.5 hover:bg-slate-50 active:bg-slate-100 text-slate-600 hover:text-slate-900 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                                disabled={item.qty >= 99 || isUpdating}
                                 aria-label="Increase quantity"
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               </button>
                             </div>
                           </div>
 
-                          {/* Item Total */}
-                          <div className="text-right">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
-                              Item Total
+                          {/* Item Total - Enhanced */}
+                          <div className="text-right sm:text-left">
+                            <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">
+                              Total
                             </p>
-                            <p className="text-xl sm:text-2xl font-bold text-slate-900">
-                              ₹{item.price * item.qty}
+                            <p className={`text-lg sm:text-xl font-bold text-slate-900 transition-all duration-300 ${isUpdating ? 'scale-105' : ''}`}>
+                              ₹{(item.price * item.qty).toLocaleString()}
                             </p>
                           </div>
                         </div>
@@ -228,51 +283,51 @@ const Cart: React.FC = () => {
               })}
             </div>
 
-            {/* Order Summary */}
+            {/* Order Summary - Minimalist Style */}
             <aside className="lg:col-span-1">
               <div 
-                className="sticky top-8 rounded-2xl border-2 border-slate-200 bg-white shadow-xl overflow-hidden"
-                data-aos="fade-left"
-                data-aos-delay="200"
-                data-aos-duration="600"
+                className="order-summary sticky top-8 rounded-2xl border border-slate-200 bg-white shadow-lg overflow-hidden animate-slide-in-right"
+                style={{
+                  animation: 'slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
               >
-                {/* Header */}
-                <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-4">
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Sparkles className="h-5 w-5" />
+                {/* Header - Clean minimalist */}
+                <div className="bg-slate-900 px-5 sm:px-6 py-4 border-b border-slate-800">
+                  <h2 className="text-lg sm:text-xl font-semibold text-white flex items-center gap-2">
+                    <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
                     Order Summary
                   </h2>
                 </div>
 
-                <div className="p-6 space-y-4">
-                  {/* Savings Badge */}
+                <div className="p-5 sm:p-6 space-y-4">
+                  {/* Savings Badge - Subtle */}
                   {savings > 0 && (
-                    <div className="flex items-center gap-2 p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200">
-                      <Gift className="h-5 w-5 text-emerald-600 flex-shrink-0" />
+                    <div className="savings-badge flex items-center gap-2.5 p-3 rounded-lg bg-emerald-50/80 border border-emerald-100 animate-pulse-subtle">
+                      <Gift className="h-4 w-4 text-emerald-600 flex-shrink-0" />
                       <div className="flex-1">
-                        <p className="text-xs font-semibold text-emerald-900 uppercase tracking-wider">
-                          Total Savings
+                        <p className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">
+                          You Save
                         </p>
-                        <p className="text-lg font-bold text-emerald-700">
-                          ₹{savings}
+                        <p className="text-base font-bold text-emerald-700">
+                          ₹{savings.toLocaleString()}
                         </p>
                       </div>
                     </div>
                   )}
 
-                  {/* Price Breakdown */}
-                  <div className="space-y-3 pt-2">
-                    <div className="flex justify-between items-center">
+                  {/* Price Breakdown - Clean */}
+                  <div className="space-y-3.5 pt-1">
+                    <div className="flex justify-between items-center py-1">
                       <span className="text-sm font-medium text-slate-600">Subtotal</span>
-                      <span className="text-base font-bold text-slate-900">₹{subtotal}</span>
+                      <span className="text-sm font-semibold text-slate-900">₹{subtotal.toLocaleString()}</span>
                     </div>
                     
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center py-1">
                       <div className="flex items-center gap-2">
-                        <Truck className="h-4 w-4 text-slate-500" />
+                        <Truck className="h-3.5 w-3.5 text-slate-400" />
                         <span className="text-sm font-medium text-slate-600">Shipping</span>
                       </div>
-                      <span className="text-base font-bold text-slate-900">
+                      <span className="text-sm font-semibold text-slate-900">
                         {shipping === 0 ? (
                           <span className="text-emerald-600">Free</span>
                         ) : (
@@ -281,53 +336,44 @@ const Cart: React.FC = () => {
                       </span>
                     </div>
 
-                    {subtotal < 799 && (
-                      <div className="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-200">
-                        <span className="font-semibold text-emerald-600">₹{799 - subtotal}</span> more for free shipping!
+                    {subtotal < 799 && subtotal > 0 && (
+                      <div className="text-[11px] text-slate-600 bg-blue-50/60 border border-blue-100 p-2.5 rounded-lg">
+                        <span className="font-semibold text-blue-700">₹{799 - subtotal}</span> more for <span className="font-semibold text-emerald-600">free shipping</span>
                       </div>
                     )}
 
-                    <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent my-4" />
+                    <div className="h-px bg-slate-200 my-4" />
 
-                    <div className="flex justify-between items-center pt-2">
-                      <span className="text-lg font-bold text-slate-900">Total</span>
-                      <span className="text-2xl font-bold text-slate-900">₹{total}</span>
+                    <div className="flex justify-between items-center pt-1">
+                      <span className="text-base font-semibold text-slate-900">Total</span>
+                      <span className="text-xl font-bold text-slate-900">₹{total.toLocaleString()}</span>
                     </div>
                   </div>
 
-                  {/* Checkout Button */}
+                  {/* Checkout Button - Minimalist */}
                   <button 
                     onClick={handleCheckout}
-                    className="w-full mt-6 group relative inline-flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl font-bold text-base shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                    className="w-full mt-6 group relative inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-slate-900 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:bg-slate-800 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
                   >
-                    <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                    <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     <span className="relative flex items-center gap-2">
-                      Proceed to Checkout
-                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      Checkout
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </button>
 
-                  {/* Trust Badges */}
-                  <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-white/90 px-3 py-2.5 shadow-inner">
-                      <ShieldCheck className="h-6 w-6 text-slate-500 flex-shrink-0" />
+                  {/* Trust Badges - Minimal */}
+                  <div className="mt-6 grid grid-cols-1 gap-2.5">
+                    <div className="flex items-center gap-2.5 rounded-lg border border-slate-100 bg-slate-50/50 px-3 py-2.5">
+                      <ShieldCheck className="h-4 w-4 text-slate-500 flex-shrink-0" />
                       <div>
-                        <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-slate-500">Secure</p>
-                        <p className="text-[11px] font-semibold text-slate-900">Encrypted checkout</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Secure Checkout</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-white/90 px-3 py-2.5 shadow-inner">
-                      <Truck className="h-6 w-6 text-slate-500 flex-shrink-0" />
+                    <div className="flex items-center gap-2.5 rounded-lg border border-slate-100 bg-slate-50/50 px-3 py-2.5">
+                      <Truck className="h-4 w-4 text-slate-500 flex-shrink-0" />
                       <div>
-                        <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-slate-500">Shipping</p>
-                        <p className="text-[11px] font-semibold text-slate-900">Free over ₹799</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-white/90 px-3 py-2.5 shadow-inner">
-                      <Heart className="h-6 w-6 text-slate-500 flex-shrink-0" />
-                      <div>
-                        <p className="text-[9px] font-semibold uppercase tracking-[0.4em] text-slate-500">Promise</p>
-                        <p className="text-[11px] font-semibold text-slate-900">30-day guarantee</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Free Shipping over ₹799</p>
                       </div>
                     </div>
                   </div>
@@ -335,9 +381,9 @@ const Cart: React.FC = () => {
                   {/* Continue Shopping Link */}
                   <Link
                     to="/product"
-                    className="block w-full text-center mt-3 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                    className="block w-full text-center mt-4 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
                   >
-                    Continue Shopping
+                    ← Continue Shopping
                   </Link>
                 </div>
               </div>
@@ -348,91 +394,80 @@ const Cart: React.FC = () => {
 
       {/* Customers Also Bought */}
       {recommendedProducts.length > 0 && (
-        <section className="pb-16 pt-4">
-          <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div className="text-center space-y-3" data-aos="fade-up" data-aos-duration="700">
-              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500">
-                Curated Ritual Pairings
+        <section className="pb-16 pt-8 border-t border-slate-200">
+          <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="text-center space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">
+                You may also like
               </p>
-              <h2 className="text-3xl font-bold text-slate-900 font-display">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900">
                 Customers also bought
               </h2>
-              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
-                Elevate your wellness routine with these perfectly paired rituals—handpicked from our communityʼs favorite combinations.
-              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {recommendedProducts.map((product, index) => (
                 <div
                   key={product.id}
-                  className="group relative overflow-hidden rounded-2xl border-2 border-white/70 bg-gradient-to-br from-white to-slate-50 shadow-xl"
-                  data-aos="fade-up"
-                  data-aos-delay={index * 80}
-                  data-aos-duration="600"
+                  className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                  style={{
+                    animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${index * 100}ms backwards`,
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative flex flex-col gap-4 p-4">
-                    <div className="relative rounded-2xl bg-white/80 border border-slate-100 shadow-inner">
-                      <ResponsiveProductImage
-                        image={product.image}
-                        className="w-full aspect-square rounded-2xl"
-                        imgClassName="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute left-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-800 shadow-sm">
-                        Ritual
+                  <div className="relative flex flex-col gap-3 p-4">
+                    <Link to={`/product/${product.id}`} className="block group/image">
+                      <div className="relative rounded-lg bg-slate-50 border border-slate-100 overflow-hidden aspect-square">
+                        <ResponsiveProductImage
+                          image={product.image}
+                          className="w-full h-full"
+                          imgClassName="object-contain p-4 group-hover/image:scale-110 transition-transform duration-500"
+                        />
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-left">
-                        <p className="text-sm font-semibold text-slate-900 line-clamp-2">
+                    </Link>
+                    <div className="space-y-2">
+                      <Link to={`/product/${product.id}`}>
+                        <p className="text-sm font-semibold text-slate-900 line-clamp-2 hover:text-slate-700 transition-colors">
                           {product.name}
                         </p>
+                      </Link>
+                      <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1 text-xs text-amber-500">
                           <Star className="h-3 w-3 fill-current" />
-                          <span>{product.rating}.0</span>
+                          <span className="text-slate-600">{product.rating}.0</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-base font-bold text-slate-900">₹{product.price}</p>
+                          <p className="text-xs text-slate-400 line-through">₹{product.originalPrice}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-slate-900">₹{product.price}</p>
-                        <p className="text-xs text-slate-400 line-through">₹{product.originalPrice}</p>
-                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Link
-                        to={`/product/${product.id}`}
-                        className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700 transition-all duration-300 hover:border-slate-300 hover:text-slate-900"
-                      >
-                        Explore
-                      </Link>
-                      <button
-                        onClick={async () => {
-                          if (addingRecommendation === product.id) return;
-                          setAddingRecommendation(product.id);
-                          addItem({
-                            id: product.id,
-                            name: product.name,
-                            price: product.price,
-                            image: product.image?.fallback || '',
-                          }, 1);
-                          setTimeout(() => setAddingRecommendation(null), 1000);
-                        }}
-                        disabled={addingRecommendation === product.id}
-                        className="inline-flex flex-1 items-center justify-center gap-1 rounded-full bg-gradient-to-r from-slate-900 to-slate-800 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {addingRecommendation === product.id ? (
-                          <>
-                            <Sparkles className="h-3 w-3 animate-pulse" />
-                            Added
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingBag className="h-3 w-3" />
-                            Add
-                          </>
-                        )}
-                      </button>
-                    </div>
+                    <button
+                      onClick={async () => {
+                        if (addingRecommendation === product.id) return;
+                        setAddingRecommendation(product.id);
+                        addItem({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          image: product.image?.fallback || '',
+                        }, 1);
+                        setTimeout(() => setAddingRecommendation(null), 1000);
+                      }}
+                      disabled={addingRecommendation === product.id}
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white transition-all duration-300 hover:bg-slate-800 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {addingRecommendation === product.id ? (
+                        <>
+                          <Sparkles className="h-3 w-3 animate-pulse" />
+                          Added
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingBag className="h-3 w-3" />
+                          Add to Cart
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -440,6 +475,117 @@ const Cart: React.FC = () => {
           </div>
         </section>
       )}
+      
+      {/* Cart Animations CSS */}
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes cartItemEnter {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        @keyframes cartItemExit {
+          to {
+            opacity: 0;
+            transform: translateX(-100%) scale(0.9);
+            margin-bottom: -200px;
+            height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+          }
+        }
+        
+        @keyframes pulseSubtle {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.9;
+          }
+        }
+        
+        .cart-item-enter {
+          animation: cartItemEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        .cart-item-exit {
+          animation: cartItemExit 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        .animate-slide-in-right {
+          animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-pulse-subtle {
+          animation: pulseSubtle 2s ease-in-out infinite;
+        }
+        
+        .quantity-btn:active {
+          transform: scale(0.9);
+        }
+        
+        .quantity-value {
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .cart-item {
+          will-change: transform, opacity;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .cart-item:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          border-color: rgba(148, 163, 184, 0.3);
+        }
+        
+        .savings-badge {
+          animation: pulseSubtle 3s ease-in-out infinite;
+        }
+        
+        /* Smooth transitions for all interactive elements */
+        .cart-item * {
+          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Loading state for quantity updates */
+        .cart-item[style*="ring-2"] {
+          animation: none;
+        }
+        
+        /* Smooth number transitions */
+        .quantity-value,
+        .order-summary span:last-child {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+      `}</style>
     </main>
   );
 };

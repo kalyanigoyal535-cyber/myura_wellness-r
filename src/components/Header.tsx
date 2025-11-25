@@ -7,6 +7,7 @@ import { useLocation as useUserLocation } from '../hooks/useLocation';
 import { useCart } from '../context/CartContext';
 import { productCatalog } from '../data/products';
 import ResponsiveProductImage from './ResponsiveProductImage';
+import CartDrawer from './CartDrawer';
 
 const FacebookIcon = FaFacebookF as React.ComponentType<{ className?: string }>;
 const InstagramIcon = FaInstagram as React.ComponentType<{ className?: string }>;
@@ -18,6 +19,7 @@ const LinkedinIcon = FaLinkedinIn as React.ComponentType<{ className?: string }>
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const headerRef = React.useRef<HTMLElement>(null);
   const topBarRef = React.useRef<HTMLDivElement>(null);
@@ -800,12 +802,23 @@ const Header: React.FC = () => {
                 <User className="h-4 w-4 sm:h-5 sm:w-5" />
               </Link>
               <div className="relative inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center flex-shrink-0">
-                <Link to="/cart" className="inline-flex h-full w-full items-center justify-center rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200">
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsCartOpen(true);
+                  }}
+                  className="inline-flex h-full w-full items-center justify-center rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
+                  aria-label="Open cart"
+                  type="button"
+                >
                   <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-                </Link>
-                <span className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-slate-900 text-white text-[10px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center font-medium ring-2 ring-white">
-                  {count}
-                </span>
+                </button>
+                {count > 0 && (
+                  <span className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-slate-900 text-white text-[10px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center font-medium ring-2 ring-white">
+                    {count}
+                  </span>
+                )}
               </div>
               {/* Professional Mobile menu button */}
               <button
@@ -1054,9 +1067,11 @@ const Header: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>,
-          document.body
-        )}
+        </div>,
+        document.body
+      )}
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       </>
     );
   }
@@ -1246,6 +1261,8 @@ const Header: React.FC = () => {
         </div>,
         document.body
       )}
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 };
