@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingBag, Gift, Sparkles, ArrowRight, Star, Leaf, Heart, Flower2, Tag, Copy, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ResponsiveProductImage from './ResponsiveProductImage';
@@ -14,6 +14,7 @@ interface CartDrawerProps {
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const { items, updateQty, removeItem, subtotal, addItem } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [updatingQty, setUpdatingQty] = useState<string | null>(null);
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
@@ -133,8 +134,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   const handleCheckout = () => {
     onClose();
-    // Navigate to checkout or cart page
-    navigate('/cart');
+    navigate('/checkout', {
+      state: {
+        previousPath: location.pathname,
+        openDrawerOnBack: true,
+      },
+    });
   };
 
   if (typeof window === 'undefined') return null;

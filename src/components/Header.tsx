@@ -429,6 +429,13 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('resize', updateHeaderHeight);
   }, [updateHeaderHeight]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const handleOpenCart: EventListener = () => setIsCartOpen(true);
+    window.addEventListener('myura:open-cart', handleOpenCart);
+    return () => window.removeEventListener('myura:open-cart', handleOpenCart);
+  }, []);
+
   // Reinforce fixed positioning in case external styles interfere
   useEffect(() => {
     const applyFixedStyles = () => {

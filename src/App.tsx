@@ -18,6 +18,7 @@ const Blog = lazy(() => import('./pages/Blog'));
 const Contact = lazy(() => import('./pages/Contact'));
 const MyAccount = lazy(() => import('./pages/MyAccount'));
 const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
 
 // Loading component
 const LoadingFallback = () => (
@@ -104,6 +105,7 @@ const AppContent: React.FC = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/my-account" element={<MyAccount />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           </Routes>
           </Suspense>
           </div>

@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Trash2, ArrowLeft, Plus, Minus, ShoppingBag, Sparkles, ShieldCheck, Truck, Gift, ArrowRight, Heart, Star, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ResponsiveProductImage from '../components/ResponsiveProductImage';
@@ -8,6 +8,7 @@ import { getProductById, productCatalog } from '../data/products';
 const Cart: React.FC = () => {
   const { items, updateQty, removeItem, subtotal, addItem } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [addingRecommendation, setAddingRecommendation] = useState<string | null>(null);
   const [updatingQty, setUpdatingQty] = useState<string | null>(null);
@@ -67,8 +68,13 @@ const Cart: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    // TODO: Implement checkout page
-    alert('Checkout functionality coming soon!');
+    if (items.length === 0) return;
+    navigate('/checkout', {
+      state: {
+        previousPath: location.pathname,
+        openDrawerOnBack: false,
+      },
+    });
   };
 
   const recommendedProducts = useMemo(() => {
@@ -354,6 +360,7 @@ const Cart: React.FC = () => {
                   <button 
                     onClick={handleCheckout}
                     className="w-full mt-6 group relative inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-slate-900 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:bg-slate-800 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                    disabled={items.length === 0}
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     <span className="relative flex items-center gap-2">
