@@ -5,6 +5,8 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
+import { MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -14,7 +16,9 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-    <App />
+        <MantineProvider>
+          <App />
+        </MantineProvider>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>
