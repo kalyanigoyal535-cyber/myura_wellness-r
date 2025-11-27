@@ -12,7 +12,7 @@ const orders = [
   },
   {
     id: 2,
-    status: "Canceled",
+    status: "Completed",
     date: "Oct 15",
     image: "https://via.placeholder.com/300x300",
     itemsCount: 0,
@@ -30,7 +30,7 @@ const orders = [
   },
 ];
 
-const OrdersPage = () => {
+const OrderCard = () => {
   return (
     <div className="min-h-screen  px-6 py-8">
       <h1 className="text-2xl font-semibold mb-6">Orders</h1>
@@ -43,9 +43,6 @@ const OrdersPage = () => {
           >
             {/* Top Status */}
             <div className="px-5 py-4 bg-gray-50 flex items-center gap-3">
-              <div className="h-7 w-7 rounded-full border border-gray-300 flex items-center justify-center">
-                <span className="text-xs">✕</span>
-              </div>
               <div className="text-sm">
                 <p className="font-semibold text-gray-800">{order.status}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{order.date}</p>
@@ -53,34 +50,30 @@ const OrdersPage = () => {
             </div>
 
             {/* Product Image */}
-            <div className="p-6 bg-[#f7f7f7] flex-1 flex items-center justify-center">
-              <img
-                src={order.image}
-                alt="product"
-                className="max-h-64 object-contain"
-              />
-            </div>
+            <div className="p-6 w-full h-52 bg-[#1C2638]"></div>
 
             {/* Bottom Details */}
             <div className="px-5 py-4 border-t border-gray-100 text-sm">
               <p className="font-semibold text-gray-800">
                 {order.itemsCount} {order.itemsCount === 1 ? "item" : "items"}
               </p>
-              <p className="text-xs text-gray-500 mt-1">Order {order.orderId}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Order {order.orderId}
+              </p>
 
-              <p className="mt-4 font-semibold text-gray-900">{order.total}</p>
+              <p className="mt-4 font-semibold text-[#1C2638]">{order.total}</p>
 
               <button
-                className="mt-4 w-full rounded-lg border border-emerald-700 text-emerald-700 font-semibold text-sm py-2 hover:bg-emerald-50 transition"
+                className="mt-4 w-full rounded-lg border border-[#1C2638] text-[#1C2638] font-semibold text-sm py-2 hover:bg-[#dee0e3] transition"
                 onClick={() => console.log("Buy again clicked", order.orderId)}
               >
-     View More 
+                View More
               </button>
               <button
-                className="mt-4 w-full rounded-lg border border-emerald-700 text-emerald-700 font-semibold text-sm py-2 hover:bg-emerald-50 transition"
+                className="mt-4 w-full rounded-lg border border-[#1C2638] text-[#1C2638] font-semibold text-sm py-2 hover:bg-[#dee0e3] transition"
                 onClick={() => console.log("Buy again clicked", order.orderId)}
               >
-                Buy again
+        Buy Again
               </button>
             </div>
           </div>
@@ -90,4 +83,4 @@ const OrdersPage = () => {
   );
 };
 
-export default OrdersPage;
+export default OrderCard;
