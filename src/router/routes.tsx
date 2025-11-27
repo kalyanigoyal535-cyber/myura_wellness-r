@@ -13,7 +13,6 @@ import { LogIn } from "lucide-react";
 import Login from "../pages/login/Login";
 import Signup from "../pages/signup/Signup";
 import Checkout from "../pages/checkout/Checkout";
-import Profile from "../pages/profile/Profile";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -62,7 +61,7 @@ const router = createBrowserRouter([
       },
       {
         path:"/profile ",
-        element: <Profile/>
+        // element: <Profile/>
       },
     ],
   },
