@@ -15,8 +15,9 @@ const Login = () => {
       {/* Image Section */}
       <div className="col-span-12 md:col-span-6 flex justify-center order-1 md:order-2">
         <img
-          src={images.offerImage}
+          src={images.LoginImage}
           alt="Offer"
+          className="h-fit"
         />
       </div>
 

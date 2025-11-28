@@ -10,6 +10,7 @@ import DeliveryImage from "./delivery.webp"
 import offerImage from "./OfferImage.png"
 import AboutUsImage from "./aboutUsImage/Images (1)_page-0001.jpg"
 import yourBestHealth from "./aboutUsImage/Images (1)_page-0004.jpg"
+import LoginImage from "./Image 1_1 (2).png"
 const images = {
   BannerImageDesktop1,
   BannerImageDesktop2,
@@ -23,6 +24,7 @@ const images = {
   offerImage,
   AboutUsImage,
   yourBestHealth,
+  LoginImage,
 };
 
 export default images;
