@@ -54,6 +54,7 @@ const Home: React.FC = () => {
   const [transitionStage, setTransitionStage] = useState<'idle' | 'entering'>('idle');
   const manualResumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [productImageIndices, setProductImageIndices] = useState<number[]>(() => new Array(6).fill(0));
+  const [proSeriesImageIndices, setProSeriesImageIndices] = useState<number[]>(() => new Array(4).fill(0));
   const promoVideoRef = useRef<HTMLVideoElement | null>(null);
   const promoVideoSectionRef = useRef<HTMLDivElement | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -374,6 +375,183 @@ const Home: React.FC = () => {
     }));
   }, []);
 
+  const proSeriesProducts = useMemo<Product[]>(() => {
+    const baseProSeriesProducts: ProductDefinition[] = [
+      {
+        id: 101,
+        slug: 'pro-omega-3-softgel-capsules',
+        name: "PRO OMEGA-3 SOFTGEL CAPSULES",
+        price: 1199,
+        originalPrice: 1599,
+        pedestalColor: 'from-amber-100 via-white to-yellow-50',
+        priceTagClass: 'from-amber-200/80 via-yellow-100/75 to-white/70',
+        borderClass: 'border-amber-200',
+        rating: 5,
+        folder: 'ProSeries/PRO OMEGA-3 SOFTGEL CAPSULES',
+        imageFiles: ['main.png', '1.png', '2.png', '4.png'],
+        discountPercent: Math.round(((1599 - 1199) / 1599) * 100),
+        spotlight: {
+          image: '/Final Images/ProSeries/PRO OMEGA-3 SOFTGEL CAPSULES/main.png',
+          badge: 'ProSeries',
+          headline: 'Premium Omega-3 Support',
+          subheadline: 'Advanced softgel formulation for optimal health',
+          highlights: ['High potency', 'Premium quality', 'Easy absorption'],
+          accentGradient: 'from-amber-500/50 to-yellow-400/50',
+          chipClassName: 'bg-amber-100/70 text-amber-800',
+          glowClassName: 'glow-amber',
+          callouts: [
+            { text: 'Premium Quality', position: 'top-left' },
+            { text: 'High Potency', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
+      },
+      {
+        id: 102,
+        slug: 'pro-mens-vitality-booster-gold',
+        name: "PRO MEN'S VITALITY BOOSTER GOLD",
+        price: 2499,
+        originalPrice: 3799,
+        pedestalColor: 'from-amber-100 via-white to-yellow-50',
+        priceTagClass: 'from-amber-200/80 via-yellow-100/75 to-white/70',
+        borderClass: 'border-amber-200',
+        rating: 5,
+        folder: 'ProSeries/PRO MEN\'S VITALITY BOOSTER GOLD',
+        imageFiles: ['main.png', '1.png', '2.png', '3.png'],
+        discountPercent: Math.round(((3799 - 2499) / 3799) * 100),
+        spotlight: {
+          image: '/Final Images/ProSeries/PRO MEN\'S VITALITY BOOSTER GOLD/main.png',
+          badge: 'ProSeries',
+          headline: 'Premium Vitality Support',
+          subheadline: 'Gold formulation for enhanced performance',
+          highlights: ['Premium blend', 'Enhanced energy', 'Optimal support'],
+          accentGradient: 'from-amber-500/50 to-yellow-400/50',
+          chipClassName: 'bg-amber-100/70 text-amber-800',
+          glowClassName: 'glow-amber',
+          callouts: [
+            { text: 'Gold Formula', position: 'top-left' },
+            { text: 'Premium Blend', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
+      },
+      {
+        id: 103,
+        slug: 'pro-womens-health-plus',
+        name: "PRO WOMEN'S HEALTH PLUS",
+        price: 2599,
+        originalPrice: 2599,
+        pedestalColor: 'from-amber-100 via-white to-yellow-50',
+        priceTagClass: 'from-amber-200/80 via-yellow-100/75 to-white/70',
+        borderClass: 'border-amber-200',
+        rating: 5,
+        folder: 'ProSeries/PRO WOMEN\'S HEALTH PLUS',
+        imageFiles: ['main.png', '2.png', '3.png', '4.png'],
+        discountPercent: 0,
+        spotlight: {
+          image: '/Final Images/ProSeries/PRO WOMEN\'S HEALTH PLUS/main.png',
+          badge: 'ProSeries',
+          headline: 'Premium Women\'s Wellness',
+          subheadline: 'Advanced formulation for women\'s health',
+          highlights: ['Premium quality', 'Advanced formula', 'Holistic support'],
+          accentGradient: 'from-amber-500/50 to-yellow-400/50',
+          chipClassName: 'bg-amber-100/70 text-amber-800',
+          glowClassName: 'glow-amber',
+          callouts: [
+            { text: 'Premium Formula', position: 'top-left' },
+            { text: 'Advanced Support', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
+      },
+      {
+        id: 104,
+        slug: 'pro-mens-multivitamin',
+        name: "PRO MEN'S MULTIVITAMIN",
+        price: 1449,
+        originalPrice: 1899,
+        pedestalColor: 'from-amber-100 via-white to-yellow-50',
+        priceTagClass: 'from-amber-200/80 via-yellow-100/75 to-white/70',
+        borderClass: 'border-amber-200',
+        rating: 5,
+        folder: 'ProSeries/PRO MEN\'S MULTIVITAMIN',
+        imageFiles: ['main.png', '2.png', '3.png', '4.png'],
+        discountPercent: Math.round(((1899 - 1449) / 1899) * 100),
+        spotlight: {
+          image: '/Final Images/ProSeries/PRO MEN\'S MULTIVITAMIN/main.png',
+          badge: 'ProSeries',
+          headline: 'Premium Multivitamin',
+          subheadline: 'Comprehensive nutritional support',
+          highlights: ['Complete formula', 'Premium quality', 'Daily support'],
+          accentGradient: 'from-amber-500/50 to-yellow-400/50',
+          chipClassName: 'bg-amber-100/70 text-amber-800',
+          glowClassName: 'glow-amber',
+          callouts: [
+            { text: 'Complete Formula', position: 'top-left' },
+            { text: 'Daily Support', position: 'bottom-right' },
+          ],
+          showActions: true,
+        },
+      },
+    ];
+
+    const buildImageDescriptor = (folder: string, fileName: string, alt: string, useOptimizedAsFallback: boolean = false): ResponsiveImageDescriptor => {
+      const fileExtIndex = fileName.lastIndexOf('.');
+      const baseName = fileExtIndex >= 0 ? fileName.slice(0, fileExtIndex) : fileName;
+      // For products with images in optimized folder, use optimized folder as fallback
+      const fallback = useOptimizedAsFallback 
+        ? `/Final Images/${folder}/optimized/${fileName}`
+        : `/Final Images/${folder}/${fileName}`;
+      const optimizedBasePath = `/Final Images/${folder}/optimized/${baseName}`;
+
+      const avifSrcSet = PRODUCT_IMAGE_WIDTHS.map((width) => `${optimizedBasePath}-${width}w.avif ${width}w`).join(', ');
+      const webpSrcSet = PRODUCT_IMAGE_WIDTHS.map((width) => `${optimizedBasePath}-${width}w.webp ${width}w`).join(', ');
+
+      return {
+        alt,
+        fallback,
+        placeholder: `${optimizedBasePath}-placeholder.jpg`,
+        width: 400,
+        height: 400,
+        sources: [
+          { type: 'image/avif', srcSet: avifSrcSet },
+          { type: 'image/webp', srcSet: webpSrcSet },
+        ],
+      };
+    };
+
+    return baseProSeriesProducts.map(({ imageFiles, folder, priceTagClass, originalPrice, price, ...rest }) => {
+      // Check if this product needs to use optimized folder as fallback (for PRO WOMEN'S HEALTH PLUS and PRO MEN'S MULTIVITAMIN)
+      const useOptimizedFallback = folder.includes("PRO WOMEN'S HEALTH PLUS") || folder.includes("PRO MEN'S MULTIVITAMIN");
+      
+      return {
+        ...rest,
+        priceTagClass,
+        originalPrice,
+        price,
+        discountPercent: Math.round(((originalPrice - price) / originalPrice) * 100),
+        images: imageFiles.map((fileName, index) =>
+          buildImageDescriptor(folder, fileName, `${rest.name} product image ${index + 1}`, useOptimizedFallback)
+        ),
+      };
+    });
+  }, []);
+
+  const handleProSeriesImageNav = useCallback(
+    (productIndex: number, delta: number) => {
+      setProSeriesImageIndices((prev) =>
+        prev.map((frameIndex, index) => {
+          if (index !== productIndex) return frameIndex;
+          const images = proSeriesProducts[productIndex].images;
+          if (!images.length) return frameIndex;
+          const next = (frameIndex + delta + images.length) % images.length;
+          return next;
+        })
+      );
+    },
+    [proSeriesProducts]
+  );
+
   const [productSliderRef, productSlider] = useKeenSlider<HTMLDivElement>(
     {
       loop: true,
@@ -448,6 +626,44 @@ const Home: React.FC = () => {
     ]
   );
 
+  const [proSeriesSliderRef, proSeriesSlider] = useKeenSlider<HTMLDivElement>(
+    {
+      loop: true,
+      renderMode: 'precision',
+      drag: true,
+      slides: {
+        perView: 1.1,
+        spacing: 16,
+      },
+      breakpoints: {
+        '(min-width: 640px)': {
+          slides: {
+            perView: 1.5,
+            spacing: 20,
+          },
+        },
+        '(min-width: 768px)': {
+          slides: {
+            perView: 2,
+            spacing: 24,
+          },
+        },
+        '(min-width: 1024px)': {
+          slides: {
+            perView: 2.5,
+            spacing: 28,
+          },
+        },
+        '(min-width: 1280px)': {
+          slides: {
+            perView: 4,
+            spacing: 32,
+          },
+        },
+      },
+    }
+  );
+
   const slideToPrevProduct = useCallback(() => {
     productSlider.current?.prev();
   }, [productSlider]);
@@ -455,6 +671,14 @@ const Home: React.FC = () => {
   const slideToNextProduct = useCallback(() => {
     productSlider.current?.next();
   }, [productSlider]);
+
+  const slideToPrevProSeries = useCallback(() => {
+    proSeriesSlider.current?.prev();
+  }, [proSeriesSlider]);
+
+  const slideToNextProSeries = useCallback(() => {
+    proSeriesSlider.current?.next();
+  }, [proSeriesSlider]);
 
   const handleProductImageNav = useCallback(
     (productIndex: number, delta: number) => {
@@ -531,6 +755,232 @@ const Home: React.FC = () => {
       videoEl.pause();
     }
   }, []);
+
+  const renderProSeriesProductCard = useCallback((product: Product, index: number, isCarousel: boolean = false) => {
+    const currentImage = product.images[proSeriesImageIndices[index]] ?? product.images[0];
+    
+    if (!currentImage) {
+      return null;
+    }
+
+    return (
+      <div
+        key={product.id}
+        className={isCarousel ? "keen-slider__slide" : ""}
+      >
+        <div
+          className="group relative h-full overflow-hidden rounded-[2.5rem] border-2 bg-white transition-all duration-700 ease-out hover:-translate-y-3 border-amber-200/70 shadow-[0_25px_70px_-35px_rgba(217,119,6,0.2)] hover:shadow-[0_40px_100px_-40px_rgba(217,119,6,0.35)] hover:border-amber-300/80"
+          data-aos="fade-up"
+          data-aos-delay={index * 100}
+        >
+          {/* Premium Enhanced ProSeries Badge */}
+          <div className="pointer-events-none absolute right-4 top-4 z-30 group-hover:scale-110 transition-all duration-500">
+            <div className="relative">
+              {/* Animated Glow Rings - Multiple Layers */}
+              <div className="absolute inset-0 -m-3 rounded-full bg-gradient-to-r from-amber-400/50 via-yellow-400/60 to-amber-500/50 blur-2xl animate-[softPulse_3s_ease-in-out_infinite]"></div>
+              <div className="absolute inset-0 -m-2 rounded-full bg-gradient-to-r from-amber-300/40 via-yellow-300/50 to-amber-400/40 blur-xl animate-[softPulse_2.5s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }}></div>
+              <div className="absolute inset-0 -m-1 rounded-full bg-gradient-to-r from-amber-200/30 via-yellow-200/40 to-amber-300/30 blur-lg animate-[softPulse_2s_ease-in-out_infinite]" style={{ animationDelay: '0.6s' }}></div>
+              
+              {/* Sparkle Effects - Multiple Points */}
+              <div className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-yellow-300 shadow-[0_0_10px_rgba(251,191,36,1),0_0_20px_rgba(251,191,36,0.5)] animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+              <div className="absolute -bottom-0.5 -left-0.5 h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(217,119,6,0.9),0_0_16px_rgba(217,119,6,0.4)] animate-[ping_2.5s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '0.7s' }}></div>
+              <div className="absolute top-1/2 -left-1 h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_6px_rgba(234,179,8,0.8)] animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '1.2s' }}></div>
+              
+              {/* Main Badge Container */}
+              <div className="relative">
+                {/* Shimmer Effect - Animated Sweep */}
+                <div className="absolute inset-0 rounded-full overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -skew-x-12 animate-[shimmer_3s_ease-in-out_infinite]"></div>
+                </div>
+                
+                {/* Badge Background with Premium Multi-Color Gradient */}
+                <span className="relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-700 via-yellow-500 via-amber-600 via-yellow-500 to-amber-700 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.32em] text-white shadow-[0_10px_40px_-10px_rgba(217,119,6,0.9),0_6px_20px_-6px_rgba(251,191,36,0.7),inset_0_2px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1)] ring-2 ring-amber-300/70 ring-offset-2 ring-offset-white/60 backdrop-blur-md border border-amber-200/30">
+                  {/* Inner Glow Layers */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/25 via-transparent to-amber-900/25"></div>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-t from-amber-800/20 via-transparent to-yellow-300/20"></div>
+                  
+                  {/* Premium Icon/Dot Cluster */}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <span className="relative">
+                      <span className="absolute inset-0 h-2 w-2 rounded-full bg-white/40 blur-sm animate-pulse"></span>
+                      <span className="relative h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,1),0_0_12px_rgba(255,255,255,0.5)]"></span>
+                    </span>
+                    <span className="h-1 w-1 rounded-full bg-yellow-200 shadow-[0_0_4px_rgba(234,179,8,0.8)]"></span>
+                    <span className="h-0.5 w-0.5 rounded-full bg-amber-300"></span>
+                  </span>
+                  
+                  {/* Text with Enhanced Typography */}
+                  <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4),0_1px_2px_rgba(217,119,6,0.3)] font-display font-extrabold tracking-wider">
+                    ProSeries
+                  </span>
+                  
+                  {/* Shine Overlay - Multiple Layers */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/30"></div>
+                </span>
+                
+                {/* Decorative Corner Accent - Enhanced */}
+                <div className="absolute -bottom-2.5 -right-1.5 h-6 w-6 rotate-45 rounded-sm bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-600 shadow-[0_8px_20px_-6px_rgba(217,119,6,0.7),0_4px_12px_-4px_rgba(251,191,36,0.5)] ring-2 ring-amber-200/60">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-sm"></div>
+                </div>
+                
+                {/* Bottom Accent Line - Enhanced with Gradient */}
+                <div className="absolute -bottom-4 right-2 h-1 w-10 rounded-full bg-gradient-to-r from-transparent via-amber-400 via-yellow-400 to-transparent shadow-[0_2px_8px_rgba(217,119,6,0.5)]"></div>
+                
+                {/* Side Accent Lines */}
+                <div className="absolute top-1/2 -left-2 h-0.5 w-4 rounded-full bg-gradient-to-r from-transparent to-amber-400 rotate-90"></div>
+                <div className="absolute top-1/2 -right-2 h-0.5 w-4 rounded-full bg-gradient-to-l from-transparent to-yellow-400 rotate-90"></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Premium Glow Effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-100/30 via-transparent to-yellow-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+          
+          <div className="relative flex flex-col items-center gap-3 p-4 sm:p-5 pb-5 sm:pb-6 rounded-[2rem] m-2 sm:m-3 bg-gradient-to-br from-amber-50/50 via-white to-yellow-50/40">
+            {/* Product Image */}
+            <div className="relative w-full">
+              <div className="overflow-hidden rounded-[1.75rem] border-2 border-amber-100/80 bg-white shadow-[0_20px_50px_-30px_rgba(217,119,6,0.15)] group-hover:border-amber-200/90 transition-all duration-500">
+                <Link
+                  to={`/product/${product.slug}`}
+                  className="relative block w-full focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/70 focus-visible:ring-offset-4 focus-visible:ring-offset-white"
+                  aria-label={`View details for ${product.name}`}
+                >
+                  <ResponsiveProductImage
+                    key={`proseries-${product.id}-${proSeriesImageIndices[index]}`}
+                    image={currentImage}
+                    className="w-full"
+                    imgClassName="w-full h-full object-cover animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                  />
+                  <span className="pointer-events-none absolute bottom-5 left-1/2 w-[85%] -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 px-5 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.3em] text-white shadow-[0_30px_70px_-35px_rgba(217,119,6,0.65)] opacity-0 transition-opacity duration-500 group-hover:opacity-100 backdrop-blur-sm">
+                    Discover Premium
+                  </span>
+                </Link>
+              </div>
+              {product.images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleProSeriesImageNav(index, -1);
+                    }}
+                    className="absolute -left-5 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-amber-200/60 transition-all duration-300 hover:ring-amber-300/80 hover:scale-110"
+                    aria-label={`Show previous ${product.name} image`}
+                  >
+                    <ChevronLeft className="h-5 w-5 text-amber-700" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleProSeriesImageNav(index, 1);
+                    }}
+                    className="absolute -right-5 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-amber-200/60 transition-all duration-300 hover:ring-amber-300/80 hover:scale-110"
+                    aria-label={`Show next ${product.name} image`}
+                  >
+                    <ChevronRight className="h-5 w-5 text-amber-700" />
+                  </button>
+                </>
+              )}
+            </div>
+            
+            {/* Product Name */}
+            <div className="flex w-full flex-col gap-2 text-center">
+              <div className="flex flex-col items-center gap-2">
+                <h3 className="w-full">
+                  <span className="inline-flex w-full items-center justify-center rounded-full border border-amber-200/60 bg-gradient-to-r from-amber-50/95 via-white to-yellow-50/95 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-slate-800 shadow-[0_16px_32px_-24px_rgba(217,119,6,0.25)]">
+                    {product.name}
+                  </span>
+                </h3>
+                {product.images.length > 1 && (
+                  <div className="flex items-center justify-center gap-2">
+                    {product.images.map((image, imageIndex) => (
+                      <button
+                        key={`proseries-${product.id}-${imageIndex}`}
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleProSeriesImageNav(
+                            index,
+                            imageIndex - proSeriesImageIndices[index]
+                          );
+                        }}
+                        className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                          proSeriesImageIndices[index] === imageIndex
+                            ? 'bg-amber-600 w-6 shadow-[0_4px_12px_rgba(217,119,6,0.5)]'
+                            : 'bg-amber-300 hover:bg-amber-400'
+                        }`}
+                        aria-label={`Show ${product.name} image ${imageIndex + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Premium Pricing */}
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 shadow-[0_16px_36px_-24px_rgba(217,119,6,0.25)] bg-gradient-to-r from-amber-200/90 via-yellow-100/85 to-amber-200/90 border border-amber-200/60">
+                <span className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-600 to-yellow-600 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_6px_12px_rgba(217,119,6,0.35)]">
+                  Deal
+                </span>
+                <span className="font-display text-xl font-semibold tracking-tight text-slate-900">
+                  ₹{product.price}
+                </span>
+              </div>
+              {product.originalPrice > product.price && (
+                <>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/60 bg-gradient-to-r from-amber-100/90 to-yellow-100/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-amber-800 shadow-[0_10px_20px_-16px_rgba(217,119,6,0.3)]">
+                    Save {product.discountPercent}%
+                  </span>
+                  <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400 line-through">
+                    MRP ₹{product.originalPrice}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Premium Action Buttons */}
+            <div className="flex items-center justify-center gap-3 w-full mt-2">
+              <button
+                onClick={async () => {
+                  if (addingProduct === product.slug) return;
+                  setAddingProduct(product.slug);
+                  addItem({
+                    id: product.slug,
+                    name: product.name,
+                    price: product.price,
+                    image: currentImage?.fallback || '',
+                  }, 1);
+                  setTimeout(() => setAddingProduct(null), 800);
+                }}
+                disabled={addingProduct === product.slug}
+                className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_16px_36px_-16px_rgba(217,119,6,0.5)] transition-all duration-300 hover:bg-amber-700 hover:shadow-[0_22px_48px_-16px_rgba(217,119,6,0.6)] hover:scale-[1.02] max-w-[240px] whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="relative inline-flex items-center gap-2">
+                  {addingProduct === product.slug ? 'Added!' : 'Add to cart'}
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </button>
+              <Link
+                to={`/product/${product.slug}`}
+                className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-amber-300/60 bg-white/95 px-4 py-2 text-xs font-semibold text-amber-700 shadow-[0_16px_36px_-22px_rgba(217,119,6,0.3)] transition-all duration-300 hover:border-amber-400/80 hover:bg-white hover:shadow-[0_22px_48px_-22px_rgba(217,119,6,0.4)] max-w-[240px] whitespace-nowrap overflow-hidden"
+                aria-label={`View details for ${product.name}`}
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-amber-50/90 via-white/95 to-yellow-50/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                <span className="relative inline-flex items-center gap-2.5">
+                  View details
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }, [proSeriesProducts, proSeriesImageIndices, handleProSeriesImageNav, addingProduct, addItem]);
 
   return (
     <>
@@ -735,6 +1185,79 @@ const Home: React.FC = () => {
                 Your Wellness, Our Promise.
               </h2>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ProSeries Section - Premium Golden Theme */}
+      <section className="relative py-4 sm:py-6 border-t border-b border-amber-300/50 bg-gradient-to-b from-amber-50/40 via-white to-yellow-50/30 overflow-hidden">
+        {/* Premium Background Effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(251,191,36,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(217,119,6,0.08),transparent_55%),radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.06),transparent_60%)]"></div>
+        <div className="absolute -top-24 right-16 h-48 w-48 rounded-full bg-amber-300/25 blur-[120px] animate-[softPulse_8s_ease-in-out_infinite]"></div>
+        <div className="absolute -bottom-20 left-12 h-40 w-40 rounded-full bg-yellow-200/30 blur-[100px] animate-[softPulse_10s_ease-in-out_infinite]" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-amber-200/15 blur-[140px]"></div>
+        
+        <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Premium Header */}
+          <div className="text-center mb-8" data-aos="fade-up">
+            <h2 className="text-[1.875rem] sm:text-[2.25rem] lg:text-[2.5rem] font-display font-semibold tracking-tight leading-[1.1]">
+              <span className="bg-gradient-to-r from-amber-700 via-yellow-600 via-amber-700 to-yellow-700 bg-clip-text text-transparent drop-shadow-[0_6px_20px_rgba(217,119,6,0.2)]">
+                ProSeries
+              </span>
+            </h2>
+            <div className="mt-2 flex justify-center">
+              <div className="h-0.5 w-20 rounded-full bg-gradient-to-r from-transparent via-amber-500 to-transparent shadow-[0_3px_10px_rgba(217,119,6,0.35)]"></div>
+            </div>
+            <p className="mt-3 text-xs sm:text-sm font-medium tracking-wide text-slate-600/85 max-w-4xl mx-auto leading-relaxed">
+              <span className="bg-gradient-to-r from-slate-700 via-amber-700 to-slate-700 bg-clip-text text-transparent">Our most exclusive wellness collection. Crafted with the finest ingredients, advanced formulations, and uncompromising quality for those who demand excellence.</span>
+            </p>
+          </div>
+
+          {/* Mobile Carousel - Hidden on Desktop */}
+          <div className="lg:hidden relative" data-aos="fade-up" data-aos-delay="140">
+            <div className="absolute inset-y-6 left-0 w-24 bg-gradient-to-r from-amber-50/90 via-amber-50/80 to-transparent pointer-events-none hidden sm:block rounded-l-3xl z-10"></div>
+            <div className="absolute inset-y-6 right-0 w-24 bg-gradient-to-l from-amber-50/90 via-amber-50/80 to-transparent pointer-events-none hidden sm:block rounded-r-3xl z-10"></div>
+
+            <div ref={proSeriesSliderRef} className="keen-slider">
+              {proSeriesProducts.map((product, index) => renderProSeriesProductCard(product, index, true))}
+            </div>
+
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <button
+                onClick={slideToPrevProSeries}
+                aria-label="Previous ProSeries product"
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-amber-200/60 bg-white/90 text-amber-700 shadow-sm transition-all duration-300 hover:border-amber-300/80 hover:text-amber-800 hover:bg-white"
+              >
+                <ChevronLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+              </button>
+              <button
+                onClick={slideToNextProSeries}
+                aria-label="Next ProSeries product"
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-amber-200/60 bg-white/90 text-amber-700 shadow-sm transition-all duration-300 hover:border-amber-300/80 hover:text-amber-800 hover:bg-white"
+              >
+                <ChevronRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Static Grid - Hidden on Mobile */}
+          <div className="hidden lg:grid lg:grid-cols-4 gap-6 sm:gap-7 mt-10" data-aos="fade-up" data-aos-delay="140">
+            {proSeriesProducts.map((product, index) => renderProSeriesProductCard(product, index, false))}
+          </div>
+
+          {/* Premium CTA */}
+          <div className="mt-8 text-center" data-aos="fade-up" data-aos-delay="400">
+            <Link
+              to="/product"
+              className="group relative inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-700 px-10 py-4 text-base sm:text-lg font-bold text-white shadow-[0_28px_60px_-20px_rgba(217,119,6,0.6)] transition-all duration-300 hover:shadow-[0_36px_80px_-20px_rgba(217,119,6,0.75)] hover:scale-[1.02] overflow-hidden"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span className="relative inline-flex items-center gap-3">
+                Explore ProSeries Collection
+                <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1.5" />
+              </span>
+            </Link>
           </div>
         </div>
       </section>
