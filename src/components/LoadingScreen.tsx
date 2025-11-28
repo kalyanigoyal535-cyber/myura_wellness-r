@@ -12,7 +12,7 @@ const LoadingScreen: React.FC = () => {
       setIsFading(true);
       setTimeout(() => {
         setIsVisible(false);
-      }, 500);
+      }, 5000);
     };
 
     // Minimum display time for logo animation
