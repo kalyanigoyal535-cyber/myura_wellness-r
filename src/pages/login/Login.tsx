@@ -2,8 +2,13 @@ import React from "react";
 import { Input, Button } from "@mantine/core";
 import { Link } from "react-router-dom";
 import images from "../../images/images";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+
+interface LoginValues {
+  email: string;
+  password: string;
+}
 
 const Login = () => {
   const validationSchema = Yup.object({
@@ -45,11 +50,11 @@ const Login = () => {
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
+          onSubmit={(values: LoginValues, helpers: FormikHelpers<LoginValues>) => {
             alert(JSON.stringify(values, null, 2));
           }}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
             <Form
               onSubmit={handleSubmit}
               className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4"

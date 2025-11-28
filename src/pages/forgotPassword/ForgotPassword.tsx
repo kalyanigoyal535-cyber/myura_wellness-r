@@ -1,10 +1,14 @@
 import { Input, Button } from "@mantine/core";
 import { Link } from "react-router-dom";
 import images from "../../images/images";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
 type Props = {};
+
+interface ForgotPasswordValues {
+  email: string;
+}
 
 const ForgotPassword = (props: Props) => {
   const validationSchema = Yup.object({
@@ -45,11 +49,11 @@ const ForgotPassword = (props: Props) => {
         <Formik
           initialValues={{ email: "" }}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
+          onSubmit={(values: ForgotPasswordValues, helpers: FormikHelpers<ForgotPasswordValues>) => {
             alert(`Password reset link sent to: ${values.email}`);
           }}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
             <Form
               onSubmit={handleSubmit}
               className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4"
