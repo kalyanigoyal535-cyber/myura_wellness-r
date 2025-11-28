@@ -15,22 +15,13 @@ const Signup = () => {
   });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
-      {/* Image Section */}
-      <div className="col-span-12 md:col-span-6 flex justify-center order-1 md:order-2">
-        <img
-          src={images.offerImage}
-          alt="Offer"
-          className="w-10/12 md:w-full object-cover h-48 md:h-full"
-        />
-      </div>
-
+    <div className="grid grid-cols-1 md:grid-cols-12 min-h-screen">
       {/* Form Section */}
-      <div className="col-span-12 md:col-span-6 flex flex-col items-center justify-center order-2 md:order-1">
+      <div className="col-span-12 md:col-span-6 flex flex-col items-center justify-center order-1 md:order-2 px-4 py-6">
         <h1 className="text-2xl font-semibold underline mb-2">Register</h1>
         <p>
           Already a user?
-          <Link to="/login" className="text-blue-800 mx-2 underline">
+          <Link to="/my-account" className="text-blue-800 mx-2 underline">
             Login
           </Link>
         </p>
@@ -49,45 +40,96 @@ const Signup = () => {
           }}
         >
           {({ handleSubmit }) => (
-            <Form onSubmit={handleSubmit} className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4">
+            <Form
+              onSubmit={handleSubmit}
+              className="flex flex-col w-11/12 md:w-6/12 mt-6 space-y-4"
+            >
               <div className="flex flex-col md:flex-row gap-4">
-                <div className="w-6/12">
+                <div className="w-full md:w-6/12">
                   <label>First Name</label>
                   <Field name="firstName" as={Input} placeholder="First Name" />
-                  <ErrorMessage name="firstName" component="p" className="text-red-500 text-sm" />
+                  <ErrorMessage
+                    name="firstName"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
                 </div>
 
-                <div className="w-6/12">
+                <div className="w-full md:w-6/12">
                   <label>Last Name</label>
                   <Field name="lastName" as={Input} placeholder="Last Name" />
-                  <ErrorMessage name="lastName" component="p" className="text-red-500 text-sm" />
+                  <ErrorMessage
+                    name="lastName"
+                    component="p"
+                    className="text-red-500 text-sm"
+                  />
                 </div>
               </div>
 
               <div>
                 <label>Email</label>
                 <Field name="email" as={Input} placeholder="Email" />
-                <ErrorMessage name="email" component="p" className="text-red-500 text-sm" />
+                <ErrorMessage
+                  name="email"
+                  component="p"
+                  className="text-red-500 text-sm"
+                />
               </div>
 
               <div>
                 <label>Pincode</label>
                 <Field name="pincode" as={Input} placeholder="Pincode" />
-                <ErrorMessage name="pincode" component="p" className="text-red-500 text-sm" />
+                <ErrorMessage
+                  name="pincode"
+                  component="p"
+                  className="text-red-500 text-sm"
+                />
               </div>
 
               <div>
                 <label>Password</label>
-                <Field name="password" as={Input} placeholder="Password" type="password" />
-                <ErrorMessage name="password" component="p" className="text-red-500 text-sm" />
+                <Field
+                  name="password"
+                  as={Input}
+                  placeholder="Password"
+                  type="password"
+                />
+                <ErrorMessage
+                  name="password"
+                  component="p"
+                  className="text-red-500 text-sm"
+                />
               </div>
 
-              <Button type="submit" variant="filled" color="#162031" radius="md" className="mt-4">
+              <Button
+                type="submit"
+                variant="filled"
+                color="#162031"
+                radius="md"
+                className="mt-4"
+              >
                 Register
               </Button>
             </Form>
           )}
         </Formik>
+      </div>
+
+      {/* Image Section */}
+      <div className="col-span-12 md:col-span-6 flex justify-center items-center order-2 md:order-1 px-4 py-6">
+        {/* Desktop */}
+        <img
+          src={images.LoginImage}
+          alt="Offer desktop"
+          className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
+        />
+
+        {/* Mobile */}
+        <img
+          src={images.MobileLoginImage}
+          alt="Offer mobile"
+          className="block md:hidden w-full h-auto object-contain rounded-lg"
+        />
       </div>
     </div>
   );
