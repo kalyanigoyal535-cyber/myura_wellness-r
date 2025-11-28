@@ -14,9 +14,13 @@ const About = (props: Props) => {
       {/* about us  */}
       <div className="grid grid-cols-12 bg-[#F8F8F8] py-8 px-4 md:px-12 gap-6">
         <div className="col-span-12 md:col-span-6 flex justify-center items-center">
-          <div className="bg-gray-700 w-full max-w-md h-48 md:h-64 rounded-xl">
-            <img src={images.AboutUsImage} alt="" />
-          </div>
+        <div className="bg-gray-700 w-full max-w-md rounded-xl overflow-hidden">
+  <img
+    src={images.AboutUsImage}
+    alt="About Myura"
+    className="w-full h-full object-cover"
+  />
+</div>
         </div>
 
         <div className="col-span-12 md:col-span-6 flex flex-col justify-center text-center md:text-left">
