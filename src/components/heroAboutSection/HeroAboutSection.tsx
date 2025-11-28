@@ -29,7 +29,7 @@ const HeroAboutSection = () => {
     <div className="w-full bg-[#F8F8F8] py-16">
       <div className="max-w-6xl mx-auto px-4 md:px-8 space-y-12 md:space-y-16">
         {sections.map((sec, idx) => {
-          const isHighlight = idx === 1; // middle section special
+          const isHighlight = idx === 1;
 
           return (
             <section
@@ -42,7 +42,6 @@ const HeroAboutSection = () => {
               }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-center p-6 md:p-10">
-                {/* Text Section */}
                 <div
                   className={`md:col-span-6 flex flex-col justify-center order-1 ${
                     sec.reverse ? "md:order-2" : "md:order-1"
