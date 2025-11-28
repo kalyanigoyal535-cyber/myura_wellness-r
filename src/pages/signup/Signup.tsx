@@ -26,7 +26,7 @@ const Signup = () => {
   <img
     src={images.MobileLoginImage}
     alt="Offer mobile"
-    className="block md:hidden w-full h-auto object-contain rounded-lg"
+    className="block md:hidden w-full mt-8 md:mt-0 h-auto object-contain rounded-lg"
   />
 </div>
 
