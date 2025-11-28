@@ -16,8 +16,23 @@ const Signup = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 min-h-screen">
-      {/* Form Section */}
-      <div className="col-span-12 md:col-span-6 flex flex-col items-center justify-center order-1 md:order-2 px-4 py-6">
+      {/* Image Section – EXACT same layout as Login */}
+      <div className="col-span-12 md:col-span-6 flex justify-center order-2 md:order-2">
+  <img
+    src={images.LoginImage}
+    alt="Offer desktop"
+    className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
+  />
+  <img
+    src={images.MobileLoginImage}
+    alt="Offer mobile"
+    className="block md:hidden w-full h-auto object-contain rounded-lg"
+  />
+</div>
+
+
+      {/* Signup Section – mirror Login section */}
+      <div className="col-span-12 md:col-span-6 flex flex-col items-center md:justify-center order-1 md:order-1">
         <h1 className="text-2xl font-semibold underline mb-2">Register</h1>
         <p>
           Already a user?
@@ -42,7 +57,7 @@ const Signup = () => {
           {({ handleSubmit }) => (
             <Form
               onSubmit={handleSubmit}
-              className="flex flex-col w-11/12 md:w-6/12 mt-6 space-y-4"
+              className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4"
             >
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="w-full md:w-6/12">
@@ -113,23 +128,6 @@ const Signup = () => {
             </Form>
           )}
         </Formik>
-      </div>
-
-      {/* Image Section */}
-      <div className="col-span-12 md:col-span-6 flex justify-center items-center order-2 md:order-1 px-4 py-6">
-        {/* Desktop */}
-        <img
-          src={images.LoginImage}
-          alt="Offer desktop"
-          className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
-        />
-
-        {/* Mobile */}
-        <img
-          src={images.MobileLoginImage}
-          alt="Offer mobile"
-          className="block md:hidden w-full h-auto object-contain rounded-lg"
-        />
       </div>
     </div>
   );

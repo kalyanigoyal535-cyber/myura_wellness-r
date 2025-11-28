@@ -28,7 +28,7 @@ const Login = () => {
         <img
           src={images.MobileLoginImage}
           alt="Offer mobile"
-          className="block md:hidden w-full h-auto object-contain rounded-lg"
+          className="block md:hidden w-full h-auto object-contain rounded-lg -mt-60 md:m-0"
         />
       </div>
 
@@ -97,7 +97,6 @@ const Login = () => {
         
         </Formik>
         <p>
-            Foget password 
           </p>
       </div>
     </div>
