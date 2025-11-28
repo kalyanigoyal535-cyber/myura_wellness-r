@@ -91,13 +91,12 @@ const Login = () => {
               >
                 Login
               </Button>
-              
             </Form>
           )}
-        
         </Formik>
-        <p>
-          </p>
+        <Link to="/forgot-password" className="text-sm text-blue-800 underline my-2">
+          Forgot password?
+        </Link>
       </div>
     </div>
   );
