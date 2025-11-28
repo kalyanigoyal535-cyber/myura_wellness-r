@@ -13,6 +13,7 @@ import Signup from "./pages/signup/Signup";
 import BlogPost from "./blogPost/BlogPost";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/forgotPassword/ForgotPassword";
+import OrderDetails from "./pages/orderDetails/OrderDetails";
 
 // Lazy load routes for code splitting
 const Home = lazy(() => import("./pages/Home"));
@@ -120,7 +121,7 @@ const AppContent: React.FC = () => {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              
+              <Route path="/order-details/:id" element={<OrderDetails />} />
             </Routes>
           </Suspense>
         </div>

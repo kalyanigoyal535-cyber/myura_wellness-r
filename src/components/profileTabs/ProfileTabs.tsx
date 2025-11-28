@@ -13,7 +13,7 @@ const ProfileTabs = (props: Props) => {
         color="#1F2839"
         variant="pills"
         orientation="vertical"
-        defaultValue="gallery"
+        defaultValue="Orders"
       >
         <Tabs.List>
           <Tabs.Tab value="Orders">Orders</Tabs.Tab>
