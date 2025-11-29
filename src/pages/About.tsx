@@ -147,34 +147,45 @@ const About = (props: Props) => {
       {/* culture at myura  */}
 
       <IconAboutUs />
-      <div className="grid grid-cols-1 md:grid-cols-12 h-auto md:h-[350px] gap-4  md:mb-52 m-4">
-        {/* Text Section */}
-        <div className="md:col-span-6 flex flex-col justify-center items-center px-6 md:px-16 bg-[#2A3244] text-white rounded-xl order-2 md:order-1 ">
-          <h1 className="text-2xl md:text-3xl font-semibold mb-3 text-center md:text-left">
-            Your best health is waiting - are you?
-          </h1>
-          <p className="text-sm md:text-base text-center md:text-left">
-            Discover the pure power of nature with MYURA – where ancient
-            Ayurvedic wisdom fuses with modern science to create wellness that
-            works. Wake up energized, feel balanced, and stay unstoppable all
-            day. Our potent botanical blends naturally detoxify, boost vitality,
-            balance hormones, aid digestion, and strengthen joints – so you can
-            feel light, clear, and alive from the inside out.
-            <br />
-            Every single ingredient is clean, transparent, and purpose-driven –
-            no fillers, no gimmicks, just results you can feel.
-          </p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:h-[400px] md:mb-52 p-4">
+  {/* Image Section */}
+  <div className="md:col-span-6 flex justify-center items-center order-1 md:order-1">
+    <div className="relative w-full max-w-[450px]">
+      <img
+        src={images.yourBestHealth}
+        alt="Wellness Image"
+        className="w-full rounded-xl shadow-lg transition-all duration-300 hover:scale-105"
+      />
+      {/* Accent element */}
+      <div className="absolute -bottom-4 -right-4 w-20 h-20 rounded-xl bg-[#FACC15]/20 blur-xl hidden md:block"></div>
+    </div>
+  </div>
 
-        {/* Image Section */}
-        <div className="md:col-span-6 flex justify-center items-center order-1 md:order-2">
-          <img
-            src={images.yourBestHealth}
-            alt="How we are different image"
-            className="w-full md:w-7/12 rounded-lg"
-          />
-        </div>
-      </div>
+  {/* Text Section */}
+  <div className="md:col-span-6 flex flex-col justify-center px-8 py-8 bg-[#2A3244] text-white rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 order-2 md:order-2">
+    <h1 className="text-2xl md:text-4xl font-bold leading-snug mb-4 text-center md:text-left">
+      Your Best Health Is Waiting — Are You Ready?
+    </h1>
+
+    <p className="text-sm md:text-base text-white/80 leading-relaxed text-center md:text-left">
+      Experience the synergy of ancient Ayurvedic wisdom and modern science with
+      <span className="text-[#38BDF8] font-medium"> MYURA</span>.
+      Wake up refreshed, feel balanced, and stay unstoppable all day.
+      <br />
+      <br />
+      Our advanced botanical formulations detoxify naturally, enhance vitality,
+      support hormonal balance, aid digestion, and fortify joint health — helping
+      you feel lighter and more alive from within.
+      <br />
+      <br />
+      <span className="font-medium text-white">
+        No fillers. No shortcuts. Just clean, transparent ingredients crafted
+        for real results.
+      </span>
+    </p>
+  </div>
+</div>
+
 
       {/* about our team  */}
       <div>{/* <OurTeam /> */}</div>
