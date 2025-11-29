@@ -12,7 +12,7 @@ import AboutUsImage from "./aboutUsImage/Images (1)_page-0001.jpg"
 import yourBestHealth from "./aboutUsImage/Images (1)_page-0004.jpg"
 import LoginImage from "./Image 1_1 (2).png"
 import MobileLoginImage from "./MobileImages.png"
-
+import MainLoginImage from "./MyuraLoginImage.png"
 const images = {
   BannerImageDesktop1,
   BannerImageDesktop2,
@@ -28,6 +28,7 @@ const images = {
   yourBestHealth,
   LoginImage,
   MobileLoginImage,
+  MainLoginImage,
 };
 
 export default images;

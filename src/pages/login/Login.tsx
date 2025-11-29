@@ -26,112 +26,149 @@ const Login = () => {
       .required("Password is required"),
   });
 
-  const handleSubmit = async (values: LoginValues, helpers: FormikHelpers<LoginValues>) => {
+  const handleSubmit = async (
+    values: LoginValues,
+    helpers: FormikHelpers<LoginValues>
+  ) => {
     setError(null);
     setIsSubmitting(true);
     try {
       await login({ email: values.email, password: values.password });
-      // Merge guest cart with user cart after login
       await syncCart();
-      // Redirect to home or previous page
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Login failed. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className=" grid grid-cols-1 md:grid-cols-12 min-h-screen">
-      {/* Image Section */}
-      <div className="col-span-12 md:col-span-6 flex justify-center order-2 md:order-2">
-        {/* Desktop */}
-        <img
-          src={images.LoginImage}
-          alt="Offer desktop"
-          className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
-        />
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Centered container */}
+      <div className="flex-1 flex flex-col items-center justify-center ">
+        {/* Top image like Minimalist bottle */}
+        <div className="flex flex-col items-center mb-2">
+          <img
+            src={images.MainLoginImage}
+            alt="Login visual"
+            className="w-40 md:w-48 mb-4"
+          />
+          <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-gray-500">
+            Welcome 
+          </p>
+        </div>
 
-        {/* Mobile */}
-        <img
-          src={images.MobileLoginImage}
-          alt="Offer mobile"
-          className="block md:hidden w-full h-auto object-contain rounded-lg -mt-60 md:m-0"
-        />
-      </div>
-
-      {/* Login Section */}
-      <div className="col-span-12 md:col-span-6 flex flex-col items-center md:justify-center order-1 md:order-1">
-        <h1 className="text-2xl font-semibold underline mb-2">Login</h1>
-        <p>
-          New User?
-          <Link to="/signup" className="text-blue-800 ml-2 underline">
-            Sign-up
-          </Link>
-        </p>
-
-        {error && (
-          <div className="w-10/12 md:w-6/12 mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
-
-        <Formik
-          initialValues={{ email: "", password: "" }}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
-            <Form
-              onSubmit={handleSubmit}
-              className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4"
-            >
-              {/* Email */}
-              <div>
-                <label className="block mb-1 font-medium">Email ID</label>
-                <Field name="email" as={Input} placeholder="Email Id" />
-                <ErrorMessage
-                  name="email"
-                  component="p"
-                  className="text-red-500 text-sm"
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block mb-1 font-medium">Password</label>
-                <Field
-                  name="password"
-                  as={Input}
-                  type="password"
-                  placeholder="Password"
-                />
-                <ErrorMessage
-                  name="password"
-                  component="p"
-                  className="text-red-500 text-sm"
-                />
-              </div>
-
-              {/* Button */}
-              <Button
-                type="submit"
-                variant="filled"
-                color="#162031"
-                radius="md"
-                className="mt-2"
-                disabled={isSubmitting}
-                loading={isSubmitting}
+        {/* Card */}
+        <div className="w-full max-w-md border border-gray-100 rounded-2xl shadow-sm md:shadow-md px-6 py-7 md:px-8 md:py-9">
+          {/* Title + link */}
+          <div className="text-center mb-4">
+            <h1 className="text-xl md:text-2xl font-semibold mb-1">
+              Login with Email
+            </h1>
+            <p className="text-sm text-gray-600">
+              New user?{" "}
+              <Link
+                to="/signup"
+                className="text-black underline underline-offset-2"
               >
-                {isSubmitting ? "Logging in..." : "Login"}
-              </Button>
-            </Form>
+                Sign up
+              </Link>
+            </p>
+          </div>
+
+          {/* Error box */}
+          {error && (
+            <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+              {error}
+            </div>
           )}
-        </Formik>
-        <Link to="/forgot-password" className="text-sm text-blue-800 underline my-2">
-          Forgot password?
-        </Link>
+
+          {/* Form */}
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({
+              handleSubmit,
+            }: {
+              handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
+            }) => (
+              <Form
+                onSubmit={handleSubmit}
+                className="flex flex-col space-y-4"
+              >
+                {/* Email */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-800">
+                    Email ID
+                  </label>
+                  <Field
+                    name="email"
+                    as={Input}
+                    placeholder="Enter your email"
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="p"
+                    className="text-red-500 text-xs mt-1"
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-800">
+                    Password
+                  </label>
+                  <Field
+                    name="password"
+                    as={Input}
+                    type="password"
+                    placeholder="Enter your password"
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="p"
+                    className="text-red-500 text-xs mt-1"
+                  />
+                </div>
+
+                {/* Login button */}
+                <Button
+                  type="submit"
+                  variant="filled"
+                  radius="lg"
+                  color="#1F283B"
+                  className="mt-2 w-full bg-black hover:bg-black/90"
+                  disabled={isSubmitting}
+                  loading={isSubmitting}
+                >
+                  {isSubmitting ? "Logging in..." : "Login"}
+                </Button>
+              </Form>
+            )}
+          </Formik>
+
+          {/* Forgot password */}
+          <div className="mt-4 text-center">
+            <Link
+              to="/forgot-password"
+              className="text-xs md:text-sm text-gray-700 underline underline-offset-2"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          {/* Terms text */}
+          <p className="mt-5 text-[10px] text-center text-gray-500 leading-relaxed">
+            By continuing, you confirm that you have read and agreed to our{" "}
+            <span className="underline">Privacy Policy</span> and{" "}
+            <span className="underline">Terms & Conditions</span>.
+          </p>
+        </div>
       </div>
     </div>
   );
