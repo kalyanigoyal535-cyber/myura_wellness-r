@@ -1,26 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import { Input, Button } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import images from "../../images/images";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 interface SignupValues {
   firstName: string;
   lastName: string;
   email: string;
-  pincode: string;
+  username: string;
   password: string;
+  password2: string;
 }
 
 const Signup = () => {
+  const { register } = useAuth();
+  const { syncCart } = useCart();
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const validationSchema = Yup.object({
     firstName: Yup.string().min(2, "At least 2 chars").required("Required"),
     lastName: Yup.string().min(2, "At least 2 chars").required("Required"),
     email: Yup.string().email("Invalid email").required("Required"),
-    pincode: Yup.string().min(6, "Min 6 digits").required("Required"),
+    username: Yup.string().min(3, "At least 3 chars").required("Required"),
     password: Yup.string().min(8, "Min 8 chars").required("Required"),
+    password2: Yup.string()
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Required"),
   });
+
+  const handleSubmit = async (values: SignupValues, helpers: FormikHelpers<SignupValues>) => {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await register({
+        email: values.email,
+        username: values.username,
+        password: values.password,
+        password2: values.password2,
+        first_name: values.firstName,
+        last_name: values.lastName,
+      });
+      // Merge guest cart with user cart after registration
+      await syncCart();
+      // Redirect to home
+      navigate("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 min-h-screen">
@@ -49,18 +84,23 @@ const Signup = () => {
           </Link>
         </p>
 
+        {error && (
+          <div className="w-10/12 md:w-6/12 mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <Formik
           initialValues={{
             firstName: "",
             lastName: "",
             email: "",
-            pincode: "",
+            username: "",
             password: "",
+            password2: "",
           }}
           validationSchema={validationSchema}
-          onSubmit={(values: SignupValues, helpers: FormikHelpers<SignupValues>) => {
-            alert(JSON.stringify(values, null, 2));
-          }}
+          onSubmit={handleSubmit}
         >
           {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
             <Form
@@ -100,10 +140,10 @@ const Signup = () => {
               </div>
 
               <div>
-                <label>Pincode</label>
-                <Field name="pincode" as={Input} placeholder="Pincode" />
+                <label>Username</label>
+                <Field name="username" as={Input} placeholder="Username" />
                 <ErrorMessage
-                  name="pincode"
+                  name="username"
                   component="p"
                   className="text-red-500 text-sm"
                 />
@@ -124,14 +164,31 @@ const Signup = () => {
                 />
               </div>
 
+              <div>
+                <label>Confirm Password</label>
+                <Field
+                  name="password2"
+                  as={Input}
+                  placeholder="Confirm Password"
+                  type="password"
+                />
+                <ErrorMessage
+                  name="password2"
+                  component="p"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+
               <Button
                 type="submit"
                 variant="filled"
                 color="#162031"
                 radius="md"
                 className="mt-4"
+                disabled={isSubmitting}
+                loading={isSubmitting}
               >
-                Register
+                {isSubmitting ? "Registering..." : "Register"}
               </Button>
             </Form>
           )}

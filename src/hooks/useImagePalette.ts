@@ -176,9 +176,7 @@ const useImagePalette = (image?: ResponsiveImageDescriptor | null, productId?: s
 
     let isActive = true;
     
-    // Preload image immediately with eager loading
     const img = new Image();
-    img.crossOrigin = 'anonymous';
     img.decoding = 'sync'; // Sync decoding for faster processing
     img.loading = 'eager'; // Eager loading priority
     

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Phone, Mail, MapPin, Headphones, MessageCircle, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, Headphones, MessageCircle, Send, CheckCircle, XCircle } from 'lucide-react';
+import { contactApi } from '../services/contact';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,9 @@ const Contact: React.FC = () => {
     helpType: 'Product Questions & Advice',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -16,11 +20,43 @@ const Contact: React.FC = () => {
       ...prev,
       [name]: value
     }));
+    // Reset status when user starts typing
+    if (submitStatus !== 'idle') {
+      setSubmitStatus('idle');
+      setErrorMessage('');
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setErrorMessage('');
+
+    try {
+      await contactApi.submitContact({
+        name: formData.name,
+        email: formData.email,
+        phone_number: formData.phone || undefined,
+        subject: formData.helpType,
+        message: formData.message,
+      });
+      
+      setSubmitStatus('success');
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        helpType: 'Product Questions & Advice',
+        message: ''
+      });
+    } catch (error) {
+      setSubmitStatus('error');
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to submit. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -192,12 +228,36 @@ const Contact: React.FC = () => {
                     />
                   </div>
 
+                  {submitStatus === 'success' && (
+                    <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      <span>Thank you! Your message has been sent successfully.</span>
+                    </div>
+                  )}
+
+                  {submitStatus === 'error' && (
+                    <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
+                      <XCircle className="h-5 w-5 mr-2" />
+                      <span>{errorMessage || 'Failed to send message. Please try again.'}</span>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full bg-slate-600 text-white py-3 px-6 rounded-lg hover:bg-slate-700 transition-colors font-semibold flex items-center justify-center"
+                    disabled={isSubmitting}
+                    className="w-full bg-slate-600 text-white py-3 px-6 rounded-lg hover:bg-slate-700 transition-colors font-semibold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit
-                    <Send className="ml-2 h-5 w-5" />
+                    {isSubmitting ? (
+                      <>
+                        <span className="animate-spin mr-2">⏳</span>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        Submit
+                        <Send className="ml-2 h-5 w-5" />
+                      </>
+                    )}
                   </button>
                 </form>
               </div>

@@ -25,7 +25,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
 
 
-  // Coupons from Spin Wheel
   const availableCoupons = [
     { code: 'FEST30', label: '30% OFF', description: 'Festive Essentials', detail: 'Signature adaptogenic blends for daily rituals.', accent: '#d97706', discount: 30 },
     { code: 'Myura30', label: '30% OFF', description: 'Ritual Kits', detail: 'Hydrating care duos curated by Ayurvedic doctors.', accent: '#45576f', discount: 30 },
@@ -37,13 +36,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     { code: 'MyuraHeals40', label: '40% OFF', description: 'Immune Shield', detail: 'Clinically dosed botanicals for rapid recovery.', accent: '#537790', discount: 40 },
   ];
 
-  // Get discount percentage from coupon code
   const getCouponDiscount = (code: string): number => {
     const coupon = availableCoupons.find(c => c.code === code);
     return coupon ? coupon.discount : 0;
   };
 
-  // Calculate coupon discount
   const couponDiscountPercent = couponCode ? getCouponDiscount(couponCode) : 0;
   const couponDiscountAmount = couponDiscountPercent > 0 ? (subtotal * couponDiscountPercent) / 100 : 0;
 
@@ -73,7 +70,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
 
 
-  // Track visible items for animations
   useEffect(() => {
     if (!isOpen) return;
     
@@ -95,7 +91,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     });
   }, [items, isOpen, visibleItems]);
 
-  // Prevent body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -209,7 +204,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     <>
       {createPortal(
         <>
-          {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -219,7 +213,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         aria-hidden={!isOpen}
       />
 
-      {/* Drawer - Always in DOM, translated when closed */}
       <div
         className={`fixed top-0 right-0 h-full w-full sm:w-[420px] max-w-full bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -230,7 +223,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         aria-label="Shopping cart"
         aria-hidden={!isOpen}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-white flex-shrink-0">
           <h2 className="text-base font-semibold text-slate-900">
             Your Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
@@ -244,14 +236,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Welcome Coupon Banner */}
         {items.length > 0 && (
           <div className="bg-slate-900 text-white px-5 py-3 text-xs font-medium flex-shrink-0">
             Use code WELCOME10 at checkout for 10% off your first order.
           </div>
         )}
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-5 py-16 text-center">
@@ -293,7 +283,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     }}
                   >
                     <div className="flex gap-3">
-                      {/* Product Image */}
                       <Link
                         to={`/product/${item.id}`}
                         onClick={onClose}
@@ -316,7 +305,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         </div>
                       </Link>
 
-                      {/* Product Details */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1.5">
                           <div className="flex-1 min-w-0">
@@ -339,7 +327,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                           </button>
                         </div>
 
-                        {/* Price */}
                         {product && product.originalPrice > product.price ? (
                           <div className="flex items-center gap-1.5 mb-2">
                             <span className="text-sm font-bold text-slate-900">₹{item.price}</span>
@@ -352,7 +339,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                           <p className="text-sm font-bold text-slate-900 mb-2">₹{item.price}</p>
                         )}
 
-                        {/* Quantity Controls */}
                         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                           <div className="inline-flex items-center rounded-md border border-slate-300 bg-white overflow-hidden shadow-sm hover:shadow transition-shadow">
                             <button
@@ -387,7 +373,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Coupon Section - Premium Aesthetic */}
           {items.length > 0 && (
             <div className="px-5 py-3 border-t border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-50/30 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/20 to-transparent opacity-40"></div>
@@ -427,16 +412,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Customers Also Bought */}
           {items.length > 0 && (
             <div className="px-5 py-4 border-t border-slate-200 bg-gradient-to-br from-white via-slate-50/30 to-white">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold uppercase tracking-widest text-slate-800">Customers also bought</span>
                 <span className="text-[10px] text-slate-500 font-medium">Tailored for your ritual</span>
               </div>
-              {/* Carousel Container */}
               <div className="relative">
-                {/* Left Navigation Arrow */}
                 <button
                   onClick={() => {
                     if (carouselRef.current) {
@@ -449,7 +431,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   <ChevronLeft className="h-4 w-4 text-slate-700" />
                 </button>
 
-                {/* Scrollable Carousel */}
                 <div
                   ref={carouselRef}
                   className="flex gap-3 overflow-x-auto scroll-smooth pb-2 px-8 hide-scrollbar"
@@ -464,10 +445,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         onClick={onClose}
                         className="group relative flex flex-col w-[140px] flex-shrink-0 p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50/50 overflow-hidden"
                       >
-                        {/* Decorative gradient overlay */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         
-                        {/* Product Image - Premium */}
                         <div className="relative w-full aspect-square rounded-lg bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 overflow-hidden shadow-md group-hover:shadow-xl transition-all mb-2">
                           {productData?.image ? (
                             <ResponsiveProductImage
@@ -487,11 +466,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                               }}
                             />
                           )}
-                          {/* Premium shimmer effect */}
                           <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </div>
 
-                        {/* Product Details */}
                         <div className="flex-1 flex flex-col relative z-10">
                           <h4 className="text-[10px] font-bold text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-2 uppercase tracking-wide mb-1">
                             {product.name}
@@ -515,7 +492,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             )}
                           </div>
                           
-                          {/* Quick Add Button */}
                           <button
                             onClick={(e) => {
                               e.preventDefault();
@@ -539,7 +515,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   })}
                 </div>
 
-                {/* Right Navigation Arrow */}
                 <button
                   onClick={() => {
                     if (carouselRef.current) {
@@ -556,10 +531,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        {/* Footer - Fixed */}
         {items.length > 0 && (
           <div className="border-t border-slate-200 bg-white flex-shrink-0">
-            {/* Savings Banner - Premium Center Aligned */}
             {savings > 0 && (
               <div className="px-5 py-1 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden border-b border-slate-800">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-60"></div>
@@ -576,7 +549,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </div>
             )}
 
-            {/* Total - Premium Enhanced */}
             <div className="px-5 py-2 bg-gradient-to-br from-slate-50 via-white to-slate-50/50 border-b border-slate-200 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/30 to-transparent opacity-30"></div>
               <div className="flex items-center justify-between relative z-10">
@@ -616,7 +588,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* Checkout Button - Premium Enhanced */}
             <div className="px-5 py-2 bg-gradient-to-b from-white via-slate-50/30 to-white">
               <button
                 onClick={handleCheckout}
@@ -632,7 +603,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </p>
             </div>
 
-            {/* Payment Icons - Premium Enhanced */}
             <div className="px-5 pb-2 pt-1.5 bg-white">
               <div className="flex items-center justify-center gap-1.5 flex-wrap">
                 {['Paytm', 'GPay', 'PhonePe', 'UPI', 'Cards'].map((method) => (
@@ -652,17 +622,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     document.body
   )}
 
-      {/* Coupon Modal */}
       {showCouponModal && createPortal(
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 bg-slate-900/70 backdrop-blur-md transition-opacity duration-300 z-[10002]"
             onClick={() => setShowCouponModal(false)}
             aria-hidden={!showCouponModal}
           />
 
-          {/* Modal */}
           <div
             className="fixed inset-0 z-[10003] flex items-center justify-center p-4"
             role="dialog"
@@ -674,7 +641,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
               <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-white">Available Coupons</h2>
                 <button
@@ -686,7 +652,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                 </button>
               </div>
 
-              {/* Coupons List */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {availableCoupons.map((coupon) => (
                   <div

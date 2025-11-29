@@ -8,6 +8,8 @@ import Footer from "./components/Footer";
 import LoadingScreen from "./components/LoadingScreen";
 import SpinWheelModal from "./components/SpinWheelModal";
 import { SpinWheelProvider, useSpinWheel } from "./context/SpinWheelContext";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import Login from "./pages/login/Login";
 import Signup from "./pages/signup/Signup";
 import BlogPost from "./blogPost/BlogPost";
@@ -145,9 +147,13 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <SpinWheelProvider>
-      <AppContent />
-    </SpinWheelProvider>
+    <AuthProvider>
+      <CartProvider>
+        <SpinWheelProvider>
+          <AppContent />
+        </SpinWheelProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

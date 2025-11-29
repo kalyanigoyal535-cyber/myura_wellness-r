@@ -498,7 +498,6 @@ const Home: React.FC = () => {
     const buildImageDescriptor = (folder: string, fileName: string, alt: string, useOptimizedAsFallback: boolean = false): ResponsiveImageDescriptor => {
       const fileExtIndex = fileName.lastIndexOf('.');
       const baseName = fileExtIndex >= 0 ? fileName.slice(0, fileExtIndex) : fileName;
-      // For products with images in optimized folder, use optimized folder as fallback
       const fallback = useOptimizedAsFallback 
         ? `/Final Images/${folder}/optimized/${fileName}`
         : `/Final Images/${folder}/${fileName}`;
@@ -521,7 +520,6 @@ const Home: React.FC = () => {
     };
 
     return baseProSeriesProducts.map(({ imageFiles, folder, priceTagClass, originalPrice, price, ...rest }) => {
-      // Check if this product needs to use optimized folder as fallback (for PRO WOMEN'S HEALTH PLUS and PRO MEN'S MULTIVITAMIN)
       const useOptimizedFallback = folder.includes("PRO WOMEN'S HEALTH PLUS") || folder.includes("PRO MEN'S MULTIVITAMIN");
       
       return {
@@ -748,9 +746,7 @@ const Home: React.FC = () => {
     if (!videoEl) return;
 
     if (videoEl.paused) {
-      void videoEl.play().catch(() => {
-        // swallow play promise rejection (browser autoplay policies)
-      });
+      void videoEl.play().catch(() => {});
     } else {
       videoEl.pause();
     }
@@ -773,33 +769,25 @@ const Home: React.FC = () => {
           data-aos="fade-up"
           data-aos-delay={index * 100}
         >
-          {/* Premium Enhanced ProSeries Badge */}
           <div className="pointer-events-none absolute right-4 top-4 z-30 group-hover:scale-110 transition-all duration-500">
             <div className="relative">
-              {/* Animated Glow Rings - Multiple Layers */}
               <div className="absolute inset-0 -m-3 rounded-full bg-gradient-to-r from-amber-400/50 via-yellow-400/60 to-amber-500/50 blur-2xl animate-[softPulse_3s_ease-in-out_infinite]"></div>
               <div className="absolute inset-0 -m-2 rounded-full bg-gradient-to-r from-amber-300/40 via-yellow-300/50 to-amber-400/40 blur-xl animate-[softPulse_2.5s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }}></div>
               <div className="absolute inset-0 -m-1 rounded-full bg-gradient-to-r from-amber-200/30 via-yellow-200/40 to-amber-300/30 blur-lg animate-[softPulse_2s_ease-in-out_infinite]" style={{ animationDelay: '0.6s' }}></div>
               
-              {/* Sparkle Effects - Multiple Points */}
               <div className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-yellow-300 shadow-[0_0_10px_rgba(251,191,36,1),0_0_20px_rgba(251,191,36,0.5)] animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
               <div className="absolute -bottom-0.5 -left-0.5 h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(217,119,6,0.9),0_0_16px_rgba(217,119,6,0.4)] animate-[ping_2.5s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '0.7s' }}></div>
               <div className="absolute top-1/2 -left-1 h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_6px_rgba(234,179,8,0.8)] animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '1.2s' }}></div>
               
-              {/* Main Badge Container */}
               <div className="relative">
-                {/* Shimmer Effect - Animated Sweep */}
                 <div className="absolute inset-0 rounded-full overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -skew-x-12 animate-[shimmer_3s_ease-in-out_infinite]"></div>
                 </div>
                 
-                {/* Badge Background with Premium Multi-Color Gradient */}
                 <span className="relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-700 via-yellow-500 via-amber-600 via-yellow-500 to-amber-700 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.32em] text-white shadow-[0_10px_40px_-10px_rgba(217,119,6,0.9),0_6px_20px_-6px_rgba(251,191,36,0.7),inset_0_2px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1)] ring-2 ring-amber-300/70 ring-offset-2 ring-offset-white/60 backdrop-blur-md border border-amber-200/30">
-                  {/* Inner Glow Layers */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/25 via-transparent to-amber-900/25"></div>
                   <div className="absolute inset-0 rounded-full bg-gradient-to-t from-amber-800/20 via-transparent to-yellow-300/20"></div>
                   
-                  {/* Premium Icon/Dot Cluster */}
                   <span className="relative z-10 flex items-center gap-1.5">
                     <span className="relative">
                       <span className="absolute inset-0 h-2 w-2 rounded-full bg-white/40 blur-sm animate-pulse"></span>
@@ -809,36 +797,29 @@ const Home: React.FC = () => {
                     <span className="h-0.5 w-0.5 rounded-full bg-amber-300"></span>
                   </span>
                   
-                  {/* Text with Enhanced Typography */}
                   <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4),0_1px_2px_rgba(217,119,6,0.3)] font-display font-extrabold tracking-wider">
                     ProSeries
                   </span>
                   
-                  {/* Shine Overlay - Multiple Layers */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-transparent to-transparent"></div>
                   <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/30"></div>
                 </span>
                 
-                {/* Decorative Corner Accent - Enhanced */}
                 <div className="absolute -bottom-2.5 -right-1.5 h-6 w-6 rotate-45 rounded-sm bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-600 shadow-[0_8px_20px_-6px_rgba(217,119,6,0.7),0_4px_12px_-4px_rgba(251,191,36,0.5)] ring-2 ring-amber-200/60">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-sm"></div>
                 </div>
                 
-                {/* Bottom Accent Line - Enhanced with Gradient */}
                 <div className="absolute -bottom-4 right-2 h-1 w-10 rounded-full bg-gradient-to-r from-transparent via-amber-400 via-yellow-400 to-transparent shadow-[0_2px_8px_rgba(217,119,6,0.5)]"></div>
                 
-                {/* Side Accent Lines */}
                 <div className="absolute top-1/2 -left-2 h-0.5 w-4 rounded-full bg-gradient-to-r from-transparent to-amber-400 rotate-90"></div>
                 <div className="absolute top-1/2 -right-2 h-0.5 w-4 rounded-full bg-gradient-to-l from-transparent to-yellow-400 rotate-90"></div>
               </div>
             </div>
           </div>
           
-          {/* Premium Glow Effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-amber-100/30 via-transparent to-yellow-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
           
           <div className="relative flex flex-col items-center gap-3 p-4 sm:p-5 pb-5 sm:pb-6 rounded-[2rem] m-2 sm:m-3 bg-gradient-to-br from-amber-50/50 via-white to-yellow-50/40">
-            {/* Product Image */}
             <div className="relative w-full">
               <div className="overflow-hidden rounded-[1.75rem] border-2 border-amber-100/80 bg-white shadow-[0_20px_50px_-30px_rgba(217,119,6,0.15)] group-hover:border-amber-200/90 transition-all duration-500">
                 <Link
@@ -885,7 +866,6 @@ const Home: React.FC = () => {
               )}
             </div>
             
-            {/* Product Name */}
             <div className="flex w-full flex-col gap-2 text-center">
               <div className="flex flex-col items-center gap-2">
                 <h3 className="w-full">
@@ -919,7 +899,6 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            {/* Premium Pricing */}
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2">
               <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 shadow-[0_16px_36px_-24px_rgba(217,119,6,0.25)] bg-gradient-to-r from-amber-200/90 via-yellow-100/85 to-amber-200/90 border border-amber-200/60">
                 <span className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-600 to-yellow-600 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_6px_12px_rgba(217,119,6,0.35)]">
@@ -941,7 +920,6 @@ const Home: React.FC = () => {
               )}
             </div>
 
-            {/* Premium Action Buttons */}
             <div className="flex items-center justify-center gap-3 w-full mt-2">
               <button
                 onClick={async () => {

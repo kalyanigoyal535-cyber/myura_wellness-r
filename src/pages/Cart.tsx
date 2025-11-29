@@ -2,8 +2,30 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Trash2, ArrowLeft, Plus, Minus, ShoppingBag, Sparkles, ShieldCheck, Truck, Gift, ArrowRight, Heart, Star, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import ResponsiveProductImage from '../components/ResponsiveProductImage';
-import { getProductById, productCatalog } from '../data/products';
+import ResponsiveProductImage, { ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
+import { getProductById, productCatalog, type ProductRecord } from '../data/products';
+
+// Helper to convert string URL to ResponsiveImageDescriptor
+const urlToImageDescriptor = (url: string, alt: string): ResponsiveImageDescriptor => {
+  return {
+    alt,
+    fallback: url,
+    sources: [
+      {
+        srcSet: url,
+        media: '(min-width: 1024px)',
+      },
+      {
+        srcSet: url,
+        media: '(min-width: 768px)',
+      },
+      {
+        srcSet: url,
+        media: '(max-width: 767px)',
+      },
+    ],
+  };
+};
 
 const Cart: React.FC = () => {
   const { items, updateQty, removeItem, subtotal, addItem } = useCart();
@@ -13,11 +35,51 @@ const Cart: React.FC = () => {
   const [addingRecommendation, setAddingRecommendation] = useState<string | null>(null);
   const [updatingQty, setUpdatingQty] = useState<string | null>(null);
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
+  const [productImages, setProductImages] = useState<Map<string, string>>(new Map());
+  
+  // Map product names to static product slugs for image lookup
+  // This is more reliable than ID mapping since IDs can change
+  const productNameToSlugMap: Record<string, string> = {
+    'DIA CARE': 'dia-care',
+    'LIVER DETOX FORMULA': 'liver-detox',
+    'BONE & JOINT SUPPORT': 'bone-joint-support',
+    'GUT AND DIGESTION': 'gut-and-digestion',
+    "WOMEN'S HEALTH PLUS": 'womens-health-plus',
+    "MEN'S VITALITY BOOSTER": 'mens-vitality-booster',
+  };
+  
+  // Get product from static data by matching name or ID
+  const getProductForCartItem = (itemId: string, itemName?: string): ProductRecord | null => {
+    // First try direct lookup by ID (if it's a slug)
+    let product = getProductById(itemId);
+    
+    // If not found, try matching by product name
+    if (!product && itemName) {
+      const normalizedName = itemName.toUpperCase().trim();
+      
+      // Try the name-to-slug map first
+      const slug = productNameToSlugMap[normalizedName];
+      if (slug) {
+        product = getProductById(slug);
+      }
+      
+      // If still not found, search by name in product catalog
+      if (!product) {
+        product = productCatalog.find(p => {
+          const productName = p.name.toUpperCase().trim();
+          return productName === normalizedName;
+        }) || null;
+      }
+    }
+    
+    
+    return product || null;
+  };
   
   const shipping = subtotal > 799 || subtotal === 0 ? 0 : 49;
   const total = subtotal + shipping;
   const savings = items.reduce((acc, item) => {
-    const product = getProductById(item.id);
+    const product = getProductForCartItem(item.id, item.name);
     if (product && product.originalPrice > product.price) {
       return acc + (product.originalPrice - product.price) * item.qty;
     }
@@ -141,7 +203,7 @@ const Cart: React.FC = () => {
             {/* Cart Items + Recommendations */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item, index) => {
-                const product = getProductById(item.id);
+                    const product = getProductForCartItem(item.id);
                 const isRemoving = removingId === item.id;
                 const isVisible = visibleItems.has(item.id);
                 const isUpdating = updatingQty === item.id;
@@ -172,20 +234,27 @@ const Cart: React.FC = () => {
                           className="block group/image"
                         >
                           <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/80 border border-slate-200/60 group-hover:border-slate-300 transition-all duration-300 shadow-sm group-hover:shadow-md">
-                            {product?.image ? (
-                              <ResponsiveProductImage
-                                image={product.image}
-                                className="w-full h-full"
-                                imgClassName="object-contain p-2 group-hover/image:scale-110 transition-transform duration-500"
-                              />
-                            ) : (
-                              <img 
-                                src={item.image} 
-                                alt={item.name} 
-                                className="w-full h-full object-contain p-2 group-hover/image:scale-110 transition-transform duration-500"
-                                loading="lazy"
-                              />
-                            )}
+                            {(() => {
+                              // Always use static product images directly (no API URLs needed)
+                              const staticProduct = getProductForCartItem(item.id, item.name);
+                              
+                              if (staticProduct?.image) {
+                                return (
+                                  <ResponsiveProductImage
+                                    image={staticProduct.image}
+                                    className="w-full h-full"
+                                    imgClassName="object-contain p-2 group-hover/image:scale-110 transition-transform duration-500"
+                                  />
+                                );
+                              }
+                              
+                              // Fallback: No image available - show placeholder
+                              return (
+                                <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                                  <ShoppingBag className="h-8 w-8 text-slate-300" />
+                                </div>
+                              );
+                            })()}
                             {/* Hover overlay */}
                             <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/5 transition-colors duration-300" />
                           </div>

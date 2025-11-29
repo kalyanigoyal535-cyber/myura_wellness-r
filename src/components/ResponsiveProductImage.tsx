@@ -84,6 +84,14 @@ const ResponsiveProductImage: React.FC<ResponsiveProductImageProps> = ({
             imgClassName
           )}
           onLoad={() => setIsLoaded(true)}
+          onError={(e) => {
+            // Log error in development
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Image failed to load:', image.fallback, e);
+            }
+            // Set loaded to true to hide placeholder even if image fails
+            setIsLoaded(true);
+          }}
           fetchPriority={image.fetchPriority}
         />
       </picture>
