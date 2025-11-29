@@ -8,17 +8,34 @@ const BlogSection: React.FC = () => {
   const displayedBlogs = blogs.slice(3, 6);
 
   return (
-    <div className="text-[#192537] p-4 max-w-7xl mx-auto">
-      {/* Your main card stays unchanged */}
-      <MainCard />
-
-      {/* 👇 Now we pass actual blog data */}
-      <div className="mt-4 p-4 grid grid-cols-12">
-      {displayedBlogs.map((blog, i) => (
-        <BlogCard key={i} blog={blog} />  
-      ))}
+    <section className="text-[#192537]">
+      {/* Featured Blog */}
+      <div className="mb-12 md:mb-16">
+        <MainCard />
       </div>
+
+      {/* Section Title */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-8">
+        <h2 className="text-xl md:text-2xl font-semibold">
+          Trending Insights
+        </h2>
+        <p className="text-sm text-gray-500">
+          Fresh from the wellness desk • updated weekly
+        </p>
+      </div>
+
+      {/* Blog Cards */}
+      <div className="grid grid-cols-12 gap-4 md:gap-6 mt-4">
+  {displayedBlogs.map((blog, i) => (
+    <div
+      key={blog?.id ?? blog?.slug ?? i}
+      className="col-span-12 sm:col-span-6 lg:col-span-4"
+    >
+      <BlogCard blog={blog} />
     </div>
+  ))}
+</div>
+    </section>
   );
 };
 

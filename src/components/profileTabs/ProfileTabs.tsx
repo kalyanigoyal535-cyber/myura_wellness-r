@@ -1,6 +1,8 @@
 import React from "react";
 import { Tabs } from "@mantine/core";
 import ProfileOrders from "../profileOrders/ProfileOrders";
+import ProfileAddreses from "../profileAddreses/ProfileAddreses";
+import Coupons from "../coupons/Coupons";
 
 type Props = {};
 
@@ -11,21 +13,25 @@ const ProfileTabs = (props: Props) => {
         color="#1F2839"
         variant="pills"
         orientation="vertical"
-        defaultValue="gallery"
+        defaultValue="Orders"
       >
         <Tabs.List>
           <Tabs.Tab value="Orders">Orders</Tabs.Tab>
           <Tabs.Tab value="Addresses">Addresses</Tabs.Tab>
-          <Tabs.Tab value="settings">Settings</Tabs.Tab>
+          <Tabs.Tab value="Coupons">Coupons </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="Orders">
           <ProfileOrders />
         </Tabs.Panel>
 
-        <Tabs.Panel value="messages">Messages tab content</Tabs.Panel>
+        <Tabs.Panel value="Addresses">
+        <ProfileAddreses/>
+        </Tabs.Panel>
 
-        <Tabs.Panel value="settings">Settings tab content</Tabs.Panel>
+        <Tabs.Panel value="Coupons">
+          <Coupons/>
+        </Tabs.Panel>
       </Tabs>
     </div>
   );

@@ -19,7 +19,7 @@ export default Profile
 export const ProfileHeader = () => {
   return (
     <div>
-        <h1 className='text-2xl font-semibold' >
+        <h1 className='text-2xl font-semibold mt-2' >
             Account 
         </h1>
     </div>

@@ -1,5 +1,6 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const orders = [
   {
     id: 1,
@@ -31,6 +32,8 @@ const orders = [
 ];
 
 const OrderCard = () => {
+const navigate = useNavigate();
+
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-6">
       <h1 className="text-xl sm:text-2xl font-semibold mb-6">Orders</h1>
@@ -64,20 +67,20 @@ const OrderCard = () => {
               <p className="font-semibold text-gray-800">
                 {order.itemsCount} {order.itemsCount === 1 ? "item" : "items"}
               </p>
-              <p className="text-xs text-gray-500 mt-1">Order {order.orderId}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Order {order.orderId}
+              </p>
 
               <p className="mt-4 font-semibold text-[#1C2638]">{order.total}</p>
 
               <div className="mt-4 space-y-3">
                 <button
                   className="w-full rounded-lg border border-[#1C2638] text-[#1C2638] font-semibold text-sm py-2 hover:bg-[#dee0e3] transition"
+                  onClick={() => navigate("/order-details/12345")}
                 >
-                  View More
+                  View Details
                 </button>
-
-                <button
-                  className="w-full rounded-lg border border-[#1C2638] text-[#1C2638] font-semibold text-sm py-2 hover:bg-[#dee0e3] transition"
-                >
+                <button className="w-full rounded-lg border border-[#1C2638] text-[#1C2638] font-semibold text-sm py-2 hover:bg-[#dee0e3] transition">
                   Buy Again
                 </button>
               </div>
