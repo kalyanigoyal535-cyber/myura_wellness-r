@@ -1,17 +1,25 @@
-import React from "react";
+import {useEffect} from "react";
 import { Microscope, CircleCheckBig, Dumbbell } from "lucide-react";
 import images from "../../images/images";
-
+import AOS from "aos";
+import "aos/dist/aos.css";
 type Props = {};
 
 const IconAboutUs = (props: Props) => {
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      easing: "ease-out-cubic",
+      once: true,
+    });
+  }, []);
   return (
     <div className="bg-[#1E2433] text-white py-10 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Optional small label – remove if not needed */}
-        {/* <p className="text-center text-xs uppercase tracking-[0.2em] text-white/60 mb-2">
+        <p className="text-center text-sm uppercase tracking-[0.2em] font-bold underline text-white/60 mb-2">
           Why Choose Us
-        </p> */}
+        </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Card 1 */}
