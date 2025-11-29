@@ -19,8 +19,8 @@ const ProfileTabs = (props: Props) => {
         <Tabs.List>
           <Tabs.Tab value="Orders">Orders</Tabs.Tab>
           <Tabs.Tab value="Addresses">Addresses</Tabs.Tab>
-          {/* <Tabs.Tab value="Coupons">Coupons </Tabs.Tab> */}
-          <Tabs.Tab value="Refer">Refer & Earn  </Tabs.Tab>
+          <Tabs.Tab value="Coupons">Coupons </Tabs.Tab>
+          {/* <Tabs.Tab value="Refer">Refer & Earn  </Tabs.Tab> */}
         </Tabs.List>
 
         <Tabs.Panel value="Orders">
