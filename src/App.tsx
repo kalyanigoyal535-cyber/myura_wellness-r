@@ -16,7 +16,12 @@ import BlogPost from "./blogPost/BlogPost";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/forgotPassword/ForgotPassword";
 import OrderDetails from "./pages/orderDetails/OrderDetails";
-
+import FAQSection from "./pages/quickLinks/Faqs";
+import DisclaimerSection from "./pages/quickLinks/DisclaimerSection"
+import PrivacyPolicySection from "./pages/quickLinks/PrivacyPolicySection"
+import BrandDirectorySection from "./pages/quickLinks/BrandDirectorySection";
+import ReturnPolicySection from "./pages/quickLinks/ReturnPolicySection";
+import TermsAndConditionSection from "./pages/quickLinks/TermsAndConditionSection";
 // Lazy load routes for code splitting
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
@@ -117,13 +122,23 @@ const AppContent: React.FC = () => {
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/profile" element={<Profile/>}/>
+              <Route path="/profile" element={<Profile />} />
               <Route path="/my-account" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/order-details/:id" element={<OrderDetails />} />
+              <Route path="/faqs3" element={<FAQSection />} />
+              <Route path="/disclaimer" element={<DisclaimerSection />} />
+              <Route path="privacy-policy" element={<PrivacyPolicySection/>}/>
+              <Route path="/brand-directory" element={<BrandDirectorySection/>}/>
+              <Route path="/returns-policy" element={<ReturnPolicySection/>}/>
+              <Route path="/terms-conditions" element={<TermsAndConditionSection/>}/>
+            
+              {/* 
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsAndConditions />} /> */}
             </Routes>
           </Suspense>
         </div>
