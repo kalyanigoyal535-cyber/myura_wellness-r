@@ -45,9 +45,17 @@ const ReturnPolicySection = (props: Props) => {
               Returns will be accepted only under the following conditions:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm md:text-base text-slate-600">
-              <li>The product is unused, unopened, and in its original packaging.</li>
-              <li>The return request is raised within 7 days from the date of delivery.</li>
-              <li>The product is accompanied by the original invoice or proof of purchase.</li>
+              <li>
+                The product is unused, unopened, and in its original packaging.
+              </li>
+              <li>
+                The return request is raised within 7 days from the date of
+                delivery.
+              </li>
+              <li>
+                The product is accompanied by the original invoice or proof of
+                purchase.
+              </li>
             </ul>
           </section>
 
@@ -64,10 +72,12 @@ const ReturnPolicySection = (props: Props) => {
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm md:text-base text-slate-600">
               <li>Opened or partially used products.</li>
-              <li>Products that have been tampered with or damaged after delivery.</li>
               <li>
-                Items purchased during promotional campaigns or sales (unless received in a
-                damaged or defective condition).
+                Products that have been tampered with or damaged after delivery.
+              </li>
+              <li>
+                Items purchased during promotional campaigns or sales (unless
+                received in a damaged or defective condition).
               </li>
               <li>Products returned without original packaging or invoice.</li>
             </ul>
@@ -82,9 +92,11 @@ const ReturnPolicySection = (props: Props) => {
               <span>Damaged or Incorrect Products</span>
             </h2>
             <p className="text-sm md:text-base leading-relaxed text-slate-600">
-              In case you receive a product that is damaged, defective, or different from
-              what you ordered, please contact us within <span className="font-semibold">48 hours</span> of
-              delivery. We may request photographic evidence to initiate a replacement or refund.
+              In case you receive a product that is damaged, defective, or
+              different from what you ordered, please contact us within{" "}
+              <span className="font-semibold">48 hours</span> of delivery. We
+              may request photographic evidence to initiate a replacement or
+              refund.
             </p>
           </section>
 
@@ -97,13 +109,14 @@ const ReturnPolicySection = (props: Props) => {
               <span>Refunds</span>
             </h2>
             <p className="text-sm md:text-base leading-relaxed text-slate-600">
-              Once the returned product is received and inspected, a refund will be
-              initiated to your original method of payment within{" "}
-              <span className="font-semibold">5–7 business days</span>, provided the return
-              meets the above criteria.
+              Once the returned product is received and inspected, a refund will
+              be initiated to your original method of payment within{" "}
+              <span className="font-semibold">5–7 business days</span>, provided
+              the return meets the above criteria.
             </p>
             <p className="text-sm md:text-base leading-relaxed text-slate-600">
-              Refund timelines may vary depending on your bank or payment provider.
+              Refund timelines may vary depending on your bank or payment
+              provider.
             </p>
           </section>
 
@@ -117,13 +130,13 @@ const ReturnPolicySection = (props: Props) => {
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-sm md:text-base text-slate-600">
               <li>
-                If the return is due to a damaged, defective, or incorrect product,{" "}
-                <span className="font-semibold">MYURA WELLNESS</span> will bear the return
-                shipping charges.
+                If the return is due to a damaged, defective, or incorrect
+                product, <span className="font-semibold">MYURA WELLNESS</span>{" "}
+                will bear the return shipping charges.
               </li>
               <li>
-                For all other eligible returns, the customer is responsible for the return
-                shipping costs.
+                For all other eligible returns, the customer is responsible for
+                the return shipping costs.
               </li>
             </ul>
           </section>
@@ -137,16 +150,15 @@ const ReturnPolicySection = (props: Props) => {
               <span>How to Initiate a Return</span>
             </h2>
             <p className="text-sm md:text-base leading-relaxed text-slate-600">
-              To initiate a return or report an issue with your order, please contact our
-              support team at:
+              To initiate a return or report an issue with your order, please
+              contact our support team at:
             </p>
             <div className="grid sm:grid-cols-2 gap-3 text-sm md:text-base text-slate-700">
               <div className="flex items-start gap-2">
                 <span className="mt-0.5">📧</span>
                 <p>
                   <span className="font-semibold">Email:</span>{" "}
-                  <span>
-                  care@myurawellness.com</span>
+                  <span>care@myurawellness.com</span>
                 </p>
               </div>
               <div className="flex items-start gap-2">
@@ -158,21 +170,22 @@ const ReturnPolicySection = (props: Props) => {
               </div>
             </div>
             <p className="text-sm md:text-base leading-relaxed text-slate-600">
-              Please include your order ID, reason for return, and supporting images (if
-              applicable).
+              Please include your order ID, reason for return, and supporting
+              images (if applicable).
             </p>
           </section>
 
           {/* Policy note & closing */}
           <section className="space-y-3 border-t border-slate-100 pt-5 md:pt-6">
             <p className="text-sm md:text-base leading-relaxed text-slate-600">
-              <span className="font-semibold">MYURA WELLNESS</span> reserves the right to
-              modify or update this policy at any time. We encourage you to review this
-              page periodically for any changes.
+              <span className="font-semibold">MYURA WELLNESS</span> reserves the
+              right to modify or update this policy at any time. We encourage
+              you to review this page periodically for any changes.
             </p>
             <p className="text-sm md:text-base leading-relaxed text-slate-600">
-              For any further assistance, feel free to reach out to our customer support
-              team. Your well-being and experience with MYURA remain our top priority.
+              For any further assistance, feel free to reach out to our customer
+              support team. Your well-being and experience with MYURA remain our
+              top priority.
             </p>
 
             <div className="text-xs md:text-sm text-slate-500 md:text-right">
