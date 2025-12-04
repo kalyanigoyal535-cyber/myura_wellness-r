@@ -15,9 +15,12 @@ import {
   X,
   Tag,
 } from 'lucide-react';
-import ResponsiveProductImage from '../components/ResponsiveProductImage';
+import ResponsiveProductImage, { ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
 import { useCart } from '../context/CartContext';
-import { getProductById } from '../data/products';
+import { useAuth } from '../context/AuthContext';
+import { ordersApi } from '../services/orders';
+import { phonepeApi, cashfreeApi } from '../services/payment';
+import { getProductById, productCatalog, type ProductRecord } from '../data/products';
 
 type CheckoutForm = {
   name: string;
@@ -65,7 +68,8 @@ const COUPONS = [
 ];
 
 const Checkout: React.FC = () => {
-  const { items, subtotal, clear } = useCart();
+  const { items, subtotal, clear, syncCart } = useCart();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { previousPath, openDrawerOnBack }: { previousPath?: string; openDrawerOnBack?: boolean } =
@@ -76,6 +80,106 @@ const Checkout: React.FC = () => {
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [showCouponModal, setShowCouponModal] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+
+  // Map product names to static product slugs for image lookup
+  const productNameToSlugMap: Record<string, string> = {
+    'DIA CARE': 'dia-care',
+    'LIVER DETOX FORMULA': 'liver-detox',
+    'BONE & JOINT SUPPORT': 'bone-joint-support',
+    'GUT AND DIGESTION': 'gut-and-digestion',
+    "WOMEN'S HEALTH PLUS": 'womens-health-plus',
+    "MEN'S VITALITY BOOSTER": 'mens-vitality-booster',
+    "PRO MEN'S MULTIVITAMIN": 'pro-mens-multivitamin',
+    "PRO WOMEN'S HEALTH PLUS": 'pro-womens-health-plus',
+  };
+
+  // Map PRO product names to their image paths
+  const proProductImageMap: Record<string, ResponsiveImageDescriptor> = {
+    "PRO MEN'S MULTIVITAMIN": {
+      alt: "PRO Men's Multivitamin supplement",
+      fallback: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+      sources: [
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(min-width: 1024px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(min-width: 768px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(max-width: 767px)',
+        },
+      ],
+    },
+    "PRO WOMEN'S HEALTH PLUS": {
+      alt: "PRO Women's Health Plus supplement",
+      fallback: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+      sources: [
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(min-width: 1024px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(min-width: 768px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(max-width: 767px)',
+        },
+      ],
+    },
+  };
+  
+  // Get product from static data by matching name or ID
+  const getProductForCartItem = (itemId: string, itemName?: string): ProductRecord | null => {
+    // First try direct lookup by ID (if it's a slug)
+    let product = getProductById(itemId);
+    
+    // If not found, try matching by product name
+    if (!product && itemName) {
+      const normalizedName = itemName.toUpperCase().trim();
+      
+      // Try the name-to-slug map first
+      const slug = productNameToSlugMap[normalizedName];
+      if (slug) {
+        product = getProductById(slug);
+      }
+      
+      // If still not found, search by name in product catalog
+      if (!product) {
+        product = productCatalog.find(p => {
+          const productName = p.name.toUpperCase().trim();
+          return productName === normalizedName;
+        }) || null;
+      }
+    }
+    
+    return product || null;
+  };
+
+  // Get product image for cart item (handles PRO products)
+  const getProductImageForCart = (itemId: string, itemName?: string): ResponsiveImageDescriptor | null => {
+    // First try to get product from static catalog
+    const product = getProductForCartItem(itemId, itemName);
+    if (product?.image) {
+      return product.image;
+    }
+    
+    // If not found, check if it's a PRO product
+    if (itemName) {
+      const normalizedName = itemName.toUpperCase().trim();
+      const proImage = proProductImageMap[normalizedName];
+      if (proImage) {
+        return proImage;
+      }
+    }
+    
+    return null;
+  };
   const openCartDrawer = () => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('myura:open-cart'));
@@ -142,15 +246,109 @@ const Checkout: React.FC = () => {
     form.postalCode.trim() &&
     items.length > 0;
 
-  const handlePlaceOrder = (event: React.FormEvent) => {
+  const handlePlaceOrder = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!isFormValid || placingOrder) return;
 
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      setOrderError('Please log in to place an order.');
+      navigate('/my-account', { state: { redirectTo: '/checkout' } });
+      return;
+    }
+
+    // Check if cart has items
+    if (items.length === 0) {
+      setOrderError('Your cart is empty. Please add items before checkout.');
+      return;
+    }
+
     setPlacingOrder(true);
-    setTimeout(() => {
-      clear();
-      navigate('/', { replace: true });
-    }, 1000);
+    setOrderError(null);
+
+    try {
+      // First, sync cart to ensure backend has the latest items
+      await syncCart();
+
+      // Prepare shipping address data
+      const shippingAddress = {
+        full_name: form.name.trim(),
+        phone_number: `+91${form.phone.trim()}`,
+        address_line_1: form.address.trim(),
+        address_line_2: '', // Optional field
+        city: form.city.trim(),
+        state: form.state.trim(),
+        postal_code: form.postalCode.trim(),
+        country: 'India',
+      };
+
+      // For COD, create order directly
+      if (form.paymentMethod === 'cod') {
+        const orderData = {
+          shipping_address: shippingAddress,
+          payment_method: 'cod',
+          payment_status: 'pending' as 'pending' | 'paid' | 'failed',
+          payment_id: '',
+        };
+
+        const order = await ordersApi.createOrder(orderData);
+        await clear();
+        navigate(`/order-details/${order.id}`, { 
+          state: { 
+            orderId: order.id,
+            orderNumber: order.order_number,
+            success: true
+          } 
+        });
+        return;
+      }
+
+      // For Card/UPI, create order first, then process payment
+      // Default to PhonePe, but you can switch to Cashfree by changing payment_method
+      const paymentGateway = 'phonepe' as 'phonepe' | 'cashfree'; // Change to 'cashfree' to use Cashfree
+      
+      const orderData = {
+        shipping_address: shippingAddress,
+        payment_method: paymentGateway,
+        payment_status: 'pending' as 'pending' | 'paid' | 'failed',
+        payment_id: '',
+      };
+
+      // Create order in database
+      const order = await ordersApi.createOrder(orderData);
+
+      if (paymentGateway === 'cashfree') {
+        // Use Cashfree payment gateway
+        const paymentResponse = await cashfreeApi.createPayment({
+          amount: total, // Cashfree uses rupees
+          order_id: order.id,
+          customer_name: form.name.trim(),
+          customer_email: form.email || user?.email || '',
+          customer_phone: `+91${form.phone.trim()}`,
+        });
+
+        // Redirect to Cashfree payment page
+        window.location.href = paymentResponse.payment_url;
+      } else {
+        // Use PhonePe payment gateway (default)
+        // Convert amount to paise (multiply by 100)
+        const amountInPaise = Math.round(total * 100);
+
+        // Create PhonePe payment request
+        const paymentResponse = await phonepeApi.createPayment({
+          amount: amountInPaise,
+          order_id: order.id,
+        });
+
+        // Redirect to PhonePe payment page with orderId as query param
+        window.location.href = `${paymentResponse.payment_url}&orderId=${order.id}`;
+      }
+    } catch (error) {
+      console.error('Failed to create order:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create order. Please try again.';
+      setOrderError(errorMessage);
+      setPlacingOrder(false);
+    }
   };
 
   if (items.length === 0) {
@@ -348,25 +546,28 @@ const Checkout: React.FC = () => {
 
               <div className="p-5 space-y-4">
                 {items.map((item) => {
-                  const product = getProductById(item.id);
+                  // Get product image (handles both regular and PRO products)
+                  const productImage = getProductImageForCart(item.id, item.name);
                   return (
                     <div key={item.id} className="flex items-center gap-3">
-                      <div className="w-16 h-16 rounded-xl border border-slate-100 bg-slate-50 overflow-hidden">
-                        {product?.image ? (
+                      <div className="w-16 h-16 rounded-xl border border-slate-100 bg-slate-50 overflow-hidden flex-shrink-0">
+                        {productImage ? (
                           <ResponsiveProductImage
-                            image={product.image}
+                            image={productImage}
                             className="w-full h-full"
                             imgClassName="object-contain p-2"
                           />
                         ) : (
-                          <img src={item.image} alt={item.name} className="w-full h-full object-contain p-2" />
+                          <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                            <ShoppingBag className="h-6 w-6 text-slate-300" />
+                          </div>
                         )}
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-slate-900 line-clamp-2">{item.name}</p>
                         <p className="text-xs text-slate-500">Qty: {item.qty}</p>
                       </div>
-                      <p className="text-sm font-semibold text-slate-900">₹{(item.price * item.qty).toLocaleString()}</p>
+                      <p className="text-sm font-semibold text-slate-900 flex-shrink-0">₹{(item.price * item.qty).toLocaleString()}</p>
                     </div>
                   );
                 })}
@@ -507,6 +708,11 @@ const Checkout: React.FC = () => {
                 />
                 Send me order updates & offers (no spam)
               </label>
+              {orderError && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                  <p className="text-sm text-red-600">{orderError}</p>
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={!isFormValid || placingOrder}

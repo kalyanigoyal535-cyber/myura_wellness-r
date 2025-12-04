@@ -22,6 +22,17 @@ export interface UpdateProfileData {
   phone_number?: string;
 }
 
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetConfirm {
+  uid: string;
+  token: string;
+  new_password: string;
+  new_password2: string;
+}
+
 // Authentication API
 export const authApi = {
   // Register new user
@@ -46,17 +57,47 @@ export const authApi = {
   // Login
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-      const response = await apiClient.post<AuthResponse>('/auth/login/', credentials);
+      const response = await apiClient.post<any>('/auth/login/', credentials);
+      const data = response.data;
+      
+      // Handle both response formats: {access, refresh, user} or {tokens: {access, refresh}, user}
+      let accessToken: string | null = null;
+      let refreshToken: string | null = null;
+      let userData: User | null = null;
+
+      if (data.tokens) {
+        // Format: {tokens: {access, refresh}, user}
+        accessToken = data.tokens.access;
+        refreshToken = data.tokens.refresh;
+        userData = data.user;
+      } else if (data.access && data.refresh) {
+        // Format: {access, refresh, user}
+        accessToken = data.access;
+        refreshToken = data.refresh;
+        userData = data.user;
+      }
+
       // Store tokens
-      if (response.data.tokens) {
-        localStorage.setItem('access_token', response.data.tokens.access);
-        localStorage.setItem('refresh_token', response.data.tokens.refresh);
+      if (accessToken) {
+        localStorage.setItem('access_token', accessToken);
       }
+      if (refreshToken) {
+        localStorage.setItem('refresh_token', refreshToken);
+      }
+      
       // Store user data
-      if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (userData) {
+        localStorage.setItem('user', JSON.stringify(userData));
       }
-      return response.data;
+
+      // Return in consistent format
+      return {
+        user: userData!,
+        tokens: {
+          access: accessToken!,
+          refresh: refreshToken!,
+        },
+      };
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }
@@ -130,6 +171,33 @@ export const authApi = {
       }
     }
     return null;
+  },
+
+  // Request password reset
+  requestPasswordReset: async (data: PasswordResetRequest): Promise<{ message: string }> => {
+    try {
+      const response = await apiClient.post<{ message: string }>('/auth/password/reset/', {
+        email: data.email,
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
+  },
+
+  // Confirm password reset
+  confirmPasswordReset: async (data: PasswordResetConfirm): Promise<{ message: string }> => {
+    try {
+      const response = await apiClient.post<{ message: string }>('/auth/password/reset/confirm/', {
+        uid: data.uid,
+        token: data.token,
+        new_password: data.new_password,
+        new_password2: data.new_password2,
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
   },
 };
 

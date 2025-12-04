@@ -90,10 +90,18 @@ const cartSlice = createSlice({
       state.items = [];
       saveToStorage(state.items);
     },
+    setCartItems: (state, action: PayloadAction<CartItem[]>) => {
+      // Replace all items with the provided items
+      state.items = action.payload.map(item => ({
+        ...item,
+        qty: clampQty(item.qty),
+      }));
+      saveToStorage(state.items);
+    },
   },
 });
 
-export const { addItem, removeItem, updateQty, clearCart } = cartSlice.actions;
+export const { addItem, removeItem, updateQty, clearCart, setCartItems } = cartSlice.actions;
 export const selectCartItems = (state: { cart: CartState }) => state.cart.items;
 export const selectCartCount = (state: { cart: CartState }) =>
   state.cart.items.reduce((total, item) => total + item.qty, 0);

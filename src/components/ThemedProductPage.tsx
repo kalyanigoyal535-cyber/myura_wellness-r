@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Minus, Star, Heart, Sparkles, ShieldCheck, HeartPulse, X, ZoomIn, ArrowRight, Leaf, Activity, Droplets } from 'lucide-react';
+import { Plus, Minus, Star, Heart, Sparkles, ShieldCheck, HeartPulse, X, ZoomIn, ArrowRight, Leaf, Activity, Droplets, Award, BadgeCheck, Medal, Shield } from 'lucide-react';
 import ResponsiveProductImage from './ResponsiveProductImage';
 import ZoomableImageViewer from './ZoomableImageViewer';
 import type { ProductRecord } from '../data/products';
@@ -23,6 +23,11 @@ const relatedCardStyles: Record<
   'gut-and-digestion': { gradient: 'from-amber-50 via-orange-50 to-white', accentText: 'text-amber-600' },
   'womens-health-plus': { gradient: 'from-rose-50 via-pink-50 to-white', accentText: 'text-rose-600' },
   'mens-vitality-booster': { gradient: 'from-sky-50 via-cyan-50 to-white', accentText: 'text-sky-600' },
+  // ProSeries products
+  'pro-mens-multivitamin': { gradient: 'from-orange-50 via-red-50 to-white', accentText: 'text-orange-600' },
+  'pro-mens-vitality-booster-gold': { gradient: 'from-teal-50 via-cyan-50 to-white', accentText: 'text-teal-600' },
+  'pro-omega-3-softgel': { gradient: 'from-green-50 via-emerald-50 to-white', accentText: 'text-green-600' },
+  'pro-womens-health-plus': { gradient: 'from-pink-50 via-rose-50 to-white', accentText: 'text-pink-600' },
 };
 
 const getRelatedCardStyle = (productId: string) =>
@@ -365,25 +370,60 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                       style={{ background: `var(--product-soft-gradient)` }}
                     />
                     <div className="relative flex flex-col gap-3.5 p-3.5 sm:gap-4 sm:p-4">
-                      <div className="flex flex-col gap-2.5">
-                        <span 
-                          className="inline-flex items-center gap-1.5 self-start rounded-full border bg-white/85 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.35em]"
-                          style={{ 
-                            color: 'var(--product-darker)',
-                            borderColor: 'var(--product-border)'
-                          }}
-                        >
-                          Special Ritual Price
-                        </span>
-                        <div className="flex items-baseline gap-2.5 text-slate-900">
-                          <span className="text-2xl sm:text-3xl font-bold leading-none">₹{product.price}</span>
-                          <div className="flex flex-col text-[10px] sm:text-xs text-slate-500 leading-tight">
-                            <span className="line-through">₹{product.originalPrice}</span>
-                            <span className="font-semibold" style={{ color: 'var(--product-darker)' }}>
-                              Save {discountPercent}%
-                            </span>
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                        <div className="flex flex-col gap-2.5 flex-shrink-0">
+                          <span 
+                            className="inline-flex items-center gap-1.5 self-start rounded-full border bg-white/85 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.35em]"
+                            style={{ 
+                              color: 'var(--product-darker)',
+                              borderColor: 'var(--product-border)'
+                            }}
+                          >
+                            Special Ritual Price
+                          </span>
+                          <div className="flex items-baseline gap-2.5 text-slate-900">
+                            <span className="text-2xl sm:text-3xl font-bold leading-none">₹{product.price}</span>
+                            <div className="flex flex-col text-[10px] sm:text-xs text-slate-500 leading-tight">
+                              <span className="line-through">₹{product.originalPrice}</span>
+                              <span className="font-semibold" style={{ color: 'var(--product-darker)' }}>
+                                Save {discountPercent}%
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        {/* Badges Section */}
+                        <div className="flex flex-nowrap sm:flex-1 sm:justify-end border-t sm:border-t-0 sm:border-l" style={{ borderColor: 'var(--product-border)' }}>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 sm:h-18 sm:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <Award className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                          </div>
+                          <span className="text-[5px] sm:text-[6px] font-minimal text-slate-700 text-center leading-tight">Result-Oriented</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 sm:h-18 sm:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <Shield className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                          </div>
+                          <span className="text-[5px] sm:text-[6px] font-minimal text-slate-700 text-center leading-tight">FDA</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 sm:h-18 sm:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <ShieldCheck className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                          </div>
+                          <span className="text-[5px] sm:text-[6px] font-minimal text-slate-700 text-center leading-tight">Certified Authentic</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 sm:h-18 sm:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <BadgeCheck className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                          </div>
+                          <span className="text-[5px] sm:text-[6px] font-minimal text-slate-700 text-center leading-tight">GMP Certified</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 sm:h-18 sm:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <Medal className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
+                          </div>
+                          <span className="text-[5px] sm:text-[6px] font-minimal text-slate-700 text-center leading-tight">FSSAI</span>
+                        </div>
+                      </div>
                       </div>
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2">
@@ -583,25 +623,60 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
                       style={{ background: `var(--product-soft-gradient)` }}
                     />
                     <div className="relative flex flex-col gap-3.5 p-3.5 sm:gap-4 sm:p-4 lg:p-5">
-                      <div className="flex flex-col gap-2.5">
-                        <span 
-                          className="inline-flex items-center gap-1.5 self-start rounded-full border bg-white/85 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.35em]"
-                          style={{ 
-                            color: 'var(--product-darker)',
-                            borderColor: 'var(--product-border)'
-                          }}
-                        >
-                          Special Ritual Price
-                        </span>
-                        <div className="flex items-baseline gap-2.5 text-slate-900">
-                          <span className="text-2xl sm:text-3xl lg:text-[2.5rem] font-bold leading-none">₹{product.price}</span>
-                          <div className="flex flex-col text-[10px] sm:text-xs text-slate-500 leading-tight">
-                            <span className="line-through">₹{product.originalPrice}</span>
-                            <span className="font-semibold" style={{ color: 'var(--product-darker)' }}>
-                              Save {discountPercent}%
-                            </span>
+                      <div className="flex flex-col lg:flex-row lg:items-start gap-3 lg:gap-4">
+                        <div className="flex flex-col gap-2.5 flex-shrink-0">
+                          <span 
+                            className="inline-flex items-center gap-1.5 self-start rounded-full border bg-white/85 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.35em]"
+                            style={{ 
+                              color: 'var(--product-darker)',
+                              borderColor: 'var(--product-border)'
+                            }}
+                          >
+                            Special Ritual Price
+                          </span>
+                          <div className="flex items-baseline gap-2.5 text-slate-900">
+                            <span className="text-2xl sm:text-3xl lg:text-[2.5rem] font-bold leading-none">₹{product.price}</span>
+                            <div className="flex flex-col text-[10px] sm:text-xs text-slate-500 leading-tight">
+                              <span className="line-through">₹{product.originalPrice}</span>
+                              <span className="font-semibold" style={{ color: 'var(--product-darker)' }}>
+                                Save {discountPercent}%
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        {/* Badges Section */}
+                        <div className="flex flex-nowrap lg:flex-1 lg:justify-end border-t lg:border-t-0 lg:border-l" style={{ borderColor: 'var(--product-border)' }}>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 lg:h-18 lg:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 lg:h-5 lg:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <Award className="h-2 w-2 lg:h-2.5 lg:w-2.5" />
+                          </div>
+                          <span className="text-[5px] lg:text-[6px] font-minimal text-slate-700 text-center leading-tight">Result-Oriented</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 lg:h-18 lg:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 lg:h-5 lg:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <Shield className="h-2 w-2 lg:h-2.5 lg:w-2.5" />
+                          </div>
+                          <span className="text-[5px] lg:text-[6px] font-minimal text-slate-700 text-center leading-tight">FDA</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 lg:h-18 lg:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 lg:h-5 lg:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <ShieldCheck className="h-2 w-2 lg:h-2.5 lg:w-2.5" />
+                          </div>
+                          <span className="text-[5px] lg:text-[6px] font-minimal text-slate-700 text-center leading-tight">Certified Authentic</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 lg:h-18 lg:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 lg:h-5 lg:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <BadgeCheck className="h-2 w-2 lg:h-2.5 lg:w-2.5" />
+                          </div>
+                          <span className="text-[5px] lg:text-[6px] font-minimal text-slate-700 text-center leading-tight">GMP Certified</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center shadow-sm aspect-square h-16 w-16 lg:h-18 lg:w-18 flex-shrink-0 bg-transparent">
+                          <div className="flex h-4 w-4 lg:h-5 lg:w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white">
+                            <Medal className="h-2 w-2 lg:h-2.5 lg:w-2.5" />
+                          </div>
+                          <span className="text-[5px] lg:text-[6px] font-minimal text-slate-700 text-center leading-tight">FSSAI</span>
+                        </div>
+                      </div>
                       </div>
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2">

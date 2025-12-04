@@ -9,6 +9,11 @@ const LiverDetox = lazy(() => import('./LiverDetox'));
 const BoneJointSupport = lazy(() => import('./BoneJointSupport'));
 const GutAndDigestion = lazy(() => import('./GutAndDigestion'));
 const MensVitalityBooster = lazy(() => import('./MensVitalityBooster'));
+// ProSeries products
+const ProMensMultivitamin = lazy(() => import('./ProMensMultivitamin'));
+const ProMensVitalityBoosterGold = lazy(() => import('./ProMensVitalityBoosterGold'));
+const ProOmega3Softgel = lazy(() => import('./ProOmega3Softgel'));
+const ProWomensHealthPlus = lazy(() => import('./ProWomensHealthPlus'));
 
 // Product ID to component mapping
 const productPages: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
@@ -18,6 +23,11 @@ const productPages: Record<string, React.LazyExoticComponent<React.ComponentType
   'bone-joint-support': BoneJointSupport,
   'gut-and-digestion': GutAndDigestion,
   'mens-vitality-booster': MensVitalityBooster,
+  // ProSeries products
+  'pro-mens-multivitamin': ProMensMultivitamin,
+  'pro-mens-vitality-booster-gold': ProMensVitalityBoosterGold,
+  'pro-omega-3-softgel': ProOmega3Softgel,
+  'pro-womens-health-plus': ProWomensHealthPlus,
 };
 
 // Loading fallback for lazy loaded pages
@@ -34,7 +44,9 @@ const ProductDetail: React.FC = () => {
     return <Navigate to="/product" replace />;
   }
 
-  const ProductPage = productPages[id];
+  // Normalize ID to lowercase for case-insensitive matching
+  const normalizedId = id.toLowerCase().trim();
+  const ProductPage = productPages[normalizedId];
   
   if (ProductPage) {
     return (
@@ -44,6 +56,8 @@ const ProductDetail: React.FC = () => {
     );
   }
 
+  // If product not found, redirect to product listing
+  console.warn(`Product page not found for ID: ${id} (normalized: ${normalizedId})`);
   return <Navigate to="/product" replace />;
 };
 

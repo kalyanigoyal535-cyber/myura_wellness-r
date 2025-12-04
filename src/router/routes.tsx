@@ -13,6 +13,7 @@ import { LogIn } from "lucide-react";
 import Login from "../pages/login/Login";
 import Signup from "../pages/signup/Signup";
 import Checkout from "../pages/checkout/Checkout";
+import PaymentCallback from "../pages/PaymentCallback";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
       {
         path:"/checkout",
         element: <Checkout/>
+      },
+      {
+        path:"/payment/callback",
+        element: <PaymentCallback/>
       },
       {
         path:"/profile ",

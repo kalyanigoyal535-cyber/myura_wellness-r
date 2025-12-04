@@ -104,7 +104,7 @@ const Footer: React.FC = React.memo(() => {
                   { to: '/cart', label: 'Shopping Cart' },
                   { to: '/checkout', label: 'Checkout' },
                   { to: '/my-account', label: 'My Account' },
-                  { to: '/order-tracking', label: 'Order Tracking' },
+                  { to: '/profile', label: 'Order Tracking' },
                   { to: '/wishlist', label: 'Wishlist' },
                   { to: '/order-history', label: 'Order History' }
                 ].map((link) => (

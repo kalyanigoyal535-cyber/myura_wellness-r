@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw, Sparkles, Gift, Star, Truck, X, TrendingUp, ArrowRight } from 'lucide-react';
+import { Search, ShoppingCart, User, MapPin, Mail, Loader2, RefreshCw, Sparkles, Gift, Star, Truck, X, TrendingUp, ArrowRight, LogOut, ChevronDown, Settings, Package } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaYoutube, FaPinterestP, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 import { useLocation as useUserLocation } from '../hooks/useLocation';
 import { useCart } from '../context/CartContext';
-import { productCatalog } from '../data/products';
+import { useAuth } from '../context/AuthContext';
+import { ProductRecord } from '../data/products';
+import { productsApi } from '../services/products';
+import { apiProductsToFrontend } from '../utils/productConverter';
 import ResponsiveProductImage from './ResponsiveProductImage';
 import CartDrawer from './CartDrawer';
 
@@ -29,18 +32,25 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { address, loading, error, refreshLocation } = useUserLocation();
-  const { count } = useCart();
+  const { count, clear: clearCart } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isForcedCompact, setIsForcedCompact] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const userMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [userMenuPosition, setUserMenuPosition] = useState({ top: 0, right: 0 });
   
   // Search functionality
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<typeof productCatalog>([]);
+  const [searchResults, setSearchResults] = useState<ProductRecord[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showResults, setShowResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchResultsRef = useRef<HTMLDivElement>(null);
   const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [mobileDropdownPosition, setMobileDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [isDesktopViewport, setIsDesktopViewport] = useState(
@@ -51,13 +61,17 @@ const Header: React.FC = () => {
   
   const handleMenuToggle = useCallback(() => {
     setIsMenuOpen(prev => {
-      if (!prev) setIsSearchOpen(false);
+      if (!prev) {
+        setIsSearchOpen(false);
+        setIsUserMenuOpen(false);
+      }
       return !prev;
     });
   }, []);
   
   const handleSearchOpen = useCallback(() => {
     setIsSearchOpen(true);
+    setIsUserMenuOpen(false);
   }, []);
   
   const handleSearchClose = useCallback(() => {
@@ -79,57 +93,142 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Search function - searches through name, headline, description, benefits, etc.
-  const performSearch = useCallback((query: string) => {
+  // Search function - uses API to search products
+  const performSearch = useCallback(async (query: string) => {
     const trimmedQuery = query.trim();
     
     if (!trimmedQuery) {
       setSearchResults([]);
       setShowResults(false);
+      setIsSearching(false);
       return;
     }
 
-    const lowerQuery = trimmedQuery.toLowerCase();
-    const results = productCatalog.filter((product) => {
-      const searchableText = [
-        product.name,
-        product.headline,
-        product.summary,
-        product.description,
-        product.heroTagline,
-        ...product.benefits,
-        product.keyIngredients,
-        product.suitableFor,
-        product.howToUse,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
+    setIsSearching(true);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
 
-      return searchableText.includes(lowerQuery);
-    });
+    // Debounce search API calls
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const response = await productsApi.getProducts({
+          search: trimmedQuery,
+          in_stock: true,
+        });
+        
+        const frontendProducts = apiProductsToFrontend(response.results);
+        
+        // Sort by relevance (exact name match first, then headline, then others)
+        const lowerQuery = trimmedQuery.toLowerCase();
+        const sortedResults = frontendProducts.sort((a, b) => {
+          const aNameMatch = a.name.toLowerCase().includes(lowerQuery);
+          const bNameMatch = b.name.toLowerCase().includes(lowerQuery);
+          if (aNameMatch && !bNameMatch) return -1;
+          if (!aNameMatch && bNameMatch) return 1;
 
-    // Sort by relevance (exact name match first, then headline, then others)
-    const sortedResults = results.sort((a, b) => {
-      const aNameMatch = a.name.toLowerCase().includes(lowerQuery);
-      const bNameMatch = b.name.toLowerCase().includes(lowerQuery);
-      if (aNameMatch && !bNameMatch) return -1;
-      if (!aNameMatch && bNameMatch) return 1;
+          const aHeadlineMatch = a.headline.toLowerCase().includes(lowerQuery);
+          const bHeadlineMatch = b.headline.toLowerCase().includes(lowerQuery);
+          if (aHeadlineMatch && !bHeadlineMatch) return -1;
+          if (!aHeadlineMatch && bHeadlineMatch) return 1;
 
-      const aHeadlineMatch = a.headline.toLowerCase().includes(lowerQuery);
-      const bHeadlineMatch = b.headline.toLowerCase().includes(lowerQuery);
-      if (aHeadlineMatch && !bHeadlineMatch) return -1;
-      if (!aHeadlineMatch && bHeadlineMatch) return 1;
+          return 0;
+        });
 
-      return 0;
-    });
-
-    const limitedResults = sortedResults.slice(0, 6);
-    setSearchResults(limitedResults);
-    // Always show dropdown when there's a query
-    setShowResults(true);
-    setSelectedIndex(-1);
+        const limitedResults = sortedResults.slice(0, 6);
+        setSearchResults(limitedResults);
+        setShowResults(true);
+        setSelectedIndex(-1);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+        setShowResults(false);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300); // 300ms debounce
   }, []);
+
+  // Get user initials for avatar
+  const getUserInitials = useCallback((user: { first_name?: string; last_name?: string; email?: string; username?: string }) => {
+    if (user.first_name && user.last_name) {
+      return `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
+    } else if (user.first_name) {
+      return user.first_name.charAt(0).toUpperCase();
+    } else if (user.email) {
+      return user.email.charAt(0).toUpperCase();
+    } else if (user.username) {
+      return user.username.charAt(0).toUpperCase();
+    }
+    return 'U';
+  }, []);
+
+  // Handle logout
+  const handleLogout = useCallback(async () => {
+    try {
+      setIsUserMenuOpen(false);
+      // Clear cart before logout
+      try {
+        await clearCart();
+      } catch (cartError) {
+        console.error('Error clearing cart on logout:', cartError);
+      }
+      // Perform logout
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still navigate even if logout fails
+      navigate('/');
+    }
+  }, [logout, navigate, clearCart]);
+
+  // Calculate user menu position for portal
+  useEffect(() => {
+    if (isUserMenuOpen && userMenuButtonRef.current) {
+      const updatePosition = () => {
+        if (userMenuButtonRef.current) {
+          const rect = userMenuButtonRef.current.getBoundingClientRect();
+          setUserMenuPosition({
+            top: rect.bottom + 8, // mt-2 = 8px
+            right: window.innerWidth - rect.right,
+          });
+        }
+      };
+      
+      updatePosition();
+      window.addEventListener('resize', updatePosition);
+      window.addEventListener('scroll', updatePosition, true);
+      
+      return () => {
+        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener('scroll', updatePosition, true);
+      };
+    }
+  }, [isUserMenuOpen]);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current && 
+        !userMenuRef.current.contains(event.target as Node) &&
+        userMenuButtonRef.current &&
+        !userMenuButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isUserMenuOpen]);
 
   // Update dropdown position for desktop
   useEffect(() => {
@@ -205,25 +304,63 @@ const Header: React.FC = () => {
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    // Perform search immediately - no delay
-    if (value.trim().length > 0) {
-      performSearch(value);
-    } else {
-      setSearchResults([]);
-      setShowResults(false);
-    }
+    // Perform search with debounce
+    performSearch(value);
   }, [performSearch]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Map product names to slugs for routing
+  const getProductSlug = useCallback((product: ProductRecord): string => {
+    // If product.id is already a slug (contains hyphens), use it
+    if (product.id && product.id.includes('-')) {
+      return product.id.toLowerCase();
+    }
+    
+    // Map product names to slugs
+    const nameToSlugMap: Record<string, string> = {
+      'DIA CARE': 'dia-care',
+      'LIVER DETOX FORMULA': 'liver-detox',
+      'BONE & JOINT SUPPORT': 'bone-joint-support',
+      'GUT AND DIGESTION': 'gut-and-digestion',
+      "WOMEN'S HEALTH PLUS": 'womens-health-plus',
+      "MEN'S VITALITY BOOSTER": 'mens-vitality-booster',
+      "PRO MEN'S MULTIVITAMIN": 'pro-mens-multivitamin',
+      "PRO WOMEN'S HEALTH PLUS": 'pro-womens-health-plus',
+    };
+    
+    const normalizedName = product.name.toUpperCase().trim();
+    const slug = nameToSlugMap[normalizedName];
+    
+    if (slug) {
+      return slug;
+    }
+    
+    // Fallback: convert product name to slug format
+    return product.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }, []);
+
   // Handle search result click
-  const handleResultClick = useCallback((productId: string) => {
-    navigate(`/product/${productId}`);
+  const handleResultClick = useCallback((product: ProductRecord) => {
+    const slug = getProductSlug(product);
+    navigate(`/product/${slug}`);
     setSearchQuery('');
     setSearchResults([]);
     setShowResults(false);
     setIsSearchOpen(false);
     if (searchInputRef.current) searchInputRef.current.blur();
     if (desktopSearchInputRef.current) desktopSearchInputRef.current.blur();
-  }, [navigate]);
+  }, [navigate, getProductSlug]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -237,7 +374,7 @@ const Header: React.FC = () => {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
     } else if (e.key === 'Enter' && selectedIndex >= 0) {
       e.preventDefault();
-      handleResultClick(searchResults[selectedIndex].id);
+      handleResultClick(searchResults[selectedIndex]);
     } else if (e.key === 'Escape') {
       setShowResults(false);
       setSearchQuery('');
@@ -269,6 +406,7 @@ const Header: React.FC = () => {
   }, [showResults, handleSearchClose]);
   
   const handleMenuClose = useCallback(() => {
+    setIsUserMenuOpen(false);
     setIsMenuOpen(false);
   }, []);
 
@@ -805,9 +943,36 @@ const Header: React.FC = () => {
                 </div>
               </div>
               
-              <Link to="/my-account" className="inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 flex-shrink-0">
-                <User className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Link>
+              {/* User Menu */}
+              {isAuthenticated && user ? (
+                <div className="relative flex-shrink-0">
+                  <button
+                    ref={userMenuButtonRef}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsUserMenuOpen(!isUserMenuOpen);
+                    }}
+                    className="inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-400/30 cursor-pointer"
+                    aria-label="User menu"
+                    aria-expanded={isUserMenuOpen}
+                    type="button"
+                  >
+                    {/* User Avatar with Initials */}
+                    <div className="h-full w-full rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-md ring-2 ring-white/50 hover:from-slate-700 hover:to-slate-800 transition-all duration-200">
+                      {getUserInitials(user)}
+                    </div>
+                  </button>
+                </div>
+              ) : (
+                <Link 
+                  to="/my-account" 
+                  className="inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200 flex-shrink-0"
+                  aria-label="Sign in"
+                >
+                  <User className="h-4 w-4 sm:h-5 sm:w-5" />
+                </Link>
+              )}
               <div className="relative inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center flex-shrink-0">
                 <button 
                   onClick={(e) => {
@@ -844,6 +1009,54 @@ const Header: React.FC = () => {
         {/* Professional Mobile menu */}
         {isMenuOpen && (
           <div ref={mobileMenuRef} className="lg:hidden bg-white border-t border-slate-200 shadow-sm">
+            {/* Mobile User Info - Show if logged in */}
+            {isAuthenticated && user && (
+              <div className="px-4 py-4 bg-gradient-to-br from-slate-50 to-slate-100 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-bold text-lg shadow-lg ring-2 ring-white/50 flex-shrink-0">
+                    {getUserInitials(user)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-900 text-sm truncate">
+                      {user.first_name && user.last_name
+                        ? `${user.first_name} ${user.last_name}`
+                        : user.username || 'User'}
+                    </p>
+                    <p className="text-xs text-slate-600 truncate mt-0.5">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-slate-200 space-y-1">
+                  <Link
+                    to="/profile"
+                    onClick={handleMenuClose}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>My Profile</span>
+                  </Link>
+                  <Link
+                    to="/my-account"
+                    onClick={handleMenuClose}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Account Settings</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleMenuClose();
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="px-4 py-3 space-y-1">
               {/* Mobile Navigation Links */}
               {navLinks.map((link) => (
@@ -860,6 +1073,16 @@ const Header: React.FC = () => {
                   {link.label}
                 </Link>
               ))}
+              {/* Show login link if not authenticated */}
+              {!isAuthenticated && (
+                <Link
+                  to="/my-account"
+                  onClick={handleMenuClose}
+                  className="block px-4 py-3 text-base font-medium transition-all duration-200 font-minimal text-slate-600 hover:text-slate-900 hover:pl-3"
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         )}
@@ -934,19 +1157,25 @@ const Header: React.FC = () => {
                     {searchResults.map((product, idx) => (
                       <button
                         key={product.id}
-                        onClick={() => handleResultClick(product.id)}
+                        onClick={() => handleResultClick(product)}
                         className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 text-left group border-2 ${
                           selectedIndex === idx
                             ? 'bg-gradient-to-r from-slate-50 to-white scale-[1.02] shadow-lg border-slate-300'
                             : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:to-white border-transparent hover:border-slate-200 hover:shadow-md'
                         }`}
                       >
-                        <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 transition-all duration-300">
-                          <ResponsiveProductImage
-                            image={product.image}
-                            className="w-full h-full"
-                            imgClassName="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
-                          />
+                        <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-md transition-all duration-300 relative">
+                          {product.image ? (
+                            <ResponsiveProductImage
+                              image={product.image}
+                              className="w-full h-full"
+                              imgClassName="object-contain p-2 group-hover:scale-110 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                              <Package className="h-6 w-6 text-slate-400" />
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-bold text-slate-900 truncate group-hover:text-slate-800">
@@ -979,6 +1208,46 @@ const Header: React.FC = () => {
           document.body
         )}
         {/* Desktop Search Results Dropdown - Portal */}
+        {/* User Menu Dropdown - Portal */}
+        {isUserMenuOpen && isAuthenticated && user && userMenuButtonRef.current && createPortal(
+          <div
+            ref={userMenuRef}
+            className="bg-white rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-slate-200 overflow-hidden min-w-[192px]"
+            style={{
+              zIndex: 99999,
+              position: 'fixed',
+              top: `${userMenuPosition.top}px`,
+              right: `${userMenuPosition.right}px`,
+              width: '192px',
+              pointerEvents: 'auto'
+            } as React.CSSProperties}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* User Email - Compact */}
+            <div className="px-3 py-2 bg-slate-50 border-b border-slate-200">
+              <p className="text-xs text-slate-600 truncate font-medium">
+                {user.email}
+              </p>
+            </div>
+
+            {/* Logout Button */}
+            <div className="p-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLogout();
+                }}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 font-medium"
+                type="button"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
         {shouldShowDesktopResults && createPortal(
           <div
             ref={searchResultsRef}
@@ -1006,19 +1275,25 @@ const Header: React.FC = () => {
                     {searchResults.map((product, idx) => (
                       <button
                         key={product.id}
-                        onClick={() => handleResultClick(product.id)}
+                        onClick={() => handleResultClick(product)}
                         className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 text-left group border-2 ${
                           selectedIndex === idx
                             ? 'bg-gradient-to-r from-slate-50 via-white to-slate-50 scale-[1.02] shadow-lg border-slate-300'
                             : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:via-white hover:to-slate-50 border-transparent hover:border-slate-200 hover:shadow-md'
                         }`}
                       >
-                        <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-md transition-all duration-300">
-                          <ResponsiveProductImage
-                            image={product.image}
-                            className="w-full h-full"
-                            imgClassName="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                          />
+                        <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-lg transition-all duration-300 relative">
+                          {product.image ? (
+                            <ResponsiveProductImage
+                              image={product.image}
+                              className="w-full h-full"
+                              imgClassName="object-contain p-2.5 group-hover:scale-110 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                              <Package className="h-8 w-8 text-slate-400" />
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-base font-bold text-slate-900 truncate group-hover:text-slate-800 transition-colors">
@@ -1077,6 +1352,46 @@ const Header: React.FC = () => {
         </div>,
         document.body
       )}
+      {/* User Menu Dropdown - Portal (Fallback) */}
+      {isUserMenuOpen && isAuthenticated && user && typeof document !== 'undefined' && userMenuButtonRef.current && createPortal(
+        <div
+          ref={userMenuRef}
+          className="bg-white rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-slate-200 overflow-hidden min-w-[192px]"
+          style={{
+            zIndex: 99999,
+            position: 'fixed',
+            top: `${userMenuPosition.top}px`,
+            right: `${userMenuPosition.right}px`,
+            width: '192px',
+            pointerEvents: 'auto'
+          } as React.CSSProperties}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* User Email - Compact */}
+          <div className="px-3 py-2 bg-slate-50 border-b border-slate-200">
+            <p className="text-xs text-slate-600 truncate font-medium">
+              {user.email}
+            </p>
+          </div>
+
+          {/* Logout Button */}
+          <div className="p-2">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleLogout();
+              }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-150 font-medium"
+              type="button"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
       {/* Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       </>
@@ -1125,19 +1440,25 @@ const Header: React.FC = () => {
                   {searchResults.map((product, idx) => (
                     <button
                       key={product.id}
-                      onClick={() => handleResultClick(product.id)}
+                      onClick={() => handleResultClick(product)}
                       className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 text-left group border-2 ${
                         selectedIndex === idx
                           ? 'bg-gradient-to-r from-slate-50 to-white scale-[1.02] shadow-lg border-slate-300'
                           : 'bg-white hover:bg-gradient-to-r hover:from-slate-50 hover:to-white border-transparent hover:border-slate-200 hover:shadow-md'
                       }`}
                     >
-                      <div className="flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 group-hover:border-slate-300 transition-all duration-300">
-                        <ResponsiveProductImage
-                          image={product.image}
-                          className="w-full h-full"
-                          imgClassName="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
-                        />
+                      <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 group-hover:border-slate-300 group-hover:shadow-md transition-all duration-300 relative">
+                        {product.image ? (
+                          <ResponsiveProductImage
+                            image={product.image}
+                            className="w-full h-full"
+                            imgClassName="object-contain p-2 group-hover:scale-110 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                            <Package className="h-6 w-6 text-slate-400" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-slate-900 truncate group-hover:text-slate-800">
@@ -1197,7 +1518,7 @@ const Header: React.FC = () => {
                   {searchResults.map((product, idx) => (
                     <button
                       key={product.id}
-                      onClick={() => handleResultClick(product.id)}
+                      onClick={() => handleResultClick(product)}
                       className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 text-left group border-2 ${
                         selectedIndex === idx
                           ? 'bg-gradient-to-r from-slate-50 via-white to-slate-50 scale-[1.02] shadow-lg border-slate-300'

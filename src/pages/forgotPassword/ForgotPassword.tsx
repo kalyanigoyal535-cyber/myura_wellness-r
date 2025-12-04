@@ -1,8 +1,10 @@
 import { Input, Button } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import images from "../../images/images";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { authApi } from "../../services/auth";
+import { useState } from "react";
 
 type Props = {};
 
@@ -11,6 +13,11 @@ interface ForgotPasswordValues {
 }
 
 const ForgotPassword = (props: Props) => {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
   });
@@ -49,8 +56,24 @@ const ForgotPassword = (props: Props) => {
         <Formik
           initialValues={{ email: "" }}
           validationSchema={validationSchema}
-          onSubmit={(values: ForgotPasswordValues, helpers: FormikHelpers<ForgotPasswordValues>) => {
-            alert(`Password reset link sent to: ${values.email}`);
+          onSubmit={async (values: ForgotPasswordValues, helpers: FormikHelpers<ForgotPasswordValues>) => {
+            setIsSubmitting(true);
+            setSubmitStatus('idle');
+            setErrorMessage('');
+
+            try {
+              await authApi.requestPasswordReset({ email: values.email });
+              setSubmitStatus('success');
+              // Optionally redirect after a delay
+              setTimeout(() => {
+                navigate('/my-account');
+              }, 3000);
+            } catch (error) {
+              setSubmitStatus('error');
+              setErrorMessage(error instanceof Error ? error.message : 'Failed to send reset link. Please try again.');
+            } finally {
+              setIsSubmitting(false);
+            }
           }}
         >
           {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
@@ -73,6 +96,18 @@ const ForgotPassword = (props: Props) => {
                 />
               </div>
 
+              {/* Success/Error Messages */}
+              {submitStatus === 'success' && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-md text-green-800 text-sm">
+                  If an account with that email exists, we have sent a password reset link. Please check your email.
+                </div>
+              )}
+              {submitStatus === 'error' && errorMessage && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-800 text-sm">
+                  {errorMessage}
+                </div>
+              )}
+
               {/* Button */}
               <Button
                 type="submit"
@@ -80,8 +115,10 @@ const ForgotPassword = (props: Props) => {
                 color="#162031"
                 radius="md"
                 className="mt-2"
+                loading={isSubmitting}
+                disabled={isSubmitting}
               >
-                Send Reset Link
+                {isSubmitting ? 'Sending...' : 'Send Reset Link'}
               </Button>
             </Form>
           )}

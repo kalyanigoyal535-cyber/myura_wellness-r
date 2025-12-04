@@ -15,6 +15,7 @@ import Signup from "./pages/signup/Signup";
 import BlogPost from "./blogPost/BlogPost";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/forgotPassword/ForgotPassword";
+import ResetPasswordConfirm from "./pages/forgotPassword/ResetPasswordConfirm";
 import OrderDetails from "./pages/orderDetails/OrderDetails";
 
 // Lazy load routes for code splitting
@@ -123,6 +124,7 @@ const AppContent: React.FC = () => {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirm />} />
               <Route path="/order-details/:id" element={<OrderDetails />} />
             </Routes>
           </Suspense>

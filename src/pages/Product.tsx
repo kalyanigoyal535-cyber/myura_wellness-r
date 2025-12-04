@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Star, Filter, Search, ShieldCheck, Award, CheckCircle2, ShoppingCart, Sparkles, X } from 'lucide-react';
+import { Star, Filter, Search, ShieldCheck, Award, CheckCircle2, ShoppingCart, Sparkles, X, ArrowRight } from 'lucide-react';
 import ResponsiveProductImage from '../components/ResponsiveProductImage';
-import { productCatalog } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { productCatalog, ProductRecord } from '../data/products';
+
+// Helper function to check if a product is ProSeries
+const isProSeriesProduct = (productId: string): boolean => {
+  return productId.startsWith('pro-');
+};
 
 const Product: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useCart();
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [sortBy, setSortBy] = useState<string>('');
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Initialize search query from URL parameter
   useEffect(() => {
     const urlSearch = searchParams.get('search');
@@ -19,77 +26,94 @@ const Product: React.FC = () => {
     }
   }, [searchParams]);
 
-  // Search function - same logic as Header component
-  const performSearch = useCallback((query: string) => {
-    const trimmedQuery = query.trim();
+  // Filter and sort products from static catalog
+  const products = useMemo(() => {
+    let filtered = [...productCatalog];
     
-    if (!trimmedQuery) {
-      return productCatalog;
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.name.toLowerCase().includes(query) ||
+        product.headline.toLowerCase().includes(query) ||
+        product.summary.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query)
+      );
     }
-
-    const lowerQuery = trimmedQuery.toLowerCase();
-    const results = productCatalog.filter((product) => {
-      const searchableText = [
-        product.name,
-        product.headline,
-        product.summary,
-        product.description,
-        product.heroTagline,
-        ...product.benefits,
-        product.keyIngredients,
-        product.suitableFor,
-        product.howToUse,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-
-      return searchableText.includes(lowerQuery);
-    });
-
-    // Sort by relevance (exact name match first, then headline, then others)
-    const sortedResults = results.sort((a, b) => {
-      const aNameMatch = a.name.toLowerCase().includes(lowerQuery);
-      const bNameMatch = b.name.toLowerCase().includes(lowerQuery);
-      if (aNameMatch && !bNameMatch) return -1;
-      if (!aNameMatch && bNameMatch) return 1;
-
-      const aHeadlineMatch = a.headline.toLowerCase().includes(lowerQuery);
-      const bHeadlineMatch = b.headline.toLowerCase().includes(lowerQuery);
-      if (aHeadlineMatch && !bHeadlineMatch) return -1;
-      if (!aHeadlineMatch && bHeadlineMatch) return 1;
-
-      return 0;
-    });
-
-    return sortedResults;
-  }, []);
-
-  // Filter products based on search query
-  const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return productCatalog;
+    
+    // Apply sorting
+    if (sortBy) {
+      switch (sortBy) {
+        case 'price-low':
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-high':
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case 'rating':
+          filtered.sort((a, b) => b.rating - a.rating);
+          break;
+        case 'newest':
+          // Static data doesn't have created_at, so we'll keep original order
+          break;
+        default:
+          break;
+      }
     }
-    return performSearch(searchQuery);
-  }, [searchQuery, performSearch]);
+    
+    return filtered;
+  }, [searchQuery, sortBy]);
 
-  // Handle search input change
+  // Debounced search - update URL after user stops typing
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    // Update URL parameter
-    if (value.trim()) {
-      setSearchParams({ search: value });
-    } else {
-      setSearchParams({});
+    
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
+    
+    // Debounce URL update and API refetch
+    searchTimeoutRef.current = setTimeout(() => {
+      if (value.trim()) {
+        setSearchParams({ search: value }, { replace: true });
+      } else {
+        setSearchParams({}, { replace: true });
+      }
+      // Refetch will happen automatically via filters dependency
+    }, 500);
   }, [setSearchParams]);
 
   // Handle clear search
   const handleClearSearch = useCallback(() => {
     setSearchQuery('');
-    setSearchParams({});
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    setSearchParams({}, { replace: true });
   }, [setSearchParams]);
+
+  // Handle sort change
+  const handleSortChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Get product detail URL - use category ID if available, otherwise use numeric ID
+  const getProductUrl = useCallback((product: ProductRecord) => {
+    // Try to get category slug from product, fallback to numeric ID
+    // The API product should have category info
+    return `/product/${product.id}`;
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -153,12 +177,16 @@ const Product: React.FC = () => {
                   <Filter className="h-4 w-4" />
                   Filter
                 </button>
-                <select className="flex-1 sm:flex-none rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 text-xs sm:text-sm text-slate-700 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)] focus:border-slate-400 focus:outline-none">
-                  <option>Sort by: Featured</option>
-                  <option>Price: Low to High</option>
-                  <option>Price: High to Low</option>
-                  <option>Rating</option>
-                  <option>Newest</option>
+                <select
+                  value={sortBy}
+                  onChange={handleSortChange}
+                  className="flex-1 sm:flex-none rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 text-xs sm:text-sm text-slate-700 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.35)] focus:border-slate-400 focus:outline-none"
+                >
+                  <option value="">Sort by: Featured</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Rating</option>
+                  <option value="newest">Newest</option>
                 </select>
               </div>
             </div>
@@ -168,7 +196,7 @@ const Product: React.FC = () => {
           {searchQuery.trim() && (
             <div className="mb-4 text-sm text-slate-600">
               <span className="font-semibold">
-                {filteredProducts.length} {filteredProducts.length === 1 ? 'product found' : 'products found'}
+                {products.length} {products.length === 1 ? 'product found' : 'products found'}
               </span>
               {searchQuery.trim() && (
                 <span className="ml-2">
@@ -179,155 +207,179 @@ const Product: React.FC = () => {
           )}
 
           {/* Products Grid */}
-          {filteredProducts.length > 0 ? (
-            <div
-              className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
-              data-aos="fade-up"
-              data-aos-duration="900"
-              data-aos-delay="180"
-              data-aos-easing="ease-out-cubic"
-            >
-              {filteredProducts.map((product, index) => {
-              const discountPercent = Math.round(
-                ((product.originalPrice - product.price) / product.originalPrice) * 100
-              );
+          {products.length > 0 ? (
+              <div
+                className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
+                data-aos="fade-up"
+                data-aos-duration="900"
+                data-aos-delay="180"
+                data-aos-easing="ease-out-cubic"
+              >
+                {products.map((product, index) => {
+                const discountPercent = Math.round(
+                  ((product.originalPrice - product.price) / product.originalPrice) * 100
+                );
+                const productUrl = getProductUrl(product);
 
-              return (
-                <div
-                  key={product.id}
-                  className="group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-100 bg-slate-950 text-white shadow-xl transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_35px_65px_rgba(15,23,42,0.55)]"
-                  data-aos="fade-up"
-                  data-aos-delay={160 + index * 80}
-                  data-aos-duration="850"
-                  data-aos-easing="ease-out-cubic"
-                >
-                  <div
-                    className="absolute right-3 top-3 sm:right-4 sm:top-4 z-20 rounded-full bg-rose-500/95 px-2.5 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.3em] text-white shadow-lg backdrop-blur transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-1 group-hover:bg-rose-400/95"
-                    data-aos="zoom-in"
-                    data-aos-delay="220"
-                    data-aos-duration="700"
+                return (
+                  <Link
+                    key={product.id}
+                    to={productUrl}
+                    className="group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-100 bg-slate-950 text-white shadow-xl transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_35px_65px_rgba(15,23,42,0.55)] block"
+                    data-aos="fade-up"
+                    data-aos-delay={160 + index * 80}
+                    data-aos-duration="850"
                     data-aos-easing="ease-out-cubic"
                   >
-                    Sale
-                  </div>
-                  <div
-                    className={`absolute inset-0 z-0 bg-gradient-to-br ${product.accentGradient} opacity-90 transition-opacity duration-500 group-hover:opacity-100`}
-                    aria-hidden="true"
-                  ></div>
-                  <div className="pointer-events-none absolute inset-0 z-[1]">
-                    <div className="absolute -inset-px rounded-[28px] border border-white/5 opacity-0 transition-all duration-700 group-hover:opacity-80 group-hover:border-white/20"></div>
-                    <div className="absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-80">
-                      <div className="absolute -top-10 left-1/2 h-32 w-48 -translate-x-1/2 rotate-6 rounded-full bg-white/30 blur-3xl"></div>
-                      <div className="absolute bottom-0 left-1/2 h-40 w-40 -translate-x-1/2 bg-gradient-to-tr from-white/10 via-white/0 to-transparent blur-2xl animate-pulse"></div>
-                    </div>
-                  </div>
-                  <div className="absolute inset-x-8 top-10 hidden sm:block h-32 rounded-full bg-white/20 blur-3xl" aria-hidden="true"></div>
-                  <div className="relative z-10 flex h-full flex-col gap-3 p-3 sm:p-4">
-                    <div className="relative">
-                      <Link
-                        to={`/product/${product.id}`}
-                        className="relative block rounded-3xl bg-white/5 shadow-inner transition-transform duration-500 hover:scale-[1.01] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+                    {/* ProSeries Badge */}
+                    {isProSeriesProduct(product.id) && (
+                    <div
+                        className="absolute left-2 top-2 sm:left-2.5 sm:top-2.5 lg:left-3 lg:top-3 z-20 rounded-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 px-2 sm:px-2.5 lg:px-3 lg:py-1 py-0.5 text-[7px] sm:text-[8px] lg:text-[10px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.22em] lg:tracking-[0.25em] text-white shadow-[0_4px_12px_-4px_rgba(217,119,6,0.6),0_2px_6px_-2px_rgba(251,191,36,0.4)] backdrop-blur transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-105 border border-amber-300/50"
+                        data-aos="zoom-in"
+                        data-aos-delay="200"
+                        data-aos-duration="700"
+                        data-aos-easing="ease-out-cubic"
                       >
-                        <ResponsiveProductImage
-                          image={product.image}
-                          className="w-full aspect-square overflow-hidden rounded-3xl"
-                          imgClassName="object-contain w-full h-full p-0 m-0 transition-transform duration-700 ease-out"
-                        />
-                      </Link>
-                      {product.inStock && (
-                        <div className="absolute left-6 top-6 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
-                          In Stock
+                        <div className="relative flex items-center gap-1 lg:gap-1.5">
+                          <Award className="h-2 w-2 sm:h-2.5 sm:w-2.5 lg:h-3 lg:w-3" />
+                          <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">ProSeries</span>
                         </div>
-                      )}
+                      </div>
+                    )}
+                    {/* Sale Badge */}
+                    {discountPercent > 0 && (
+                      <div
+                        className="absolute right-2 top-2 sm:right-2.5 sm:top-2.5 lg:right-3 lg:top-3 z-20 rounded-full bg-rose-500/95 px-2 lg:px-3 py-0.5 lg:py-1 text-[7px] sm:text-[8px] lg:text-[10px] font-semibold uppercase tracking-[0.25em] sm:tracking-[0.3em] lg:tracking-[0.35em] text-white shadow-md backdrop-blur transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-0.5 group-hover:bg-rose-400/95"
+                      data-aos="zoom-in"
+                      data-aos-delay="220"
+                      data-aos-duration="700"
+                      data-aos-easing="ease-out-cubic"
+                    >
+                      Sale
                     </div>
-
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <Link
-                          to={`/product/${product.id}`}
-                          className="inline-flex text-xs font-semibold sm:text-lg text-white hover:text-myura-purple-200 transition-colors"
-                        >
-                          {product.name}
-                        </Link>
-                        <div className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5">
-                          <div className="flex items-center gap-0.5 text-amber-200">
-                            {[...Array(product.rating)].map((_, i) => (
-                              <Star key={i} className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-current" />
-                            ))}
+                    )}
+                    <div
+                      className={`absolute inset-0 z-0 bg-gradient-to-br ${product.accentGradient} opacity-90 transition-opacity duration-500 group-hover:opacity-100`}
+                      aria-hidden="true"
+                    ></div>
+                    <div className="pointer-events-none absolute inset-0 z-[1]">
+                      <div className="absolute -inset-px rounded-[28px] border border-white/5 opacity-0 transition-all duration-700 group-hover:opacity-80 group-hover:border-white/20"></div>
+                      <div className="absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-80">
+                        <div className="absolute -top-10 left-1/2 h-32 w-48 -translate-x-1/2 rotate-6 rounded-full bg-white/30 blur-3xl"></div>
+                        <div className="absolute bottom-0 left-1/2 h-40 w-40 -translate-x-1/2 bg-gradient-to-tr from-white/10 via-white/0 to-transparent blur-2xl animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="absolute inset-x-8 top-10 hidden sm:block h-32 rounded-full bg-white/20 blur-3xl pointer-events-none" aria-hidden="true"></div>
+                    <div className="relative z-10 flex h-full flex-col gap-3 p-3 sm:p-4">
+                      <div className="relative">
+                        <div className="relative block rounded-3xl bg-white/5 shadow-inner transition-transform duration-500 group-hover:scale-[1.01]">
+                          <ResponsiveProductImage
+                            image={product.image}
+                            className="w-full aspect-square overflow-hidden rounded-3xl"
+                            imgClassName="object-contain w-full h-full p-0 m-0 transition-transform duration-700 ease-out"
+                          />
+                        </div>
+                        {product.inStock && (
+                          <div className="absolute left-6 top-6 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white backdrop-blur">
+                            In Stock
                           </div>
-                          <span className="text-[9px] sm:text-[10px] font-semibold text-white/80">{product.rating}.0</span>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="inline-flex text-xs font-semibold sm:text-lg lg:text-xl text-white group-hover:text-myura-purple-200 transition-colors">
+                            {product.name}
+                          </span>
+                          <div className="inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-white/10 px-1.5 sm:px-2 py-0.5">
+                            <div className="flex items-center gap-0 sm:gap-0.5 text-amber-200">
+                              {[...Array(Math.floor(product.rating || 0))].map((_, i) => (
+                                <Star key={i} className="h-2 w-2 sm:h-3 sm:w-3 lg:h-3.5 lg:w-3.5 fill-current" />
+                              ))}
+                            </div>
+                            <span className="text-[8px] sm:text-[10px] lg:text-xs font-semibold text-white/80">
+                              {product.rating ? product.rating.toFixed(1) : '0.0'}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      <span className="text-[8px] sm:text-xs uppercase tracking-[0.24em] text-white/60">
-                        {product.reviews} reviews
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
-                      <div className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2 py-0.5 sm:px-3 sm:py-1 text-slate-900 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.45)]">
-                        <span className="inline-flex items-center justify-center rounded-full bg-slate-900 px-1 py-0.5 text-[7px] sm:text-[9px] font-semibold uppercase tracking-[0.2em] text-white">
-                          Deal
-                        </span>
-                        <span className="font-display text-xs sm:text-xl font-semibold tracking-tight">
-                          ₹{product.price}
+                        <span className="text-[8px] sm:text-xs lg:text-sm uppercase tracking-[0.24em] text-white/60">
+                          {product.reviews || 0} {product.reviews === 1 ? 'review' : 'reviews'}
                         </span>
                       </div>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/60 bg-emerald-50 px-1 py-0.5 text-[7px] sm:text-[9px] font-semibold uppercase tracking-[0.24em] text-emerald-600">
-                        Save {discountPercent}%
-                      </span>
-                      <span className="text-[6.5px] sm:text-[9px] font-semibold uppercase tracking-[0.24em] text-white/70">
-                        MRP ₹{product.originalPrice}
-                      </span>
-                    </div>
 
-                    <div className="mt-auto pt-1 flex gap-2">
-                      <Link
-                        to={`/product/${product.id}`}
-                        className="inline-flex flex-1 items-center justify-center rounded-full bg-white/15 px-3 py-1.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] text-white transition-all duration-300 hover:bg-white/25 whitespace-nowrap"
-                      >
-                        Explore Ritual
-                      </Link>
-                      <button
-                        onClick={async () => {
-                          if (addingToCart === product.id) return;
-                          setAddingToCart(product.id);
-                          addItem({
-                            id: product.id,
-                            name: product.name,
-                            price: product.price,
-                            image: product.image?.fallback || '',
-                          }, 1);
-                          setTimeout(() => setAddingToCart(null), 1000);
-                        }}
-                        disabled={addingToCart === product.id || !product.inStock}
-                        className="group relative inline-flex flex-1 items-center justify-center gap-1 rounded-full bg-white/20 px-2.5 py-1.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] text-white transition-all duration-300 hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden whitespace-nowrap"
-                      >
-                        <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                        <span className="relative inline-flex items-center gap-1">
-                          {addingToCart === product.id ? (
-                            <>
-                              <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 animate-pulse" />
-                              <span>Added!</span>
-                            </>
-                          ) : (
-                            <>
-                              <ShoppingCart className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                              <span>Add to Cart</span>
-                            </>
-                          )}
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+                        <div className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2 py-0.5 sm:px-3 sm:py-1 lg:px-4 lg:py-1.5 text-slate-900 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.45)]">
+                          <span className="inline-flex items-center justify-center rounded-full bg-slate-900 px-1 py-0.5 text-[7px] sm:text-[9px] lg:text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+                            Deal
+                          </span>
+                          <span className="font-display text-xs sm:text-xl lg:text-2xl font-semibold tracking-tight">
+                            ₹{product.price}
+                          </span>
+                        </div>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/60 bg-emerald-50 px-1 py-0.5 sm:px-2 sm:py-1 text-[7px] sm:text-[9px] lg:text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-600">
+                          Save {discountPercent}%
                         </span>
-                      </button>
+                        <span className="text-[6.5px] sm:text-[9px] lg:text-[10px] font-semibold uppercase tracking-[0.24em] text-white/70">
+                          MRP ₹{product.originalPrice}
+                        </span>
+                      </div>
+
+                      <div className="mt-auto pt-1 flex gap-1.5 sm:gap-2 lg:gap-3">
+                        <span className="inline-flex flex-1 items-center justify-center rounded-full bg-white/15 px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 text-white transition-all duration-300 group-hover:bg-white/25 pointer-events-none">
+                          {/* Arrow icon on mobile, text on desktop */}
+                          <ArrowRight className="h-3 w-3 sm:hidden" />
+                          <span className="hidden sm:inline text-[8px] sm:text-[9px] lg:text-[10px] font-semibold uppercase tracking-[0.15em] lg:tracking-[0.18em]">
+                          Explore Ritual
+                          </span>
+                        </span>
+                        <button
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (addingToCart === product.id) return;
+                            setAddingToCart(product.id);
+                            try {
+                              await addItem({
+                                id: product.id,
+                                name: product.name,
+                                price: product.price,
+                                image: product.image?.fallback || '',
+                              }, 1);
+                            } catch (error) {
+                              console.error('Error adding to cart:', error);
+                            } finally {
+                              setTimeout(() => setAddingToCart(null), 1000);
+                            }
+                          }}
+                          disabled={addingToCart === product.id || !product.inStock}
+                          className="group/btn relative inline-flex flex-1 items-center justify-center rounded-full bg-white/20 px-2 py-1 sm:px-3 sm:py-1.5 lg:px-4 lg:py-2 text-[7px] sm:text-[8px] lg:text-[10px] font-semibold uppercase tracking-[0.12em] sm:tracking-[0.15em] lg:tracking-[0.18em] text-white transition-all duration-300 hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden whitespace-nowrap z-20"
+                        >
+                          <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100" />
+                          <span className="relative inline-flex items-center">
+                            {addingToCart === product.id ? (
+                                <span>Added!</span>
+                            ) : (
+                                <span>Add to Cart</span>
+                            )}
+                          </span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-              })}
-            </div>
-          ) : (
+                  </Link>
+                );
+                })}
+              </div>
+            ) : (
             <div className="py-16 text-center">
               <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-lg font-semibold text-slate-700 mb-2">No products found</p>
-              <p className="text-sm text-slate-500 mb-6">Try searching for product names, benefits, or ingredients</p>
+              <p className="text-lg font-semibold text-slate-700 mb-2">
+                {searchQuery.trim() ? 'No products found' : 'No products available'}
+              </p>
+              <p className="text-sm text-slate-500 mb-6">
+                {searchQuery.trim() 
+                  ? 'Try searching for product names, benefits, or ingredients'
+                  : 'Check back later for new products'}
+              </p>
               {searchQuery.trim() && (
                 <button
                   onClick={handleClearSearch}
@@ -337,22 +389,7 @@ const Product: React.FC = () => {
                 </button>
               )}
             </div>
-          )}
-
-          {/* Load More Button - Only show when not searching */}
-          {!searchQuery.trim() && (
-            <div
-              className="mt-12 text-center"
-              data-aos="fade-up"
-              data-aos-duration="850"
-              data-aos-delay="220"
-              data-aos-easing="ease-out-cubic"
-            >
-              <button className="rounded-full bg-slate-900 px-10 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-colors hover:bg-slate-700">
-                Discover More Blends
-              </button>
-            </div>
-          )}
+            )}
         </div>
       </section>
 

@@ -82,8 +82,24 @@ export const useProduct = (productId: string | number) => {
       setIsLoading(true);
       setError(null);
       try {
-        const apiProduct = await productsApi.getProduct(Number(productId));
-        setProduct(apiProductToFrontend(apiProduct));
+        // Check if productId is a number (API ID) or string (category slug)
+        const numericId = typeof productId === 'number' ? productId : Number(productId);
+        
+        if (!isNaN(numericId) && numericId > 0) {
+          // It's a numeric ID - fetch directly
+          const apiProduct = await productsApi.getProduct(numericId);
+          setProduct(apiProductToFrontend(apiProduct));
+        } else if (typeof productId === 'string') {
+          // It's a category slug - fetch category and get first product
+          const categoryData = await productsApi.getCategory(productId);
+          if (categoryData.products && categoryData.products.length > 0) {
+            setProduct(apiProductToFrontend(categoryData.products[0]));
+          } else {
+            setError('No products found in this category');
+          }
+        } else {
+          setError('Invalid product identifier');
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch product');
       } finally {

@@ -4,6 +4,7 @@ import {
   removeItem,
   updateQty,
   clearCart,
+  setCartItems,
   selectCartItems,
   selectCartCount,
   selectCartSubtotal,
@@ -60,17 +61,20 @@ export const useCart = (): CartContextValue => {
   const syncCart = async () => {
     setIsLoading(true);
     try {
+      console.log('[Cart] Fetching cart from backend...');
       const apiCart = await cartApi.getCart();
+      console.log('[Cart] Backend cart response:', apiCart);
+      
       // Convert API cart items to frontend format
       const frontendItems: CartItem[] = apiCart.items.map(apiCartItemToFrontend);
+      console.log('[Cart] Converted frontend items:', frontendItems);
+      console.log('[Cart] API cart ID:', apiCart.id, 'Total items:', apiCart.total_items);
       
-      // Update Redux store
-      dispatch(clearCart());
-      frontendItems.forEach((item) => {
-        dispatch(addItem({ item: { id: item.id, name: item.name, price: item.price, image: item.image }, qty: item.qty }));
-      });
+      // Update Redux store with all items from API (source of truth)
+      dispatch(setCartItems(frontendItems));
+      console.log('[Cart] Cart sync complete. Items count:', frontendItems.length);
     } catch (error) {
-      console.error('Failed to sync cart from backend:', error);
+      console.error('[Cart] Failed to sync cart from backend:', error);
       // Continue with local cart if sync fails
     } finally {
       setIsLoading(false);
@@ -80,6 +84,7 @@ export const useCart = (): CartContextValue => {
   // Add item to cart (syncs with backend)
   const addItemToCart = async (item: Omit<CartItem, 'qty'>, qty = 1) => {
     setIsLoading(true);
+    console.log('[Cart] Adding item to cart:', { item, qty });
     try {
       // Handle both numeric IDs (from API) and string IDs (from static data)
       let productId: number;
@@ -87,6 +92,7 @@ export const useCart = (): CartContextValue => {
       // Check if ID is already a number
       if (typeof item.id === 'number') {
         productId = item.id;
+        console.log('[Cart] Using numeric ID:', productId);
       } else {
         // Try to parse as integer
         const parsedId = parseInt(item.id, 10);
@@ -94,23 +100,72 @@ export const useCart = (): CartContextValue => {
         if (!isNaN(parsedId) && parsedId > 0) {
           // ID is a numeric string (e.g., "1", "2")
           productId = parsedId;
+          console.log('[Cart] Parsed numeric string ID:', productId);
         } else {
-          // ID is a slug (e.g., "dia-care") - need to find product by category
-          // Try to get product from API by category ID
+          // ID is a slug (e.g., "dia-care") - need to find product by category or search
+          console.log('[Cart] Looking up product by slug/category:', item.id);
+          const { productsApi } = await import('../services/products');
+          
+          // First, try to find by category ID
           try {
-            const { productsApi } = await import('../services/products');
             const categoryData = await productsApi.getCategory(item.id);
+            console.log('[Cart] Category lookup result:', categoryData);
             
             if (categoryData.products && categoryData.products.length > 0) {
               // Use the first product from that category
               productId = categoryData.products[0].id;
+              console.log('[Cart] Found product in category:', productId);
             } else {
               throw new Error(`No products found for category: ${item.id}`);
             }
-          } catch (apiError) {
-            console.error('Failed to find product by category:', apiError);
-            const errorMessage = apiError instanceof Error ? apiError.message : 'Unknown error';
-            throw new Error(`Cannot add to cart: Product "${item.name}" not found in database. ${errorMessage}`);
+          } catch (categoryError) {
+            console.log('[Cart] Category lookup failed, trying search:', categoryError);
+            // If category lookup fails, try searching by product name or slug
+            try {
+              // First try searching by exact product name
+              let searchResponse = await productsApi.getProducts({
+                search: item.name,
+                in_stock: true,
+              });
+              console.log('[Cart] Search by name result:', searchResponse);
+              
+              // If no results, try searching by slug (item.id)
+              if (!searchResponse.results || searchResponse.results.length === 0) {
+                searchResponse = await productsApi.getProducts({
+                  search: item.id, // Try slug as search term
+                  in_stock: true,
+                });
+                console.log('[Cart] Search by slug result:', searchResponse);
+              }
+              
+              if (searchResponse.results && searchResponse.results.length > 0) {
+                // Find exact match by name (case-insensitive)
+                const exactMatch = searchResponse.results.find(
+                  (p) => p.name.toLowerCase() === item.name.toLowerCase()
+                );
+                
+                if (exactMatch) {
+                  productId = exactMatch.id;
+                  console.log('[Cart] Found exact match:', productId);
+                } else if (searchResponse.results.length > 0) {
+                  // Use first result if no exact match
+                  productId = searchResponse.results[0].id;
+                  console.log('[Cart] Using first search result:', productId);
+                } else {
+                  throw new Error(`Product "${item.name}" not found in database`);
+                }
+              } else {
+                throw new Error(`Product "${item.name}" not found in database`);
+              }
+            } catch (searchError) {
+              console.error('[Cart] Failed to find product:', { categoryError, searchError });
+              const errorMessage = searchError instanceof Error ? searchError.message : 'Unknown error';
+              throw new Error(
+                `Cannot add to cart: Product "${item.name}" is not available in the database. ` +
+                `Please ensure this product has been added to the backend. ` +
+                `Error: ${errorMessage}`
+              );
+            }
           }
         }
       }
@@ -119,11 +174,35 @@ export const useCart = (): CartContextValue => {
         throw new Error(`Invalid product ID: ${item.id}`);
       }
       
-      await cartApi.addToCart(productId, qty);
-      // Sync cart from backend to get updated state
-      await syncCart();
+      console.log('[Cart] Calling API to add product:', { productId, qty });
+      const cartResponse = await cartApi.addToCart(productId, qty);
+      console.log('[Cart] API response:', cartResponse);
+      
+      // Use the cart response directly as source of truth (avoids session issues)
+      console.log('[Cart] Updating cart from API response...');
+      const frontendItems: CartItem[] = cartResponse.items.map(apiCartItemToFrontend);
+      console.log('[Cart] Converted frontend items from response:', frontendItems);
+      console.log('[Cart] API cart ID:', cartResponse.id, 'Total items:', cartResponse.total_items);
+      
+      // Get current Redux items for comparison
+      const currentItems = items;
+      console.log('[Cart] Current Redux items count:', currentItems.length);
+      
+      // Replace all cart items with API response (API is source of truth)
+      // This is more efficient than clear + add loop and avoids race conditions
+      dispatch(setCartItems(frontendItems));
+      console.log('[Cart] Cart updated from API response. Items count:', frontendItems.length);
+      
+      // If API response has fewer items than expected, log a warning
+      if (currentItems.length > 0 && frontendItems.length < currentItems.length) {
+        console.warn('[Cart] API response has fewer items than Redux store. This may indicate a session issue.', {
+          reduxCount: currentItems.length,
+          apiCount: frontendItems.length,
+          cartId: cartResponse.id
+        });
+      }
     } catch (error) {
-      console.error('Failed to add item to cart:', error);
+      console.error('[Cart] Failed to add item to cart:', error);
       throw error;
     } finally {
       setIsLoading(false);

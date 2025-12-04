@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { KeenSliderInstance } from 'keen-slider';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
-import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Play, Pause } from 'lucide-react';
+import { Truck, Shield, Headphones, CheckCircle, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Play, Pause, AlertCircle, X, Award, FlaskConical, ShieldCheck, BadgeCheck, Medal } from 'lucide-react';
 import ResponsiveProductImage, { type ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
 import { useCart } from '../context/CartContext';
 
@@ -163,6 +163,7 @@ const Home: React.FC = () => {
 
   const { addItem } = useCart();
   const [addingProduct, setAddingProduct] = useState<string | null>(null);
+  const [cartError, setCartError] = useState<string | null>(null);
 
   const products = useMemo<Product[]>(() => {
     const baseProducts: ProductDefinition[] = [
@@ -765,63 +766,30 @@ const Home: React.FC = () => {
         className={isCarousel ? "keen-slider__slide" : ""}
       >
         <div
-          className="group relative h-full overflow-hidden rounded-[2.5rem] border-2 bg-white transition-all duration-700 ease-out hover:-translate-y-3 border-amber-200/70 shadow-[0_25px_70px_-35px_rgba(217,119,6,0.2)] hover:shadow-[0_40px_100px_-40px_rgba(217,119,6,0.35)] hover:border-amber-300/80"
+          className="group relative h-full overflow-hidden rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] border-2 bg-white transition-all duration-700 ease-out hover:-translate-y-2 sm:hover:-translate-y-3 border-amber-200/70 shadow-[0_25px_70px_-35px_rgba(217,119,6,0.2)] hover:shadow-[0_40px_100px_-40px_rgba(217,119,6,0.35)] hover:border-amber-300/80"
           data-aos="fade-up"
           data-aos-delay={index * 100}
         >
-          <div className="pointer-events-none absolute right-4 top-4 z-30 group-hover:scale-110 transition-all duration-500">
+          <div className="pointer-events-none absolute right-2 top-2 sm:right-2.5 sm:top-2.5 z-30 group-hover:scale-105 transition-all duration-500">
             <div className="relative">
-              <div className="absolute inset-0 -m-3 rounded-full bg-gradient-to-r from-amber-400/50 via-yellow-400/60 to-amber-500/50 blur-2xl animate-[softPulse_3s_ease-in-out_infinite]"></div>
-              <div className="absolute inset-0 -m-2 rounded-full bg-gradient-to-r from-amber-300/40 via-yellow-300/50 to-amber-400/40 blur-xl animate-[softPulse_2.5s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }}></div>
-              <div className="absolute inset-0 -m-1 rounded-full bg-gradient-to-r from-amber-200/30 via-yellow-200/40 to-amber-300/30 blur-lg animate-[softPulse_2s_ease-in-out_infinite]" style={{ animationDelay: '0.6s' }}></div>
-              
-              <div className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-yellow-300 shadow-[0_0_10px_rgba(251,191,36,1),0_0_20px_rgba(251,191,36,0.5)] animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-              <div className="absolute -bottom-0.5 -left-0.5 h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(217,119,6,0.9),0_0_16px_rgba(217,119,6,0.4)] animate-[ping_2.5s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '0.7s' }}></div>
-              <div className="absolute top-1/2 -left-1 h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_6px_rgba(234,179,8,0.8)] animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '1.2s' }}></div>
+              <div className="absolute inset-0 -m-2 rounded-full bg-gradient-to-r from-amber-400/30 via-yellow-400/40 to-amber-500/30 blur-xl animate-[softPulse_3s_ease-in-out_infinite]"></div>
+              <div className="absolute inset-0 -m-1 rounded-full bg-gradient-to-r from-amber-300/20 via-yellow-300/30 to-amber-400/20 blur-lg animate-[softPulse_2.5s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }}></div>
               
               <div className="relative">
-                <div className="absolute inset-0 rounded-full overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -skew-x-12 animate-[shimmer_3s_ease-in-out_infinite]"></div>
-                </div>
-                
-                <span className="relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-700 via-yellow-500 via-amber-600 via-yellow-500 to-amber-700 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.32em] text-white shadow-[0_10px_40px_-10px_rgba(217,119,6,0.9),0_6px_20px_-6px_rgba(251,191,36,0.7),inset_0_2px_0_rgba(255,255,255,0.4),inset_0_-1px_0_rgba(0,0,0,0.1)] ring-2 ring-amber-300/70 ring-offset-2 ring-offset-white/60 backdrop-blur-md border border-amber-200/30">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/25 via-transparent to-amber-900/25"></div>
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-t from-amber-800/20 via-transparent to-yellow-300/20"></div>
-                  
-                  <span className="relative z-10 flex items-center gap-1.5">
-                    <span className="relative">
-                      <span className="absolute inset-0 h-2 w-2 rounded-full bg-white/40 blur-sm animate-pulse"></span>
-                      <span className="relative h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,1),0_0_12px_rgba(255,255,255,0.5)]"></span>
-                    </span>
-                    <span className="h-1 w-1 rounded-full bg-yellow-200 shadow-[0_0_4px_rgba(234,179,8,0.8)]"></span>
-                    <span className="h-0.5 w-0.5 rounded-full bg-amber-300"></span>
-                  </span>
-                  
-                  <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4),0_1px_2px_rgba(217,119,6,0.3)] font-display font-extrabold tracking-wider">
+                <span className="relative inline-flex items-center gap-0.5 sm:gap-1 rounded-full bg-gradient-to-r from-amber-700 via-yellow-500 via-amber-600 via-yellow-500 to-amber-700 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[7px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white shadow-[0_4px_16px_-4px_rgba(217,119,6,0.7),0_2px_8px_-2px_rgba(251,191,36,0.5),inset_0_1px_0_rgba(255,255,255,0.3)] ring-1 ring-amber-300/60 ring-offset-1 ring-offset-white/50 backdrop-blur-sm border border-amber-200/30">
+                  <span className="relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] font-display font-extrabold">
                     ProSeries
                   </span>
-                  
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-transparent to-transparent"></div>
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/30"></div>
                 </span>
-                
-                <div className="absolute -bottom-2.5 -right-1.5 h-6 w-6 rotate-45 rounded-sm bg-gradient-to-br from-amber-500 via-yellow-500 to-amber-600 shadow-[0_8px_20px_-6px_rgba(217,119,6,0.7),0_4px_12px_-4px_rgba(251,191,36,0.5)] ring-2 ring-amber-200/60">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-sm"></div>
-                </div>
-                
-                <div className="absolute -bottom-4 right-2 h-1 w-10 rounded-full bg-gradient-to-r from-transparent via-amber-400 via-yellow-400 to-transparent shadow-[0_2px_8px_rgba(217,119,6,0.5)]"></div>
-                
-                <div className="absolute top-1/2 -left-2 h-0.5 w-4 rounded-full bg-gradient-to-r from-transparent to-amber-400 rotate-90"></div>
-                <div className="absolute top-1/2 -right-2 h-0.5 w-4 rounded-full bg-gradient-to-l from-transparent to-yellow-400 rotate-90"></div>
               </div>
             </div>
           </div>
           
           <div className="absolute inset-0 bg-gradient-to-br from-amber-100/30 via-transparent to-yellow-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
           
-          <div className="relative flex flex-col items-center gap-3 p-4 sm:p-5 pb-5 sm:pb-6 rounded-[2rem] m-2 sm:m-3 bg-gradient-to-br from-amber-50/50 via-white to-yellow-50/40">
+          <div className="relative flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 lg:p-5 pb-4 sm:pb-5 lg:pb-6 rounded-xl sm:rounded-2xl lg:rounded-[2rem] m-1.5 sm:m-2 lg:m-3 bg-gradient-to-br from-amber-50/50 via-white to-yellow-50/40">
             <div className="relative w-full">
-              <div className="overflow-hidden rounded-[1.75rem] border-2 border-amber-100/80 bg-white shadow-[0_20px_50px_-30px_rgba(217,119,6,0.15)] group-hover:border-amber-200/90 transition-all duration-500">
+              <div className="overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-[1.75rem] border-2 border-amber-100/80 bg-white shadow-[0_20px_50px_-30px_rgba(217,119,6,0.15)] group-hover:border-amber-200/90 transition-all duration-500">
                 <Link
                   to={`/product/${product.slug}`}
                   className="relative block w-full focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/70 focus-visible:ring-offset-4 focus-visible:ring-offset-white"
@@ -833,7 +801,7 @@ const Home: React.FC = () => {
                     className="w-full"
                     imgClassName="w-full h-full object-cover animate-[productFade_1.1s_cubic-bezier(0.22,1,0.36,1)_forwards] transition-transform duration-700 ease-out group-hover:scale-[1.05]"
                   />
-                  <span className="pointer-events-none absolute bottom-5 left-1/2 w-[85%] -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 px-5 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.3em] text-white shadow-[0_30px_70px_-35px_rgba(217,119,6,0.65)] opacity-0 transition-opacity duration-500 group-hover:opacity-100 backdrop-blur-sm">
+                  <span className="pointer-events-none absolute bottom-3 sm:bottom-4 lg:bottom-5 left-1/2 w-[85%] -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 lg:py-2.5 text-center text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] lg:tracking-[0.3em] text-white shadow-[0_30px_70px_-35px_rgba(217,119,6,0.65)] opacity-0 transition-opacity duration-500 group-hover:opacity-100 backdrop-blur-sm">
                     Discover Premium
                   </span>
                 </Link>
@@ -846,10 +814,10 @@ const Home: React.FC = () => {
                       event.stopPropagation();
                       handleProSeriesImageNav(index, -1);
                     }}
-                    className="absolute -left-5 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-amber-200/60 transition-all duration-300 hover:ring-amber-300/80 hover:scale-110"
+                    className="absolute -left-2 sm:-left-3 lg:-left-5 top-1/2 z-20 flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-amber-200/60 transition-all duration-300 hover:ring-amber-300/80 hover:scale-110 active:scale-95"
                     aria-label={`Show previous ${product.name} image`}
                   >
-                    <ChevronLeft className="h-5 w-5 text-amber-700" />
+                    <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-amber-700" />
                   </button>
                   <button
                     type="button"
@@ -857,10 +825,10 @@ const Home: React.FC = () => {
                       event.stopPropagation();
                       handleProSeriesImageNav(index, 1);
                     }}
-                    className="absolute -right-5 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-amber-200/60 transition-all duration-300 hover:ring-amber-300/80 hover:scale-110"
+                    className="absolute -right-2 sm:-right-3 lg:-right-5 top-1/2 z-20 flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-lg ring-2 ring-amber-200/60 transition-all duration-300 hover:ring-amber-300/80 hover:scale-110 active:scale-95"
                     aria-label={`Show next ${product.name} image`}
                   >
-                    <ChevronRight className="h-5 w-5 text-amber-700" />
+                    <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-amber-700" />
                   </button>
                 </>
               )}
@@ -869,7 +837,7 @@ const Home: React.FC = () => {
             <div className="flex w-full flex-col gap-2 text-center">
               <div className="flex flex-col items-center gap-2">
                 <h3 className="w-full">
-                  <span className="inline-flex w-full items-center justify-center rounded-full border border-amber-200/60 bg-gradient-to-r from-amber-50/95 via-white to-yellow-50/95 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-slate-800 shadow-[0_16px_32px_-24px_rgba(217,119,6,0.25)]">
+                  <span className="inline-flex w-full items-center justify-center rounded-full border border-amber-200/60 bg-gradient-to-r from-amber-50/95 via-white to-yellow-50/95 px-2.5 sm:px-3 lg:px-4 py-1 sm:py-1.5 text-[10px] sm:text-[11px] lg:text-xs font-semibold uppercase tracking-[0.1em] sm:tracking-[0.12em] lg:tracking-[0.15em] text-slate-800 shadow-[0_16px_32px_-24px_rgba(217,119,6,0.25)]">
                     {product.name}
                   </span>
                 </h3>
@@ -899,58 +867,67 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2">
-              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 shadow-[0_16px_36px_-24px_rgba(217,119,6,0.25)] bg-gradient-to-r from-amber-200/90 via-yellow-100/85 to-amber-200/90 border border-amber-200/60">
-                <span className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-600 to-yellow-600 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white shadow-[0_6px_12px_rgba(217,119,6,0.35)]">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-2.5 lg:px-3 py-1 sm:py-1.5 shadow-[0_16px_36px_-24px_rgba(217,119,6,0.25)] bg-gradient-to-r from-amber-200/90 via-yellow-100/85 to-amber-200/90 border border-amber-200/60">
+                <span className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-600 to-yellow-600 px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white shadow-[0_6px_12px_rgba(217,119,6,0.35)]">
                   Deal
                 </span>
-                <span className="font-display text-xl font-semibold tracking-tight text-slate-900">
+                <span className="font-display text-base sm:text-lg lg:text-xl font-semibold tracking-tight text-slate-900">
                   ₹{product.price}
                 </span>
               </div>
               {product.originalPrice > product.price && (
                 <>
-                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/60 bg-gradient-to-r from-amber-100/90 to-yellow-100/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-amber-800 shadow-[0_10px_20px_-16px_rgba(217,119,6,0.3)]">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/60 bg-gradient-to-r from-amber-100/90 to-yellow-100/90 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.18em] sm:tracking-[0.22em] text-amber-800 shadow-[0_10px_20px_-16px_rgba(217,119,6,0.3)]">
                     Save {product.discountPercent}%
                   </span>
-                  <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400 line-through">
+                  <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-[0.15em] sm:tracking-[0.2em] text-slate-400 line-through">
                     MRP ₹{product.originalPrice}
                   </span>
                 </>
               )}
             </div>
 
-            <div className="flex items-center justify-center gap-3 w-full mt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 w-full mt-2">
               <button
                 onClick={async () => {
                   if (addingProduct === product.slug) return;
                   setAddingProduct(product.slug);
-                  addItem({
-                    id: product.slug,
-                    name: product.name,
-                    price: product.price,
-                    image: currentImage?.fallback || '',
-                  }, 1);
-                  setTimeout(() => setAddingProduct(null), 800);
+                  setCartError(null);
+                  try {
+                    await addItem({
+                      id: product.slug,
+                      name: product.name,
+                      price: product.price,
+                      image: currentImage?.fallback || '',
+                    }, 1);
+                  } catch (error) {
+                    console.error('Failed to add to cart:', error);
+                    setCartError(error instanceof Error ? error.message : 'Failed to add product to cart');
+                    // Clear error after 5 seconds
+                    setTimeout(() => setCartError(null), 5000);
+                  } finally {
+                    setTimeout(() => setAddingProduct(null), 800);
+                  }
                 }}
                 disabled={addingProduct === product.slug}
-                className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_16px_36px_-16px_rgba(217,119,6,0.5)] transition-all duration-300 hover:bg-amber-700 hover:shadow-[0_22px_48px_-16px_rgba(217,119,6,0.6)] hover:scale-[1.02] max-w-[240px] whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                className="group relative inline-flex flex-1 items-center justify-center gap-1 sm:gap-1.5 rounded-full bg-amber-600 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[8px] sm:text-[9px] font-semibold text-white shadow-[0_12px_28px_-12px_rgba(217,119,6,0.5)] transition-all duration-300 hover:bg-amber-700 hover:shadow-[0_16px_36px_-12px_rgba(217,119,6,0.6)] hover:scale-[1.01] active:scale-95 max-w-full sm:max-w-[200px] whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto"
               >
                 <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="relative inline-flex items-center gap-2">
+                <span className="relative inline-flex items-center gap-1 sm:gap-1.5">
                   {addingProduct === product.slug ? 'Added!' : 'Add to cart'}
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRight className="h-2.5 w-2.5 sm:h-3 sm:w-3 transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </button>
               <Link
                 to={`/product/${product.slug}`}
-                className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-amber-300/60 bg-white/95 px-4 py-2 text-xs font-semibold text-amber-700 shadow-[0_16px_36px_-22px_rgba(217,119,6,0.3)] transition-all duration-300 hover:border-amber-400/80 hover:bg-white hover:shadow-[0_22px_48px_-22px_rgba(217,119,6,0.4)] max-w-[240px] whitespace-nowrap overflow-hidden"
+                className="group relative inline-flex flex-1 items-center justify-center gap-1 sm:gap-1.5 rounded-full border border-amber-300/60 bg-white/95 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[8px] sm:text-[9px] font-semibold text-amber-700 shadow-[0_12px_28px_-18px_rgba(217,119,6,0.3)] transition-all duration-300 hover:border-amber-400/80 hover:bg-white hover:shadow-[0_16px_36px_-18px_rgba(217,119,6,0.4)] active:scale-95 max-w-full sm:max-w-[200px] whitespace-nowrap overflow-hidden w-full sm:w-auto"
                 aria-label={`View details for ${product.name}`}
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-amber-50/90 via-white/95 to-yellow-50/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                <span className="relative inline-flex items-center gap-2.5">
+                <span className="relative inline-flex items-center gap-1 sm:gap-1.5">
                   View details
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRight className="h-2.5 w-2.5 sm:h-3 sm:w-3 transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
               </Link>
             </div>
@@ -1402,13 +1379,21 @@ const Home: React.FC = () => {
                             onClick={async () => {
                               if (addingProduct === product.slug) return;
                               setAddingProduct(product.slug);
-                              addItem({
-                                id: product.slug,
-                                name: product.name,
-                                price: product.price,
-                                image: currentImage?.fallback || '',
-                              }, 1);
-                              setTimeout(() => setAddingProduct(null), 800);
+                              setCartError(null);
+                              try {
+                                await addItem({
+                                  id: product.slug,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: currentImage?.fallback || '',
+                                }, 1);
+                              } catch (error) {
+                                console.error('Failed to add to cart:', error);
+                                setCartError(error instanceof Error ? error.message : 'Failed to add product to cart');
+                                setTimeout(() => setCartError(null), 5000);
+                              } finally {
+                                setTimeout(() => setAddingProduct(null), 800);
+                              }
                             }}
                             disabled={addingProduct === product.slug}
                             className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-[0_18px_36px_-18px_rgba(15,23,42,0.55)] transition-all duration-300 hover:shadow-[0_24px_44px_-18px_rgba(15,23,42,0.65)] max-w-[220px] whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
@@ -1570,7 +1555,7 @@ const Home: React.FC = () => {
               <p className="text-sm sm:text-base lg:text-lg text-slate-700 leading-relaxed font-premium bg-gradient-to-r from-white via-[#f8fafc] to-white border border-slate-100 rounded-2xl px-4 sm:px-5 py-4 shadow-[0_22px_44px_-30px_rgba(15,23,42,0.25)]">
                 We believe true well-being comes from nature. Our thoughtfully crafted Ayurvedic supplements blend ancient wisdom with modern science to help you feel your best, naturally. Experience everyday balance, energy, and restoration.
               </p>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-2.5" data-aos="fade-up" data-aos-delay="200">
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-2.5" data-aos="fade-up" data-aos-delay="200">
                 <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(17,44,59,0.3)] px-3 py-2 sm:px-4">
                   <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                     <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -1588,6 +1573,36 @@ const Home: React.FC = () => {
                     <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
                   <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">No Harmful Additives</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#fff7ed] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(251,146,60,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <Award className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">Highly Result-Oriented</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#eff6ff] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(59,130,246,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <FlaskConical className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">Lab Tested</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f0fdf4] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(34,197,94,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">Verified Authentic Ingredients</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#fef3c7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(234,179,8,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <BadgeCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">GMP Certified</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#fce7f3] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(236,72,153,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
+                    <Medal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </div>
+                  <span className="text-slate-700 font-minimal text-[0.6rem] sm:text-xs">FSSAI</span>
                 </div>
               </div>
             </div>
@@ -1657,6 +1672,32 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Cart Error Toast */}
+      {cartError && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-md animate-slide-up">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-lg">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-red-900 mb-1">
+                  Unable to Add to Cart
+                </h3>
+                <p className="text-sm text-red-800">
+                  {cartError}
+                </p>
+              </div>
+              <button
+                onClick={() => setCartError(null)}
+                className="text-red-400 hover:text-red-600 transition-colors flex-shrink-0"
+                aria-label="Dismiss error"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </>
   );

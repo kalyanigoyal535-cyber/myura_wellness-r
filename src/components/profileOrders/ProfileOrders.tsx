@@ -4,7 +4,7 @@ type Props = {}
 
 const ProfileOrders = (props: Props) => {
   return (
-    <div className='mx-4'>
+    <div>
         <OrderCard/>
     </div>
   )

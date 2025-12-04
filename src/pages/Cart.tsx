@@ -46,6 +46,48 @@ const Cart: React.FC = () => {
     'GUT AND DIGESTION': 'gut-and-digestion',
     "WOMEN'S HEALTH PLUS": 'womens-health-plus',
     "MEN'S VITALITY BOOSTER": 'mens-vitality-booster',
+    "PRO MEN'S MULTIVITAMIN": 'pro-mens-multivitamin',
+    "PRO WOMEN'S HEALTH PLUS": 'pro-womens-health-plus',
+  };
+
+  // Map PRO product names to their image paths
+  const proProductImageMap: Record<string, ResponsiveImageDescriptor> = {
+    "PRO MEN'S MULTIVITAMIN": {
+      alt: "PRO Men's Multivitamin supplement",
+      fallback: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+      sources: [
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(min-width: 1024px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(min-width: 768px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(max-width: 767px)',
+        },
+      ],
+    },
+    "PRO WOMEN'S HEALTH PLUS": {
+      alt: "PRO Women's Health Plus supplement",
+      fallback: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+      sources: [
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(min-width: 1024px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(min-width: 768px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(max-width: 767px)',
+        },
+      ],
+    },
   };
   
   // Get product from static data by matching name or ID
@@ -72,8 +114,27 @@ const Cart: React.FC = () => {
       }
     }
     
-    
     return product || null;
+  };
+
+  // Get product image for cart item (handles PRO products)
+  const getProductImageForCart = (itemId: string, itemName?: string): ResponsiveImageDescriptor | null => {
+    // First try to get product from static catalog
+    const product = getProductForCartItem(itemId, itemName);
+    if (product?.image) {
+      return product.image;
+    }
+    
+    // If not found, check if it's a PRO product
+    if (itemName) {
+      const normalizedName = itemName.toUpperCase().trim();
+      const proImage = proProductImageMap[normalizedName];
+      if (proImage) {
+        return proImage;
+      }
+    }
+    
+    return null;
   };
   
   const shipping = subtotal > 799 || subtotal === 0 ? 0 : 49;
@@ -235,13 +296,13 @@ const Cart: React.FC = () => {
                         >
                           <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/80 border border-slate-200/60 group-hover:border-slate-300 transition-all duration-300 shadow-sm group-hover:shadow-md">
                             {(() => {
-                              // Always use static product images directly (no API URLs needed)
-                              const staticProduct = getProductForCartItem(item.id, item.name);
+                              // Get product image (handles both regular and PRO products)
+                              const productImage = getProductImageForCart(item.id, item.name);
                               
-                              if (staticProduct?.image) {
+                              if (productImage) {
                                 return (
                                   <ResponsiveProductImage
-                                    image={staticProduct.image}
+                                    image={productImage}
                                     className="w-full h-full"
                                     imgClassName="object-contain p-2 group-hover/image:scale-110 transition-transform duration-500"
                                   />

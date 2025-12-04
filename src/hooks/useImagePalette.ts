@@ -118,6 +118,11 @@ const PRODUCT_DEFAULT_COLORS: Record<string, RGB> = {
   'gut-and-digestion': { r: 251, g: 191, b: 36 }, // amber-400
   'womens-health-plus': { r: 236, g: 72, b: 153 }, // pink-500
   'mens-vitality-booster': { r: 14, g: 165, b: 233 }, // sky-500
+  // ProSeries products - colors extracted from actual product images
+  'pro-mens-multivitamin': { r: 183, g: 108, b: 87 }, // #b76c57 - warm terracotta/brown from image
+  'pro-mens-vitality-booster-gold': { r: 51, g: 104, b: 125 }, // #33687d - teal/blue from image
+  'pro-omega-3-softgel': { r: 14, g: 116, b: 144 }, // #0e7490 - deep ocean blue/teal for omega-3
+  'pro-womens-health-plus': { r: 192, g: 78, b: 172 }, // #c04eac - pink/magenta from image
 };
 
 const DEFAULT_COLOR: RGB = { r: 236, g: 120, b: 155 };

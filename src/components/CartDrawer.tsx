@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingBag, Gift, Sparkles, ArrowRight, Star, Leaf, Heart, Flower2, Tag, Copy, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import ResponsiveProductImage from './ResponsiveProductImage';
-import { getProductById } from '../data/products';
+import ResponsiveProductImage, { ResponsiveImageDescriptor } from './ResponsiveProductImage';
+import { getProductById, productCatalog, type ProductRecord } from '../data/products';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -24,6 +24,104 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const [carouselScrollPosition, setCarouselScrollPosition] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
+  // Map product names to static product slugs for image lookup
+  const productNameToSlugMap: Record<string, string> = {
+    'DIA CARE': 'dia-care',
+    'LIVER DETOX FORMULA': 'liver-detox',
+    'BONE & JOINT SUPPORT': 'bone-joint-support',
+    'GUT AND DIGESTION': 'gut-and-digestion',
+    "WOMEN'S HEALTH PLUS": 'womens-health-plus',
+    "MEN'S VITALITY BOOSTER": 'mens-vitality-booster',
+    "PRO MEN'S MULTIVITAMIN": 'pro-mens-multivitamin',
+    "PRO WOMEN'S HEALTH PLUS": 'pro-womens-health-plus',
+  };
+
+  // Map PRO product names to their image paths
+  const proProductImageMap: Record<string, ResponsiveImageDescriptor> = {
+    "PRO MEN'S MULTIVITAMIN": {
+      alt: "PRO Men's Multivitamin supplement",
+      fallback: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+      sources: [
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(min-width: 1024px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(min-width: 768px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
+          media: '(max-width: 767px)',
+        },
+      ],
+    },
+    "PRO WOMEN'S HEALTH PLUS": {
+      alt: "PRO Women's Health Plus supplement",
+      fallback: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+      sources: [
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(min-width: 1024px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(min-width: 768px)',
+        },
+        {
+          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
+          media: '(max-width: 767px)',
+        },
+      ],
+    },
+  };
+
+  // Get product from static data by matching name or ID
+  const getProductForCartItem = (itemId: string, itemName?: string): ProductRecord | null => {
+    // First try direct lookup by ID (if it's a slug)
+    let product = getProductById(itemId);
+    
+    // If not found, try matching by product name
+    if (!product && itemName) {
+      const normalizedName = itemName.toUpperCase().trim();
+      
+      // Try the name-to-slug map first
+      const slug = productNameToSlugMap[normalizedName];
+      if (slug) {
+        product = getProductById(slug);
+      }
+      
+      // If still not found, search by name in product catalog
+      if (!product) {
+        product = productCatalog.find(p => {
+          const productName = p.name.toUpperCase().trim();
+          return productName === normalizedName;
+        }) || null;
+      }
+    }
+    
+    return product || null;
+  };
+
+  // Get product image for cart item (handles PRO products)
+  const getProductImageForCart = (itemId: string, itemName?: string): ResponsiveImageDescriptor | null => {
+    // First try to get product from static catalog
+    const product = getProductForCartItem(itemId, itemName);
+    if (product?.image) {
+      return product.image;
+    }
+    
+    // If not found, check if it's a PRO product
+    if (itemName) {
+      const normalizedName = itemName.toUpperCase().trim();
+      const proImage = proProductImageMap[normalizedName];
+      if (proImage) {
+        return proImage;
+      }
+    }
+    
+    return null;
+  };
 
   const availableCoupons = [
     { code: 'FEST30', label: '30% OFF', description: 'Festive Essentials', detail: 'Signature adaptogenic blends for daily rituals.', accent: '#d97706', discount: 30 },
@@ -49,7 +147,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const discountedSubtotal = couponDiscountAmount > 0 ? subtotal - couponDiscountAmount : subtotal;
   const total = discountedSubtotal + shipping;
   const savings = items.reduce((acc, item) => {
-    const product = getProductById(item.id);
+    const product = getProductForCartItem(item.id, item.name);
     if (product && product.originalPrice > product.price) {
       return acc + (product.originalPrice - product.price) * item.qty;
     }
@@ -57,7 +155,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   }, 0);
 
   const originalSubtotal = items.reduce((acc, item) => {
-    const product = getProductById(item.id);
+    const product = getProductForCartItem(item.id, item.name);
     if (product && product.originalPrice > product.price) {
       return acc + product.originalPrice * item.qty;
     }
@@ -251,17 +349,19 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2 font-display">Your cart is empty</h3>
               <p className="text-sm text-slate-600 mb-6">Start your wellness journey by adding natural supplements</p>
-              <button
+              <Link
+                to="/product"
                 onClick={onClose}
-                className="px-6 py-3 bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 text-white rounded-lg font-semibold text-sm hover:from-slate-900 hover:via-slate-900 hover:to-slate-900 transition-all shadow-md hover:shadow-lg"
+                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 text-white rounded-lg font-semibold text-sm hover:from-slate-900 hover:via-slate-900 hover:to-slate-900 transition-all shadow-md hover:shadow-lg"
               >
                 Explore Wellness Products
-              </button>
+              </Link>
             </div>
           ) : (
             <div className="px-5 py-3 space-y-3">
               {items.map((item, index) => {
-                const product = getProductById(item.id);
+                const product = getProductForCartItem(item.id, item.name);
+                const productImage = getProductImageForCart(item.id, item.name);
                 const isRemoving = removingId === item.id;
                 const isVisible = visibleItems.has(item.id);
                 const isUpdating = updatingQty === item.id;
@@ -289,9 +389,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         className="flex-shrink-0 group/image"
                       >
                         <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-slate-50 to-white border border-slate-200 overflow-hidden shadow-md group-hover/image:shadow-lg group-hover/image:border-slate-300 transition-all duration-300">
-                          {product?.image ? (
+                          {productImage ? (
                             <ResponsiveProductImage
-                              image={product.image}
+                              image={productImage}
                               className="w-full h-full"
                               imgClassName="object-contain"
                             />
