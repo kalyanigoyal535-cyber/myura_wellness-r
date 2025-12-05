@@ -79,10 +79,10 @@ const Checkout: React.FC = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [redirectingToPayment, setRedirectingToPayment] = useState(false);
   const [showCouponModal, setShowCouponModal] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
 
-  // Map product names to static product slugs for image lookup
   const productNameToSlugMap: Record<string, string> = {
     'DIA CARE': 'dia-care',
     'LIVER DETOX FORMULA': 'liver-detox',
@@ -94,7 +94,6 @@ const Checkout: React.FC = () => {
     "PRO WOMEN'S HEALTH PLUS": 'pro-womens-health-plus',
   };
 
-  // Map PRO product names to their image paths
   const proProductImageMap: Record<string, ResponsiveImageDescriptor> = {
     "PRO MEN'S MULTIVITAMIN": {
       alt: "PRO Men's Multivitamin supplement",
@@ -327,8 +326,16 @@ const Checkout: React.FC = () => {
           customer_phone: `+91${form.phone.trim()}`,
         });
 
-        // Redirect to Cashfree payment page
-        window.location.href = paymentResponse.payment_url;
+        // Note: Cashfree will redirect back to callback URLs configured in their dashboard
+        // The callback URLs should be set to:
+        // - Success: /payment/success?order_id={order_id}&gateway=cashfree&cf_order_id={cf_order_id}
+        // - Failure: /payment/failure?order_id={order_id}&gateway=cashfree&error={error}
+        // Show redirecting state
+        setRedirectingToPayment(true);
+        // Small delay to show message before redirect
+        setTimeout(() => {
+          window.location.href = paymentResponse.payment_url;
+        }, 500);
       } else {
         // Use PhonePe payment gateway (default)
         // Convert amount to paise (multiply by 100)
@@ -340,14 +347,31 @@ const Checkout: React.FC = () => {
           order_id: order.id,
         });
 
-        // Redirect to PhonePe payment page with orderId as query param
-        window.location.href = `${paymentResponse.payment_url}&orderId=${order.id}`;
+        // Note: PhonePe will redirect back to callback URLs configured in their dashboard
+        // The callback URLs should be set to:
+        // - Success: /payment/success?order_id={order_id}&gateway=phonepe&transaction_id={transaction_id}
+        // - Failure: /payment/failure?order_id={order_id}&gateway=phonepe&error={error}
+        // Store transaction_id in sessionStorage for verification
+        if (paymentResponse.transaction_id) {
+          sessionStorage.setItem(`payment_${order.id}`, JSON.stringify({
+            transaction_id: paymentResponse.transaction_id,
+            gateway: 'phonepe',
+            order_id: order.id,
+          }));
+        }
+        // Show redirecting state
+        setRedirectingToPayment(true);
+        // Small delay to show message before redirect
+        setTimeout(() => {
+          window.location.href = paymentResponse.payment_url;
+        }, 500);
       }
     } catch (error) {
       console.error('Failed to create order:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create order. Please try again.';
       setOrderError(errorMessage);
       setPlacingOrder(false);
+      setRedirectingToPayment(false);
     }
   };
 
@@ -715,10 +739,10 @@ const Checkout: React.FC = () => {
               )}
               <button
                 type="submit"
-                disabled={!isFormValid || placingOrder}
+                disabled={!isFormValid || placingOrder || redirectingToPayment}
                 className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold bg-slate-900 hover:bg-slate-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {placingOrder ? 'Placing order...' : 'Place Order'}
+                {redirectingToPayment ? 'Redirecting to payment...' : placingOrder ? 'Placing order...' : 'Place Order'}
               </button>
               <p className="text-[11px] text-slate-400 text-center">
                 By proceeding, you agree to Minimalist&apos;s privacy policy & T&C
@@ -727,6 +751,17 @@ const Checkout: React.FC = () => {
           </aside>
         </form>
       </div>
+
+      {/* Payment Redirect Overlay */}
+      {redirectingToPayment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Redirecting to Payment Gateway</h3>
+            <p className="text-sm text-slate-600">Please wait while we redirect you to complete your payment...</p>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

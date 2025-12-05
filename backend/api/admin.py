@@ -6,10 +6,8 @@ from .models import (
 )
 from .forms import EmailAuthenticationForm
 
-# Override the default admin site to use email authentication
 admin.site.login_form = EmailAuthenticationForm
 
-# Custom User Admin
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     list_display = ['email', 'username', 'first_name', 'last_name', 'phone_number', 'is_staff', 'created_at']
@@ -17,12 +15,10 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ['email', 'username', 'first_name', 'last_name']
     ordering = ['-created_at']
     
-    # Use email as the login field
     fieldsets = BaseUserAdmin.fieldsets + (
         ('Additional Info', {'fields': ('phone_number',)}),
     )
     
-    # Configure add form to use email
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -30,7 +26,6 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-# Product Admin
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
@@ -68,7 +63,6 @@ class ProductAdmin(admin.ModelAdmin):
         }),
     )
 
-# Cart Admin
 class CartItemInline(admin.TabularInline):
     model = CartItem
     extra = 0
@@ -80,17 +74,15 @@ class CartAdmin(admin.ModelAdmin):
     list_filter = ['created_at', 'updated_at']
     search_fields = ['user__email', 'session_key']
     readonly_fields = ['created_at', 'updated_at', 'total_items', 'total_amount']
-    ordering = ['-updated_at']  # Order by most recently updated first
+    ordering = ['-updated_at']
     inlines = [CartItemInline]
 
-# Address Admin
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'user', 'city', 'state', 'is_default']
     list_filter = ['address_type', 'state', 'is_default']
     search_fields = ['user__email', 'full_name', 'city']
 
-# Order Admin
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
@@ -104,7 +96,6 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ['order_number', 'created_at', 'updated_at']
     inlines = [OrderItemInline]
 
-# Contact Admin
 @admin.register(ContactSubmission)
 class ContactSubmissionAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'subject', 'is_read', 'created_at']

@@ -11,9 +11,31 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+# Try python-decouple first (already in requirements), fallback to manual .env reading
+try:
+    from decouple import config
+    USE_DECOUPLE = True
+    # decouple automatically loads .env file from BASE_DIR
+except ImportError:
+    USE_DECOUPLE = False
+    # Fallback: manually load .env file
+    env_path = BASE_DIR / '.env'
+    if env_path.exists():
+        with open(env_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+        print(f"[Settings] Loaded .env file from {env_path}")
+    else:
+        print(f"[Settings] Warning: .env file not found at {env_path}")
 
 
 # Quick-start development settings - unsuitable for production
@@ -213,17 +235,39 @@ DEFAULT_FROM_EMAIL = 'noreply@myurawellness.com'
 # EMAIL_HOST_PASSWORD = 'your-app-password'
 
 # PhonePe Payment Gateway Settings
-import os
-PHONEPE_CLIENT_ID = os.getenv('PHONEPE_CLIENT_ID', '')
-PHONEPE_CLIENT_SECRET = os.getenv('PHONEPE_CLIENT_SECRET', '')
-PHONEPE_MERCHANT_ID = os.getenv('PHONEPE_MERCHANT_ID', '')
-PHONEPE_API_URL = os.getenv('PHONEPE_API_URL', 'https://api-preprod.phonepe.com/apis/pg-sandbox')
-PHONEPE_REDIRECT_URL = os.getenv('PHONEPE_REDIRECT_URL', 'http://localhost:3000/payment/callback')
-PHONEPE_CALLBACK_URL = os.getenv('PHONEPE_CALLBACK_URL', 'http://127.0.0.1:8000/api/payments/phonepe/callback')
+if USE_DECOUPLE:
+    # Use decouple if available (better .env handling)
+    PHONEPE_CLIENT_ID = config('PHONEPE_CLIENT_ID', default='')
+    PHONEPE_CLIENT_SECRET = config('PHONEPE_CLIENT_SECRET', default='')
+    PHONEPE_MERCHANT_ID = config('PHONEPE_MERCHANT_ID', default='')
+    PHONEPE_API_URL = config('PHONEPE_API_URL', default='https://api-preprod.phonepe.com/apis/pg-sandbox')
+    PHONEPE_REDIRECT_URL = config('PHONEPE_REDIRECT_URL', default='http://localhost:3000/payment/success')
+    PHONEPE_CALLBACK_URL = config('PHONEPE_CALLBACK_URL', default='http://127.0.0.1:8000/api/payments/phonepe/callback')
+else:
+    # Fallback to os.getenv (after manual .env loading)
+    PHONEPE_CLIENT_ID = os.getenv('PHONEPE_CLIENT_ID', '')
+    PHONEPE_CLIENT_SECRET = os.getenv('PHONEPE_CLIENT_SECRET', '')
+    PHONEPE_MERCHANT_ID = os.getenv('PHONEPE_MERCHANT_ID', '')
+    PHONEPE_API_URL = os.getenv('PHONEPE_API_URL', 'https://api-preprod.phonepe.com/apis/pg-sandbox')
+    PHONEPE_REDIRECT_URL = os.getenv('PHONEPE_REDIRECT_URL', 'http://localhost:3000/payment/success')
+    PHONEPE_CALLBACK_URL = os.getenv('PHONEPE_CALLBACK_URL', 'http://127.0.0.1:8000/api/payments/phonepe/callback')
+
+# Debug: Print if credentials are loaded (remove in production)
+if not PHONEPE_CLIENT_ID:
+    print("[Settings] WARNING: PHONEPE_CLIENT_ID is empty. Check .env file.")
+else:
+    print(f"[Settings] PhonePe Client ID loaded: {PHONEPE_CLIENT_ID[:20]}...")
 
 # Cashfree Payment Gateway Settings
-CASHFREE_APP_ID = os.getenv('CASHFREE_APP_ID', '')
-CASHFREE_SECRET_KEY = os.getenv('CASHFREE_SECRET_KEY', '')
-CASHFREE_API_URL = os.getenv('CASHFREE_API_URL', 'https://sandbox.cashfree.com/pg')
-CASHFREE_REDIRECT_URL = os.getenv('CASHFREE_REDIRECT_URL', 'http://localhost:3000/payment/callback')
-CASHFREE_CALLBACK_URL = os.getenv('CASHFREE_CALLBACK_URL', 'http://127.0.0.1:8000/api/payments/cashfree/callback')
+if USE_DECOUPLE:
+    CASHFREE_APP_ID = config('CASHFREE_APP_ID', default='')
+    CASHFREE_SECRET_KEY = config('CASHFREE_SECRET_KEY', default='')
+    CASHFREE_API_URL = config('CASHFREE_API_URL', default='https://sandbox.cashfree.com/pg')
+    CASHFREE_REDIRECT_URL = config('CASHFREE_REDIRECT_URL', default='http://localhost:3000/payment/success')
+    CASHFREE_CALLBACK_URL = config('CASHFREE_CALLBACK_URL', default='http://127.0.0.1:8000/api/payments/cashfree/callback')
+else:
+    CASHFREE_APP_ID = os.getenv('CASHFREE_APP_ID', '')
+    CASHFREE_SECRET_KEY = os.getenv('CASHFREE_SECRET_KEY', '')
+    CASHFREE_API_URL = os.getenv('CASHFREE_API_URL', 'https://sandbox.cashfree.com/pg')
+    CASHFREE_REDIRECT_URL = os.getenv('CASHFREE_REDIRECT_URL', 'http://localhost:3000/payment/success')
+    CASHFREE_CALLBACK_URL = os.getenv('CASHFREE_CALLBACK_URL', 'http://127.0.0.1:8000/api/payments/cashfree/callback')

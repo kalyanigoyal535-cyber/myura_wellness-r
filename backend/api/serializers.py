@@ -9,10 +9,7 @@ from .models import (
 User = get_user_model()
 
 
-# ==================== USER SERIALIZERS ====================
-
 class UserSerializer(serializers.ModelSerializer):
-    """Serializer for User model"""
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'first_name', 'last_name', 'phone_number', 'date_joined']
@@ -20,7 +17,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    """Serializer for user registration"""
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True, label='Confirm Password')
 
@@ -39,10 +35,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
-# ==================== PRODUCT IMAGE SERIALIZER ====================
-
 class ProductImageSerializer(serializers.ModelSerializer):
-    """Serializer for ProductImage model"""
     image_url = serializers.SerializerMethodField()
     
     class Meta:

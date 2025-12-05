@@ -28,6 +28,8 @@ const Contact = lazy(() => import("./pages/Contact"));
 const MyAccount = lazy(() => import("./pages/MyAccount"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentFailure = lazy(() => import("./pages/PaymentFailure"));
 
 // Loading component
 const LoadingFallback = () => (
@@ -126,6 +128,8 @@ const AppContent: React.FC = () => {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirm />} />
               <Route path="/order-details/:id" element={<OrderDetails />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/failure" element={<PaymentFailure />} />
             </Routes>
           </Suspense>
         </div>

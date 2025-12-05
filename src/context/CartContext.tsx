@@ -27,20 +27,17 @@ export interface CartContextValue {
   syncCart: () => Promise<void>;
 }
 
-// Helper to convert API cart item to frontend cart item
 const apiCartItemToFrontend = (apiItem: ApiCartItem): CartItem => {
   const product = apiItem.product;
-  // Note: We don't need image URLs from API - cart will use static product images directly
   return {
     id: String(product.id),
     name: product.name,
     price: parseFloat(product.price),
-    image: '', // Not used - cart uses static product images directly
+    image: '',
     qty: apiItem.quantity,
   };
 };
 
-// Helper to convert frontend cart item to API format
 const frontendCartItemToApi = (item: CartItem) => {
   return {
     product_id: parseInt(item.id),
@@ -57,7 +54,6 @@ export const useCart = (): CartContextValue => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Sync cart from backend
   const syncCart = async () => {
     setIsLoading(true);
     try {
@@ -65,36 +61,29 @@ export const useCart = (): CartContextValue => {
       const apiCart = await cartApi.getCart();
       console.log('[Cart] Backend cart response:', apiCart);
       
-      // Convert API cart items to frontend format
       const frontendItems: CartItem[] = apiCart.items.map(apiCartItemToFrontend);
       console.log('[Cart] Converted frontend items:', frontendItems);
       console.log('[Cart] API cart ID:', apiCart.id, 'Total items:', apiCart.total_items);
       
-      // Update Redux store with all items from API (source of truth)
       dispatch(setCartItems(frontendItems));
       console.log('[Cart] Cart sync complete. Items count:', frontendItems.length);
     } catch (error) {
       console.error('[Cart] Failed to sync cart from backend:', error);
-      // Continue with local cart if sync fails
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Add item to cart (syncs with backend)
   const addItemToCart = async (item: Omit<CartItem, 'qty'>, qty = 1) => {
     setIsLoading(true);
     console.log('[Cart] Adding item to cart:', { item, qty });
     try {
-      // Handle both numeric IDs (from API) and string IDs (from static data)
       let productId: number;
       
-      // Check if ID is already a number
       if (typeof item.id === 'number') {
         productId = item.id;
         console.log('[Cart] Using numeric ID:', productId);
       } else {
-        // Try to parse as integer
         const parsedId = parseInt(item.id, 10);
         
         if (!isNaN(parsedId) && parsedId > 0) {

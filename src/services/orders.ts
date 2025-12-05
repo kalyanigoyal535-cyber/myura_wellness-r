@@ -1,9 +1,7 @@
 import apiClient, { getErrorMessage } from './api';
 import { Order, CreateOrderRequest } from './types';
 
-// Orders API
 export const ordersApi = {
-  // Create order from cart
   createOrder: async (data: CreateOrderRequest): Promise<Order> => {
     try {
       const response = await apiClient.post<{ message: string; order: Order }>('/orders/create/', data);
@@ -13,7 +11,6 @@ export const ordersApi = {
     }
   },
 
-  // Get user's orders
   getOrders: async (): Promise<Order[]> => {
     try {
       const response = await apiClient.get<Order[]>('/orders/');
@@ -23,7 +20,6 @@ export const ordersApi = {
     }
   },
 
-  // Get order by ID
   getOrder: async (id: number): Promise<Order> => {
     try {
       const response = await apiClient.get<Order>(`/orders/${id}/`);
@@ -33,7 +29,6 @@ export const ordersApi = {
     }
   },
 
-  // Cancel order
   cancelOrder: async (id: number): Promise<Order> => {
     try {
       const response = await apiClient.post<{ message: string; order: Order }>(`/orders/${id}/cancel/`);

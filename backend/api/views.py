@@ -30,19 +30,7 @@ from .serializers import (
 User = get_user_model()
 
 
-# ==================== PRODUCT VIEWSET ====================
-
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    ViewSet for viewing products.
-    Provides list and detail views with filtering and search.
-    
-    List endpoint: GET /api/products/
-    Detail endpoint: GET /api/products/{id}/
-    Filter by category: GET /api/products/?category=dia-care
-    Search: GET /api/products/?search=keyword
-    Filter by stock: GET /api/products/?in_stock=true
-    """
     queryset = Product.objects.select_related('category').prefetch_related('gallery_images').all()
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -55,36 +43,30 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     }
     search_fields = ['name', 'headline', 'description', 'summary', 'category__name', 'key_ingredients']
     ordering_fields = ['price', 'rating', 'created_at', 'name', 'reviews_count']
-    ordering = ['-created_at']  # Default ordering
+    ordering = ['-created_at']
 
     def get_serializer_context(self):
-        """Add request context for image URLs"""
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
 
     def get_serializer_class(self):
-        """Use detailed serializer for detail view, lightweight for list"""
         if self.action == 'retrieve':
             return ProductDetailSerializer
         return ProductListSerializer
 
     def get_queryset(self):
-        """Custom queryset with enhanced filtering"""
         queryset = super().get_queryset()
         
-        # Filter by multiple categories (comma-separated)
         categories = self.request.query_params.get('categories', None)
         if categories:
             category_list = [cat.strip() for cat in categories.split(',')]
             queryset = queryset.filter(category__id__in=category_list)
         
-        # Filter by single category (backward compatibility)
         category = self.request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category__id=category)
         
-        # Filter by price range (enhanced)
         min_price = self.request.query_params.get('min_price', None)
         max_price = self.request.query_params.get('max_price', None)
         if min_price:
@@ -98,7 +80,6 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             except (ValueError, TypeError):
                 pass
         
-        # Filter by rating range
         min_rating = self.request.query_params.get('min_rating', None)
         max_rating = self.request.query_params.get('max_rating', None)
         if min_rating:
@@ -112,7 +93,6 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             except (ValueError, TypeError):
                 pass
         
-        # Filter by discount (products with discount)
         has_discount = self.request.query_params.get('has_discount', None)
         if has_discount:
             if has_discount.lower() == 'true':
@@ -120,23 +100,18 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
                     original_price__isnull=False
                 ).exclude(original_price=F('price'))
             elif has_discount.lower() == 'false':
-                # Products without discount (no original_price or original_price == price)
                 queryset = queryset.filter(
                     Q(original_price__isnull=True) | Q(original_price=F('price'))
                 )
         
-        # Filter by on sale (has discount)
         on_sale = self.request.query_params.get('on_sale', None)
         if on_sale:
             if on_sale.lower() == 'true':
-                # Products on sale (have discount: original_price > price)
                 queryset = queryset.filter(
                     original_price__isnull=False,
                     original_price__gt=F('price')
                 )
             elif on_sale.lower() == 'false':
-                # Products NOT on sale (no discount: exclude products where original_price > price)
-                # This means: original_price is null OR original_price <= price
                 queryset = queryset.exclude(
                     original_price__isnull=False,
                     original_price__gt=F('price')
@@ -146,7 +121,6 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'])
     def featured(self, request):
-        """Get featured products (highly rated, in stock)"""
         featured = self.get_queryset().filter(
             in_stock=True,
             rating__gte=4.5
@@ -157,7 +131,6 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'])
     def related(self, request, pk=None):
-        """Get related products (same category, excluding current product)"""
         product_id = request.query_params.get('product_id', None)
         if not product_id:
             return Response(
@@ -222,13 +195,9 @@ class ProductCategoryViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(description__icontains=search)
             )
         
-        # Serialize category
         category_serializer = self.get_serializer(instance)
-        
-        # Serialize products
         product_serializer = ProductListSerializer(products, many=True, context={'request': request})
         
-        # Combine response
         response_data = category_serializer.data
         response_data['products'] = product_serializer.data
         response_data['products_count'] = products.count()
@@ -236,45 +205,25 @@ class ProductCategoryViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(response_data)
 
 
-# ==================== AUTHENTICATION VIEWS ====================
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Custom token serializer to include user data"""
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        # Add custom claims
         token['email'] = user.email
         token['username'] = user.username
         return token
 
     def validate(self, attrs):
         data = super().validate(attrs)
-        # Add user data to response
         data['user'] = UserSerializer(self.user).data
         return data
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    """Custom login view that returns user data with tokens"""
     serializer_class = CustomTokenObtainPairSerializer
 
 
 class UserRegistrationView(generics.CreateAPIView):
-    """
-    User registration endpoint.
-    
-    POST /api/auth/register/
-    Body: {
-        "email": "user@example.com",
-        "username": "username",
-        "password": "password123",
-        "password2": "password123",
-        "first_name": "John",
-        "last_name": "Doe",
-        "phone_number": "+1234567890"
-    }
-    """
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
@@ -284,7 +233,6 @@ class UserRegistrationView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        # Generate tokens
         refresh = RefreshToken.for_user(user)
         
         return Response({
@@ -298,12 +246,6 @@ class UserRegistrationView(generics.CreateAPIView):
 
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
-    """
-    Get or update current user profile.
-    
-    GET /api/auth/user/ - Get current user
-    PUT /api/auth/user/ - Update current user
-    """
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
@@ -314,13 +256,6 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    """
-    Logout endpoint.
-    
-    POST /api/auth/logout/
-    Note: Client should discard tokens on their end.
-    For token blacklisting, install django-rest-framework-simplejwt[token_blacklist]
-    """
     return Response(
         {'message': 'Successfully logged out. Please discard tokens on client side.'},
         status=status.HTTP_200_OK
@@ -330,17 +265,6 @@ def logout_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def password_reset_request_view(request):
-    """
-    Password reset request endpoint.
-    
-    POST /api/auth/password/reset/
-    Body: {
-        "email": "user@example.com"
-    }
-    
-    Sends password reset email to user if email exists.
-    Always returns success message for security (don't reveal if email exists).
-    """
     serializer = PasswordResetRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     
@@ -349,19 +273,13 @@ def password_reset_request_view(request):
     try:
         user = User.objects.get(email=email)
         
-        # Generate password reset token
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
         
-        # Build reset URL (frontend URL)
-        # In production, this should be your frontend URL
         reset_url = f"{request.scheme}://{request.get_host()}/reset-password/{uid}/{token}"
         
-        # For development, use localhost:3000
         if settings.DEBUG:
             reset_url = f"http://localhost:3000/reset-password/{uid}/{token}"
-        
-        # Send email
         try:
             send_mail(
                 subject='Password Reset Request - Myura Wellness',
@@ -454,20 +372,11 @@ def password_reset_confirm_view(request):
         )
 
 
-# ==================== CART VIEWS ====================
-
 def get_or_create_cart(request):
-    """
-    Helper function to get or create cart for authenticated user or guest.
-    Returns (cart, created) tuple.
-    
-    Supports cart ID from X-Cart-ID header as fallback when session cookies fail.
-    """
     import logging
     logger = logging.getLogger(__name__)
     
     if request.user.is_authenticated:
-        # Authenticated user - get/create cart for user
         cart, created = Cart.objects.get_or_create(
             user=request.user,
             session_key__isnull=True,
@@ -475,13 +384,10 @@ def get_or_create_cart(request):
         )
         logger.info(f"[Cart] Authenticated user - Cart ID: {cart.id}, Created: {created}")
     else:
-        # Guest user - use session key or cart ID header
-        # First, check if cart ID is provided in header (fallback for session issues)
         cart_id_header = request.headers.get('X-Cart-ID', None)
         if cart_id_header:
             try:
                 cart_id = int(cart_id_header)
-                # Try to get cart by ID (must be guest cart with no user)
                 try:
                     cart = Cart.objects.get(id=cart_id, user=None)
                     created = False
@@ -1144,12 +1050,22 @@ def create_phonepe_payment(request):
         transaction_id = f"TXN{order.order_number}{uuid.uuid4().hex[:8].upper()}"
         
         # Create payment request
-        payment_response = phonepe_client.create_payment_request(
-            transaction_id=transaction_id,
-            amount=amount,
-            user_id=request.user.id,
-            order_id=order_id
-        )
+        try:
+            payment_response = phonepe_client.create_payment_request(
+                transaction_id=transaction_id,
+                amount=amount,
+                user_id=request.user.id,
+                order_id=order_id
+            )
+        except Exception as payment_error:
+            # Log the error for debugging
+            import traceback
+            print(f"PhonePe payment creation error: {str(payment_error)}")
+            print(traceback.format_exc())
+            return Response(
+                {'error': f'Payment gateway error: {str(payment_error)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
         if payment_response.get("success"):
             # Store transaction ID in order (temporarily)
@@ -1162,14 +1078,19 @@ def create_phonepe_payment(request):
                 'order_id': order_id
             }, status=status.HTTP_200_OK)
         else:
+            error_msg = payment_response.get('error', 'Payment request failed')
+            print(f"PhonePe payment creation failed: {error_msg}")
             return Response(
-                {'error': payment_response.get('error', 'Payment request failed')},
+                {'error': error_msg},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
     except Exception as e:
+        import traceback
+        print(f"Unexpected error in create_phonepe_payment: {str(e)}")
+        print(traceback.format_exc())
         return Response(
-            {'error': str(e)},
+            {'error': f'Internal server error: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 

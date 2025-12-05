@@ -12,13 +12,11 @@ export interface ProductFilters {
   on_sale?: boolean;
   has_discount?: boolean;
   search?: string;
-  ordering?: string; // e.g., 'price', '-price', 'rating', '-created_at'
+  ordering?: string;
   page?: number;
 }
 
-// Products API
 export const productsApi = {
-  // Get all products with optional filters
   getProducts: async (filters?: ProductFilters): Promise<ProductListResponse> => {
     try {
       const params = new URLSearchParams();
@@ -47,7 +45,6 @@ export const productsApi = {
     }
   },
 
-  // Get single product by ID
   getProduct: async (id: number): Promise<Product> => {
     try {
       const response = await apiClient.get<Product>(`/products/${id}/`);
@@ -57,7 +54,6 @@ export const productsApi = {
     }
   },
 
-  // Get featured products
   getFeaturedProducts: async (): Promise<Product[]> => {
     try {
       const response = await apiClient.get<Product[]>('/products/featured/');
@@ -67,7 +63,6 @@ export const productsApi = {
     }
   },
 
-  // Get related products
   getRelatedProducts: async (productId: number): Promise<Product[]> => {
     try {
       const response = await apiClient.get<Product[]>(`/products/related/?product_id=${productId}`);
@@ -77,7 +72,6 @@ export const productsApi = {
     }
   },
 
-  // Get all categories
   getCategories: async (): Promise<ProductCategory[]> => {
     try {
       const response = await apiClient.get<ProductCategory[]>('/categories/');
@@ -87,7 +81,6 @@ export const productsApi = {
     }
   },
 
-  // Get category with products
   getCategory: async (id: string, filters?: { in_stock?: boolean; search?: string }): Promise<ProductCategory & { products: Product[]; products_count: number }> => {
     try {
       const params = new URLSearchParams();
@@ -103,6 +96,8 @@ export const productsApi = {
     }
   },
 };
+
+
 
 
 

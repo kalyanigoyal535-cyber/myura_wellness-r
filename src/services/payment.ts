@@ -1,7 +1,7 @@
 import apiClient, { getErrorMessage } from './api';
 
 export interface CreatePhonePePaymentRequest {
-  amount: number; // Amount in paise
+  amount: number;
   order_id: number;
 }
 
@@ -17,7 +17,6 @@ export interface VerifyPhonePePaymentRequest {
 }
 
 export const phonepeApi = {
-  // Create PhonePe payment request
   createPayment: async (data: CreatePhonePePaymentRequest): Promise<CreatePhonePePaymentResponse> => {
     try {
       const response = await apiClient.post<CreatePhonePePaymentResponse>(
@@ -30,7 +29,6 @@ export const phonepeApi = {
     }
   },
 
-  // Verify payment status
   verifyPayment: async (data: VerifyPhonePePaymentRequest): Promise<{ success: boolean; payment_status: string; order?: any }> => {
     try {
       const response = await apiClient.post<{ success: boolean; payment_status: string; order?: any }>(
@@ -44,9 +42,8 @@ export const phonepeApi = {
   },
 };
 
-// Cashfree Payment API
 export interface CreateCashfreePaymentRequest {
-  amount: number; // Amount in rupees
+  amount: number;
   order_id: number;
   customer_name?: string;
   customer_email?: string;
@@ -60,12 +57,11 @@ export interface CreateCashfreePaymentResponse {
 }
 
 export interface VerifyCashfreePaymentRequest {
-  order_id: string; // Cashfree order ID (ORDER_xxx)
-  order_db_id: number; // Database order ID
+  order_id: string;
+  order_db_id: number;
 }
 
 export const cashfreeApi = {
-  // Create Cashfree payment session
   createPayment: async (data: CreateCashfreePaymentRequest): Promise<CreateCashfreePaymentResponse> => {
     try {
       const response = await apiClient.post<CreateCashfreePaymentResponse>(
@@ -78,7 +74,6 @@ export const cashfreeApi = {
     }
   },
 
-  // Verify payment status
   verifyPayment: async (data: VerifyCashfreePaymentRequest): Promise<{ success: boolean; payment_status: string; order?: any }> => {
     try {
       const response = await apiClient.post<{ success: boolean; payment_status: string; order?: any }>(

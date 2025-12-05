@@ -1,18 +1,15 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
-// API Base URL - defaults to localhost:8000 for development
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/api';
 
-// Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Important for session-based cart (guest users)
+  withCredentials: true,
 });
 
-// Request interceptor - Add auth token to requests
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('access_token');
@@ -26,13 +23,11 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor - Handle token refresh and errors
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // Handle 401 Unauthorized - Try to refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -53,7 +48,6 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        // Refresh failed - clear tokens and redirect to login
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
@@ -68,19 +62,17 @@ apiClient.interceptors.response.use(
 
 export default apiClient;
 
-// Helper function to extract error message
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<{ 
       error?: string; 
       message?: string; 
       detail?: string;
-      [key: string]: any; // For field-specific errors
+      [key: string]: any;
     }>;
     
     const responseData = axiosError.response?.data;
     
-    // Handle field-specific validation errors (e.g., {email: ["This field is required."]})
     if (responseData && typeof responseData === 'object') {
       const fieldErrors: string[] = [];
       for (const [key, value] of Object.entries(responseData)) {

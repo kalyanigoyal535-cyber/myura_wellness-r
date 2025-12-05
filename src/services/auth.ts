@@ -33,18 +33,14 @@ export interface PasswordResetConfirm {
   new_password2: string;
 }
 
-// Authentication API
 export const authApi = {
-  // Register new user
   register: async (data: RegisterData): Promise<AuthResponse> => {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/register/', data);
-      // Store tokens
       if (response.data.tokens) {
         localStorage.setItem('access_token', response.data.tokens.access);
         localStorage.setItem('refresh_token', response.data.tokens.refresh);
       }
-      // Store user data
       if (response.data.user) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
@@ -54,30 +50,25 @@ export const authApi = {
     }
   },
 
-  // Login
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
       const response = await apiClient.post<any>('/auth/login/', credentials);
       const data = response.data;
       
-      // Handle both response formats: {access, refresh, user} or {tokens: {access, refresh}, user}
       let accessToken: string | null = null;
       let refreshToken: string | null = null;
       let userData: User | null = null;
 
       if (data.tokens) {
-        // Format: {tokens: {access, refresh}, user}
         accessToken = data.tokens.access;
         refreshToken = data.tokens.refresh;
         userData = data.user;
       } else if (data.access && data.refresh) {
-        // Format: {access, refresh, user}
         accessToken = data.access;
         refreshToken = data.refresh;
         userData = data.user;
       }
 
-      // Store tokens
       if (accessToken) {
         localStorage.setItem('access_token', accessToken);
       }
@@ -85,12 +76,10 @@ export const authApi = {
         localStorage.setItem('refresh_token', refreshToken);
       }
       
-      // Store user data
       if (userData) {
         localStorage.setItem('user', JSON.stringify(userData));
       }
 
-      // Return in consistent format
       return {
         user: userData!,
         tokens: {
@@ -103,26 +92,21 @@ export const authApi = {
     }
   },
 
-  // Logout
   logout: async (): Promise<void> => {
     try {
       await apiClient.post('/auth/logout/');
     } catch (error) {
-      // Continue with logout even if API call fails
       console.error('Logout API error:', error);
     } finally {
-      // Clear local storage
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
     }
   },
 
-  // Get current user profile
   getProfile: async (): Promise<User> => {
     try {
       const response = await apiClient.get<User>('/auth/user/');
-      // Update stored user data
       localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
@@ -130,11 +114,9 @@ export const authApi = {
     }
   },
 
-  // Update user profile
   updateProfile: async (data: UpdateProfileData): Promise<User> => {
     try {
       const response = await apiClient.put<User>('/auth/user/', data);
-      // Update stored user data
       localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
@@ -142,7 +124,6 @@ export const authApi = {
     }
   },
 
-  // Refresh token
   refreshToken: async (refreshToken: string): Promise<{ access: string }> => {
     try {
       const response = await apiClient.post<{ access: string }>('/auth/token/refresh/', {
@@ -155,12 +136,10 @@ export const authApi = {
     }
   },
 
-  // Check if user is authenticated
   isAuthenticated: (): boolean => {
     return !!localStorage.getItem('access_token');
   },
 
-  // Get stored user
   getStoredUser: (): User | null => {
     const userStr = localStorage.getItem('user');
     if (userStr) {
@@ -173,7 +152,6 @@ export const authApi = {
     return null;
   },
 
-  // Request password reset
   requestPasswordReset: async (data: PasswordResetRequest): Promise<{ message: string }> => {
     try {
       const response = await apiClient.post<{ message: string }>('/auth/password/reset/', {
@@ -185,7 +163,6 @@ export const authApi = {
     }
   },
 
-  // Confirm password reset
   confirmPasswordReset: async (data: PasswordResetConfirm): Promise<{ message: string }> => {
     try {
       const response = await apiClient.post<{ message: string }>('/auth/password/reset/confirm/', {
