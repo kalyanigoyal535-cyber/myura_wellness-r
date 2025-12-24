@@ -11,10 +11,19 @@ const storage = multer.memoryStorage();
 
 export const upload = multer({ 
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB (increased for processing)
+  limits: { 
+    fileSize: 5 * 1024 * 1024 // 5MB max size
+  },
   fileFilter: (req, file, cb) => {
+    // Check if file is an image
     if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
+      // Additional validation for image types
+      const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+      if (allowedMimes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only JPEG, PNG, WebP, and GIF images are allowed'));
+      }
     } else {
       cb(new Error('Only image files are allowed'));
     }

@@ -1,7 +1,22 @@
 // Generate image URL helper
-export const getImageUrl = (req, imageName) => {
+export const getImageUrl = (req, imageName, folder = null) => {
   if (!imageName) return null;
-  return `${req.protocol}://${req.get('host')}/uploads/${imageName}`;
+  
+  // If imageName already contains folder path (e.g., "admins/filename.jpg"), use it directly
+  // Otherwise, construct path with folder parameter
+  let path;
+  if (imageName.includes('/')) {
+    // Path already includes folder (e.g., "admins/filename.jpg")
+    path = `uploads/${imageName}`;
+  } else if (folder) {
+    // Construct path with folder
+    path = `uploads/${folder}/${imageName}`;
+  } else {
+    // Just use imageName in uploads root
+    path = `uploads/${imageName}`;
+  }
+  
+  return `${req.protocol}://${req.get('host')}/${path}`;
 };
 
 // Format product with image URLs

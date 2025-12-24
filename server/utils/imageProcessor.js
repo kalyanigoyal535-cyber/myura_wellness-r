@@ -16,6 +16,16 @@ const __dirname = path.dirname(__filename);
  */
 export const processImage = async (imageBuffer, folder = 'general', options = {}) => {
   try {
+    // Validate input
+    if (!imageBuffer || !Buffer.isBuffer(imageBuffer)) {
+      throw new Error('Invalid image buffer provided');
+    }
+
+    // Validate buffer is not empty
+    if (imageBuffer.length === 0) {
+      throw new Error('Image buffer is empty');
+    }
+
     // Default options
     const {
       maxWidth = 1920,
@@ -36,20 +46,34 @@ export const processImage = async (imageBuffer, folder = 'general', options = {}
       fs.mkdirSync(folderPath, { recursive: true });
     }
 
-    // Generate unique filename
+    // Generate unique filename with timestamp for better organization
     const uniqueId = uuidv4();
+    const timestamp = Date.now();
     const extension = format === 'png' ? 'png' : format === 'webp' ? 'webp' : 'jpg';
-    const filename = `${uniqueId}.${extension}`;
+    const filename = `${timestamp}-${uniqueId}.${extension}`;
     const filePath = path.join(folderPath, filename);
 
-    // Process image with Sharp
-    let sharpInstance = sharp(imageBuffer)
+    // Validate image format with Sharp before processing
+    let sharpInstance;
+    try {
+      sharpInstance = sharp(imageBuffer);
+      // Verify it's a valid image
+      const metadata = await sharpInstance.metadata();
+      if (!metadata.width || !metadata.height) {
+        throw new Error('Invalid image format');
+      }
+    } catch (sharpError) {
+      throw new Error(`Invalid image file: ${sharpError.message}`);
+    }
+
+    // Process image with Sharp - resize and compress
+    sharpInstance = sharp(imageBuffer)
       .resize(maxWidth, maxHeight, {
         fit: fit,
         withoutEnlargement: true
       });
 
-    // Apply format-specific settings
+    // Apply format-specific compression settings
     if (format === 'jpeg') {
       sharpInstance = sharpInstance.jpeg({
         quality: quality,
@@ -71,6 +95,15 @@ export const processImage = async (imageBuffer, folder = 'general', options = {}
 
     // Save processed image
     await sharpInstance.toFile(filePath);
+
+    // Verify file was created
+    if (!fs.existsSync(filePath)) {
+      throw new Error('Failed to save processed image');
+    }
+
+    // Get final file size
+    const stats = fs.statSync(filePath);
+    console.log(`Image processed: ${filename}, Size: ${(stats.size / 1024).toFixed(2)}KB`);
 
     // Return relative path for database storage
     return `${folder}/${filename}`;

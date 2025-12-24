@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { sendSuccess, sendError, sendNotFound, sendBadRequest } from '../utils/response.js';
 import { buildUpdateQuery, executeQuery } from '../utils/query.js';
 import { processImage, deleteImage } from '../utils/imageProcessor.js';
+import { getImageUrl } from '../utils/imageUrl.js';
 
 // Dashboard Stats
 export const getDashboardStats = async (req, res) => {
@@ -830,6 +831,17 @@ export const updateProfile = async (req, res) => {
 
     // Process avatar image if provided
     if (req.file) {
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (req.file.size > maxSize) {
+        return sendBadRequest(res, 'Image size must be less than 5MB');
+      }
+
+      // Validate file type
+      if (!req.file.mimetype.startsWith('image/')) {
+        return sendBadRequest(res, 'Only image files are allowed');
+      }
+
       // Get old photo path
       const [admins] = await pool.execute(
         'SELECT photo FROM admins WHERE id = ?',
@@ -837,8 +849,14 @@ export const updateProfile = async (req, res) => {
       );
       const oldPhoto = admins.length > 0 ? admins[0].photo : null;
 
-      // Process new image
-      photoPath = await processImage(req.file, 'admins');
+      // Process new image with compression and proper sizing
+      // For avatars, use smaller dimensions and good compression
+      photoPath = await processImage(req.file.buffer, 'admins', {
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 85,
+        format: 'jpeg'
+      });
 
       // Delete old image if exists
       if (oldPhoto) {
@@ -877,7 +895,7 @@ export const updateProfile = async (req, res) => {
       id: updated[0].id,
       name: updated[0].name,
       email: updated[0].email,
-      photo: updated[0].photo,
+      photo: updated[0].photo ? getImageUrl(req, updated[0].photo, 'admins') : null,
       is_verified: updated[0].is_verified,
       is_staff: true,
       is_superuser: true,

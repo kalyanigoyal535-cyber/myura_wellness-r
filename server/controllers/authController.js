@@ -1,8 +1,9 @@
-import bcrypt from 'bcryptjs';
-import { body, validationResult } from 'express-validator';
-import pool from '../config/database.js';
-import { generateTokens, verifyRefreshToken } from '../utils/jwt.js';
-import { sendSuccess, sendError, sendBadRequest } from '../utils/response.js';
+import bcrypt from "bcryptjs";
+import { body, validationResult } from "express-validator";
+import pool from "../config/database.js";
+import { generateTokens, verifyRefreshToken } from "../utils/jwt.js";
+import { sendSuccess, sendError, sendBadRequest } from "../utils/response.js";
+import { getImageUrl } from "../utils/imageUrl.js";
 
 // Register
 export const register = async (req, res) => {
@@ -12,16 +13,24 @@ export const register = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, first_name, last_name, username, phone, phone_number } = req.body;
+    const {
+      email,
+      password,
+      first_name,
+      last_name,
+      username,
+      phone,
+      phone_number,
+    } = req.body;
 
     // Check if user exists
     const [existing] = await pool.execute(
-      'SELECT id FROM user WHERE email = ?',
+      "SELECT id FROM user WHERE email = ?",
       [email]
     );
 
     if (existing.length > 0) {
-      return sendBadRequest(res, 'User already exists');
+      return sendBadRequest(res, "User already exists");
     }
 
     // Hash password
@@ -31,7 +40,15 @@ export const register = async (req, res) => {
     const [result] = await pool.execute(
       `INSERT INTO user (email, username, first_name, last_name, password, phone, phone_number, status) 
        VALUES (?, ?, ?, ?, ?, ?, ?, 'Active')`,
-      [email, username || null, first_name || null, last_name || null, hashedPassword, phone || null, phone_number || null]
+      [
+        email,
+        username || null,
+        first_name || null,
+        last_name || null,
+        hashedPassword,
+        phone || null,
+        phone_number || null,
+      ]
     );
 
     const userId = result.insertId;
@@ -39,20 +56,25 @@ export const register = async (req, res) => {
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(userId);
 
-    return sendSuccess(res, {
-      user: {
-        id: userId,
-        email,
-        username: username || null,
-        first_name: first_name || null,
-        last_name: last_name || null,
+    return sendSuccess(
+      res,
+      {
+        user: {
+          id: userId,
+          email,
+          username: username || null,
+          first_name: first_name || null,
+          last_name: last_name || null,
+        },
+        access: accessToken,
+        refresh: refreshToken,
       },
-      access: accessToken,
-      refresh: refreshToken,
-    }, 'User registered successfully', 201);
+      "User registered successfully",
+      201
+    );
   } catch (error) {
-    console.error('Register error:', error);
-    return sendError(res, 'Registration failed', 500);
+    console.error("Register error:", error);
+    return sendError(res, "Registration failed", 500);
   }
 };
 
@@ -68,49 +90,76 @@ export const login = async (req, res) => {
 
     // Only allow admins to login - check admins table only
     const [admins] = await pool.execute(
-      'SELECT id, email, name, password, is_verified FROM admins WHERE email = ?',
+      "SELECT id, email, name, password, is_verified FROM admins WHERE email = ?",
       [email]
     );
 
     if (admins.length === 0) {
-      return sendError(res, 'Access denied. Admin account required.', 401);
+      return sendError(res, "Access denied. Admin account required.", 401);
     }
 
     const admin = admins[0];
-    
+
     // Verify password
     const isValid = await bcrypt.compare(password, admin.password);
     if (!isValid) {
-      return sendError(res, 'Invalid credentials', 401);
+      return sendError(res, "Invalid credentials", 401);
     }
-    
+
     if (!admin.is_verified) {
-      return sendError(res, 'Admin account not verified', 401);
+      return sendError(res, "Admin account not verified", 401);
     }
-    
+
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(admin.id);
 
-    return sendSuccess(res, {
-      user: {
-        id: admin.id,
-        email: admin.email,
-        name: admin.name,
-        is_staff: true,
-        is_superuser: true,
+    return sendSuccess(
+      res,
+      {
+        user: {
+          id: admin.id,
+          email: admin.email,
+          name: admin.name,
+          is_staff: true,
+          is_superuser: true,
+        },
+        access: accessToken,
+        refresh: refreshToken,
       },
-      access: accessToken,
-      refresh: refreshToken,
-    }, 'Login successful');
+      "Login successful"
+    );
   } catch (error) {
-    console.error('Login error:', error);
-    return sendError(res, 'Login failed', 500);
+    console.error("Login error:", error);
+    return sendError(res, "Login failed", 500);
   }
 };
 
 // Get current user
 export const getCurrentUser = async (req, res) => {
   try {
+    // Check if user is admin (has name field or is_staff/is_superuser)
+    if (req.user.is_staff || req.user.is_superuser || req.user.name) {
+      // Fetch full admin data from admins table
+      const [admins] = await pool.execute(
+        "SELECT id, email, name, photo, is_verified FROM admins WHERE id = ?",
+        [req.user.id]
+      );
+
+      if (admins.length > 0) {
+        const admin = admins[0];
+        return sendSuccess(res, {
+          id: admin.id,
+          email: admin.email,
+          name: admin.name,
+          photo: admin.photo ? getImageUrl(req, admin.photo, "admins") : null,
+          is_verified: admin.is_verified,
+          is_staff: true,
+          is_superuser: true,
+        });
+      }
+    }
+
+    // Regular user - return user table data
     return sendSuccess(res, {
       id: req.user.id,
       email: req.user.email,
@@ -125,8 +174,8 @@ export const getCurrentUser = async (req, res) => {
       is_superuser: req.user.is_superuser || false,
     });
   } catch (error) {
-    console.error('Get user error:', error);
-    return sendError(res, 'Failed to get user', 500);
+    console.error("Get user error:", error);
+    return sendError(res, "Failed to get user", 500);
   }
 };
 
@@ -136,7 +185,7 @@ export const refreshToken = async (req, res) => {
     const { refresh } = req.body;
 
     if (!refresh) {
-      return sendBadRequest(res, 'Refresh token required');
+      return sendBadRequest(res, "Refresh token required");
     }
 
     const decoded = verifyRefreshToken(refresh);
@@ -144,12 +193,11 @@ export const refreshToken = async (req, res) => {
 
     return sendSuccess(res, { access: accessToken });
   } catch (error) {
-    return sendError(res, 'Invalid refresh token', 401);
+    return sendError(res, "Invalid refresh token", 401);
   }
 };
 
 // Logout
 export const logout = async (req, res) => {
-  return sendSuccess(res, {}, 'Logged out successfully');
+  return sendSuccess(res, {}, "Logged out successfully");
 };
-

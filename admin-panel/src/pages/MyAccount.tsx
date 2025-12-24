@@ -47,11 +47,30 @@ export default function MyAccount() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const response = await api.get("/auth/user");
+        const userData = response.data;
+        setProfileData({
+          name: (userData as any)?.name || userData?.first_name || "",
+          email: userData.email || "",
+        });
+        // Set avatar preview if photo exists
+        if ((userData as any)?.photo) {
+          setAvatarPreview((userData as any).photo);
+        }
+      } catch (error) {
+        console.error("Failed to fetch admin profile:", error);
+      }
+    };
+
     if (user) {
       setProfileData({
         name: (user as any)?.name || user?.first_name || "",
         email: user.email || "",
       });
+      // Also fetch fresh data from backend
+      fetchAdminProfile();
     }
   }, [user]);
 
@@ -111,8 +130,20 @@ export default function MyAccount() {
       // Refresh user data
       const response = await api.get("/auth/user");
       if (response.data) {
-        // Update context would require refetching
-        window.location.reload();
+        const userData = response.data;
+        // Update local state with new data
+        setProfileData({
+          name: (userData as any)?.name || userData?.first_name || "",
+          email: userData.email || "",
+        });
+        // Update avatar preview if photo was updated
+        if ((userData as any)?.photo) {
+          setAvatarPreview((userData as any).photo);
+        }
+        // Reload to update context and sidebar
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (error: any) {
       setMessage({
@@ -231,9 +262,9 @@ export default function MyAccount() {
                     alt="Avatar preview"
                     className="myaccount-avatar-preview"
                   />
-                ) : user.photo ? (
+                ) : (user as any)?.photo ? (
                   <img
-                    src={user.photo}
+                    src={(user as any).photo}
                     alt="Avatar"
                     className="myaccount-avatar-preview"
                   />

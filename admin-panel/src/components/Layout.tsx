@@ -118,12 +118,21 @@ export default function Layout() {
             title={sidebarCollapsed ? "My Account" : ""}
           >
             <div className="user-avatar-layout">
-              {(
-                user?.first_name?.charAt(0) ||
-                user?.last_name?.charAt(0) ||
-                user?.username?.charAt(0) ||
-                user?.email?.charAt(0)
-              )?.toUpperCase()}
+              {(user as any)?.photo ? (
+                <img 
+                  src={(user as any).photo} 
+                  alt="Avatar" 
+                  className="user-avatar-image-layout"
+                />
+              ) : (
+                (
+                  (user as any)?.name?.charAt(0) ||
+                  user?.first_name?.charAt(0) ||
+                  user?.last_name?.charAt(0) ||
+                  user?.username?.charAt(0) ||
+                  user?.email?.charAt(0)
+                )?.toUpperCase()
+              )}
             </div>
             {!sidebarCollapsed && (
               <div className="user-details-layout">
