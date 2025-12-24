@@ -14,6 +14,35 @@ export default function BlogForm(): React.JSX.Element {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+
+  // Helper function to normalize tags to always be string[]
+  const normalizeTags = (
+    tags: string[] | string | null | undefined
+  ): string[] => {
+    if (Array.isArray(tags)) {
+      return tags;
+    }
+    if (typeof tags === "string") {
+      const trimmed = tags.trim();
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return trimmed
+            .split(",")
+            .map((t: string) => t.trim())
+            .filter((t: string) => t);
+        }
+      }
+      return trimmed
+        .split(",")
+        .map((t: string) => t.trim())
+        .filter((t: string) => t);
+    }
+    return [];
+  };
+
   const [formData, setFormData] = useState<
     BlogFormData & {
       author_id?: number;
@@ -29,7 +58,7 @@ export default function BlogForm(): React.JSX.Element {
     author_id: undefined,
     published: false,
     status: "draft",
-    tags: [] as string[] | string,
+    tags: [],
     category: "",
     date: new Date().toISOString().split("T")[0],
   });
@@ -57,6 +86,7 @@ export default function BlogForm(): React.JSX.Element {
           meta_description?: string;
           featured_image?: string;
           featured_image_url?: string;
+          created_at?: string;
         }
       >(`/admin/blogs/${id}`);
       const blog = response.data;
@@ -74,11 +104,7 @@ export default function BlogForm(): React.JSX.Element {
         author_id: blog.author_id,
         published: isPublished,
         status: blog.status || (isPublished ? "published" : "draft"),
-        tags: Array.isArray(blog.tags)
-          ? blog.tags
-          : typeof blog.tags === "string"
-          ? blog.tags
-          : [],
+        tags: normalizeTags(blog.tags),
         category: blog.category || "",
         date: blog.date
           ? new Date(blog.date).toISOString().split("T")[0]
@@ -107,18 +133,31 @@ export default function BlogForm(): React.JSX.Element {
     }
   };
 
-  const handleTagsChange = (e: TextareaChangeEvent): void => {
-    const value = e.target.value;
-    // Keep the value exactly as entered (preserve backend format)
-    setFormData({ ...formData, tags: value });
+  const handleTagsChange = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    const input = e.currentTarget;
+    const value = input.value.trim();
+
+    if ((e.key === "Enter" || e.key === ",") && value) {
+      e.preventDefault();
+      const currentTags = normalizeTags(formData.tags);
+
+      if (!currentTags.includes(value)) {
+        setFormData({
+          ...formData,
+          tags: [...currentTags, value],
+        });
+      }
+      input.value = "";
+    }
   };
 
-  const handleMetaDescriptionChange = (e: TextareaChangeEvent): void => {
-    const value = e.target.value;
-    // Limit to 160 characters for SEO best practices
-    if (value.length <= 160) {
-      setFormData({ ...formData, meta_description: value });
-    }
+  const removeTag = (tagToRemove: string): void => {
+    const currentTags = normalizeTags(formData.tags);
+
+    setFormData({
+      ...formData,
+      tags: currentTags.filter((tag: string) => tag !== tagToRemove),
+    });
   };
 
   const generateSlug = (title: string): string => {
@@ -152,15 +191,12 @@ export default function BlogForm(): React.JSX.Element {
             data.append(formKey, value);
           }
         } else if (formKey === "tags") {
-          // If tags is already a string (from backend), use it as-is
-          // If it's an array, stringify it
-          if (typeof value === "string") {
-            data.append(formKey, value);
-          } else if (Array.isArray(value)) {
-            data.append(formKey, JSON.stringify(value));
-          } else {
-            data.append(formKey, JSON.stringify([]));
-          }
+          // Convert tags to proper format for backend
+          const tagsArray = normalizeTags(
+            value as string[] | string | null | undefined
+          );
+          // Backend accepts JSON string or array, we'll send as JSON string
+          data.append(formKey, JSON.stringify(tagsArray));
         } else if (formKey === "published") {
           const status = value ? "published" : "draft";
           data.append("status", status);
@@ -332,22 +368,34 @@ export default function BlogForm(): React.JSX.Element {
           <label htmlFor="tags" className="form-label">
             Tags
           </label>
-          <textarea
-            id="tags"
-            value={
-              typeof formData.tags === "string"
-                ? formData.tags
-                : Array.isArray(formData.tags)
-                ? JSON.stringify(formData.tags)
-                : ""
-            }
-            onChange={handleTagsChange}
-            rows={2}
-            className="form-textarea"
-            placeholder='["health", "wellness", "nutrition"]'
-          />
+          <div className="tags-input-container">
+            <div className="tags-display">
+              {normalizeTags(formData.tags).map(
+                (tag: string, index: number) => (
+                  <span key={index} className="tag-chip">
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="tag-remove"
+                      aria-label={`Remove ${tag}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                )
+              )}
+            </div>
+            <input
+              id="tags"
+              type="text"
+              className="tags-input"
+              placeholder="Type a tag and press Enter or comma"
+              onKeyDown={handleTagsChange}
+            />
+          </div>
           <p className="help-text">
-            Enter tags as JSON array format, e.g., ["tag1", "tag2"]
+            Type tags and press Enter or comma to add them. Click × to remove.
           </p>
         </div>
 

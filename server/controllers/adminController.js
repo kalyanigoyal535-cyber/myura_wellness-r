@@ -685,7 +685,7 @@ export const updateBlog = async (req, res) => {
     const updateFields = [];
     const values = [];
 
-    const allowedFields = ['title', 'slug', 'subtitle', 'excerpt', 'content', 'content_blocks', 'status', 'tags', 'meta_title', 'meta_description', 'date'];
+    const allowedFields = ['title', 'slug', 'subtitle', 'excerpt', 'content', 'content_blocks', 'tags', 'meta_title', 'meta_description', 'date'];
     
     // Get old image paths before update
     const [oldBlogs] = await pool.execute(
@@ -695,21 +695,69 @@ export const updateBlog = async (req, res) => {
     const oldImagePath = oldBlogs.length > 0 ? oldBlogs[0].featured_image : null;
     const oldThumbnailPath = oldBlogs.length > 0 ? oldBlogs[0].thumbnail : null;
     
+    // Handle status separately to avoid conflicts and ensure single value
+    if (req.body.status !== undefined) {
+      updateFields.push('status = ?');
+      // Ensure status is a string, not an array
+      const statusValue = Array.isArray(req.body.status) ? req.body.status[0] : req.body.status;
+      values.push(statusValue);
+    } else if (req.body.published !== undefined) {
+      // Fallback to published checkbox if status not provided
+      updateFields.push('status = ?');
+      const published = req.body.published === 'true' || req.body.published === true || req.body.published === '1';
+      values.push(published ? 'published' : 'draft');
+    }
+    
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
         if (field === 'tags') {
           updateFields.push('tags = ?');
           const data = req.body[field];
-          values.push(JSON.stringify(Array.isArray(data) ? data : data.split(',').map(t => t.trim())));
+          let tagsValue = null;
+          
+          // Handle different input formats
+          if (Array.isArray(data)) {
+            tagsValue = JSON.stringify(data);
+          } else if (typeof data === 'string') {
+            const trimmed = data.trim();
+            // If it's already a valid JSON string, use it directly
+            if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+              try {
+                // Validate it's valid JSON
+                JSON.parse(trimmed);
+                tagsValue = trimmed; // Use as-is if valid JSON
+              } catch (e) {
+                // If JSON parse fails, treat as comma-separated string
+                const tagsArray = trimmed.split(',').map(t => t.trim()).filter(t => t);
+                tagsValue = JSON.stringify(tagsArray);
+              }
+            } else if (trimmed === '') {
+              tagsValue = JSON.stringify([]);
+            } else {
+              // Comma-separated string
+              const tagsArray = trimmed.split(',').map(t => t.trim()).filter(t => t);
+              tagsValue = JSON.stringify(tagsArray);
+            }
+          } else {
+            tagsValue = JSON.stringify([]);
+          }
+          
+          values.push(tagsValue);
         } else if (field === 'content_blocks') {
           updateFields.push('content_blocks = ?');
-          values.push(JSON.stringify(req.body[field]));
-        } else if (field === 'published') {
-          updateFields.push('status = ?');
-          values.push(req.body[field] ? 'published' : 'draft');
-        } else if (field === 'status') {
-          updateFields.push('status = ?');
-          values.push(req.body[field]);
+          const data = req.body[field];
+          if (typeof data === 'string' && (data.trim().startsWith('[') || data.trim().startsWith('{'))) {
+            try {
+              // Validate it's valid JSON before using as-is
+              JSON.parse(data);
+              values.push(data);
+            } catch (e) {
+              // If JSON parse fails, stringify it
+              values.push(JSON.stringify(data));
+            }
+          } else {
+            values.push(JSON.stringify(data));
+          }
         } else {
           updateFields.push(`${field} = ?`);
           values.push(req.body[field]);
@@ -734,10 +782,9 @@ export const updateBlog = async (req, res) => {
 
     values.push(blogId);
 
-    await pool.execute(
-      `UPDATE blogs SET ${updateFields.join(', ')} WHERE blog_id = ?`,
-      values
-    );
+    const query = `UPDATE blogs SET ${updateFields.join(', ')} WHERE blog_id = ?`;
+
+    await pool.execute(query, values);
 
     // Delete old image if new image was uploaded
     if (req.file && oldImagePath) {
