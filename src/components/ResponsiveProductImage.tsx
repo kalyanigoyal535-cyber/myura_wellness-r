@@ -86,7 +86,7 @@ const ResponsiveProductImage: React.FC<ResponsiveProductImageProps> = ({
           onLoad={() => setIsLoaded(true)}
           onError={(e) => {
             // Log error in development
-            if (process.env.NODE_ENV === 'development') {
+            if (import.meta.env.DEV) {
               console.error('Image failed to load:', image.fallback, e);
             }
             // Set loaded to true to hide placeholder even if image fails
