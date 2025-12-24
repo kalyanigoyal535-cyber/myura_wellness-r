@@ -1,0 +1,239 @@
+.orders-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.orders-header {
+  margin-bottom: 32px;
+}
+
+.orders-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.orders-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+/* Filters */
+.filters-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.filter-icon {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.filter-select {
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+}
+
+/* Table */
+.orders-table-container {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orders-table thead {
+  background-color: var(--bg-tertiary);
+}
+
+.orders-table th {
+  padding: 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.orders-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.orders-table tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+.orders-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.order-number {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.order-customer {
+  color: var(--text-primary);
+}
+
+.order-amount {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.status-badge.processing {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.status-badge.shipped {
+  background-color: #e0e7ff;
+  color: #6366f1;
+}
+
+.status-badge.delivered {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.status-badge.cancelled {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.payment-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.payment-status-badge.pending {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.payment-status-badge.paid {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.payment-status-badge.failed {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.payment-status-badge.refunded {
+  background-color: #e0e7ff;
+  color: #6366f1;
+}
+
+.order-date {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .orders-table {
+    font-size: 12px;
+  }
+  
+  .orders-table th,
+  .orders-table td {
+    padding: 12px 8px;
+  }
+}
+

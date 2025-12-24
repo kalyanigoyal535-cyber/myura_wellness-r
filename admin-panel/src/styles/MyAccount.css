@@ -1,0 +1,278 @@
+.myaccount-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.myaccount-header {
+  margin-bottom: 32px;
+}
+
+.myaccount-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.myaccount-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.myaccount-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.myaccount-message-success {
+  background-color: #d1fae5;
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.myaccount-message-error {
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.myaccount-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid var(--border);
+}
+
+.myaccount-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -2px;
+}
+
+.myaccount-tab:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.myaccount-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.myaccount-content {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+}
+
+.myaccount-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.myaccount-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.myaccount-avatar-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.myaccount-avatar-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--border);
+}
+
+.myaccount-avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 48px;
+  font-weight: 700;
+  border: 3px solid var(--border);
+}
+
+.myaccount-avatar-upload {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 3px solid var(--bg-primary);
+}
+
+.myaccount-avatar-upload:hover {
+  transform: scale(1.1);
+}
+
+.myaccount-avatar-input {
+  display: none;
+}
+
+.myaccount-avatar-hint {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.myaccount-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.myaccount-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.myaccount-input {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 15px;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: all 0.2s ease;
+}
+
+.myaccount-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.myaccount-input:disabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.myaccount-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.myaccount-password-wrapper .myaccount-input {
+  padding-right: 48px;
+  width: 100%;
+}
+
+.myaccount-password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.myaccount-password-toggle:hover {
+  color: var(--text-primary);
+}
+
+.myaccount-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: -4px;
+}
+
+.myaccount-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.myaccount-submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.myaccount-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.myaccount-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+@media (max-width: 768px) {
+  .myaccount-content {
+    padding: 24px;
+  }
+
+  .myaccount-tabs {
+    flex-wrap: wrap;
+  }
+
+  .myaccount-tab {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+

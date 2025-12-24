@@ -1,0 +1,161 @@
+.users-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.users-header {
+  margin-bottom: 32px;
+}
+
+.users-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.users-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.users-search-container {
+  margin-bottom: 24px;
+}
+
+.users-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+.users-table-container {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table thead {
+  background-color: var(--bg-tertiary);
+}
+
+.users-table th {
+  padding: 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.users-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.users-table tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+.users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.user-username {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.user-email,
+.user-phone {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-badge.superuser {
+  background-color: #ede9fe;
+  color: #8b5cf6;
+}
+
+.role-badge.staff {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.role-badge.user {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.user-date {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .users-table {
+    font-size: 12px;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: 12px 8px;
+  }
+}
+
