@@ -15,7 +15,6 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/aos": "^3.0.7",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
     "@types/react-router-dom": "^5.3.3",
     "aos": "^2.3.4",
     "axios": "^1.13.2",
@@ -30,7 +29,6 @@
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.4",
-    "react-scripts": "5.0.1",
     "react-zoom-pan-pinch": "^3.6.1",
     "three": "^0.181.1",
     "typescript": "^4.9.5",
@@ -38,10 +36,11 @@
     "yup": "^1.7.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "optimize:images": "node scripts/generate-product-images.js"
   },
   "eslintConfig": {
@@ -63,13 +62,16 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^20.19.27",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/react-icons": "^2.2.7",
     "@types/three": "^0.181.0",
+    "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "sharp": "^0.33.5",
-    "tailwindcss": "^3.4.18"
+    "tailwindcss": "^3.4.18",
+    "vite": "^7.3.0"
   }
 }
