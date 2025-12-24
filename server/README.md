@@ -5,11 +5,13 @@ Node.js + Express + MySQL backend server for Myura Wellness admin panel and fron
 ## 🚀 Setup Instructions
 
 ### 1. Prerequisites
+
 - Node.js (v18 or higher)
 - XAMPP (MySQL)
 - npm or yarn
 
 ### 2. Install Dependencies
+
 ```bash
 cd server
 npm install
@@ -18,27 +20,33 @@ npm install
 ### 3. Database Setup
 
 #### Step 1: Create Database in phpMyAdmin
+
 1. Open XAMPP and start MySQL
 2. Open phpMyAdmin: http://localhost/phpmyadmin
 3. Click on "SQL" tab
 4. Run this command:
+
 ```sql
 CREATE DATABASE IF NOT EXISTS myura_wellness CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 #### Step 2: Import Database Schema
+
 1. In phpMyAdmin, select `myura_wellness` database
 2. Click on "Import" tab
 3. Choose file: `server/database/schema.sql`
 4. Click "Go"
 
 #### Step 3: Configure Environment
+
 1. Copy `.env.example` to `.env`:
+
 ```bash
 cp .env.example .env
 ```
 
 2. Edit `.env` file with your MySQL credentials:
+
 ```env
 DB_HOST=localhost
 DB_USER=root
@@ -47,24 +55,16 @@ DB_NAME=myura_wellness
 DB_PORT=3306
 ```
 
-### 4. Migrate Data from SQLite to MySQL
-
-If you have existing data in the Django SQLite database:
-
-```bash
-npm run migrate
-```
-
-This will migrate all data from `backend/db.sqlite3` to MySQL.
-
-### 5. Start Server
+### 4. Start Server
 
 Development mode (with auto-reload):
+
 ```bash
 npm run dev
 ```
 
 Production mode:
+
 ```bash
 npm start
 ```
@@ -86,8 +86,6 @@ server/
 │   └── admin.js             # Admin routes
 ├── utils/
 │   └── jwt.js               # JWT token utilities
-├── scripts/
-│   └── migrate.js           # Data migration script
 ├── database/
 │   └── schema.sql            # MySQL database schema
 ├── uploads/                 # File uploads directory
@@ -99,12 +97,14 @@ server/
 ## 🔐 Default Admin Credentials
 
 After migration:
+
 - **Email:** admin@myurawellness.com
 - **Password:** admin123
 
 ## 📡 API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login
 - `GET /api/auth/user` - Get current user
@@ -112,14 +112,17 @@ After migration:
 - `POST /api/auth/logout` - Logout
 
 ### Products
+
 - `GET /api/products` - Get all products (with filters)
 - `GET /api/products/:id` - Get single product
 
 ### Categories
+
 - `GET /api/categories` - Get all categories
 - `GET /api/categories/:id` - Get single category
 
 ### Admin (Requires Authentication)
+
 - `GET /api/admin/dashboard/stats` - Dashboard statistics
 - `GET /api/admin/products` - Get all products (admin)
 - `POST /api/admin/products` - Create product
@@ -137,6 +140,7 @@ After migration:
 - `PATCH /api/admin/contacts/:id/mark_read` - Mark contact as read
 
 ### Contact
+
 - `POST /api/contact` - Submit contact form
 
 ## 🔧 Environment Variables
@@ -169,16 +173,17 @@ CORS_ORIGIN=http://localhost:5000,http://localhost:3000
 ## 🐛 Troubleshooting
 
 ### Database Connection Error
+
 - Make sure XAMPP MySQL is running
 - Check database credentials in `.env`
 - Verify database `myura_wellness` exists
 
-### Migration Issues
-- Ensure SQLite database exists at `backend/db.sqlite3`
+### Database Issues
+
 - Check MySQL connection settings
 - Verify database schema is imported
 
 ### Port Already in Use
+
 - Change `PORT` in `.env` file
 - Or stop the process using port 8000
-

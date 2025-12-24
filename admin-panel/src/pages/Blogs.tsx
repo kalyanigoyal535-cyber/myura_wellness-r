@@ -33,6 +33,15 @@ export default function Blogs() {
   });
   const [deleting, setDeleting] = useState<boolean>(false);
   const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
+  const [imageModal, setImageModal] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    title: string;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    title: "",
+  });
 
   useEffect(() => {
     fetchBlogs();
@@ -192,46 +201,71 @@ export default function Blogs() {
           </div>
         )}
 
-        <div className="blogs-grid">
-          {filteredBlogs.length === 0 ? (
-            <div className="empty-state-blogs">
-              <FileText className="empty-state-icon-blogs" size={64} />
-              <p className="empty-state-text-blogs">
-                {searchTerm ? "No blogs match your search" : "No blogs found"}
-              </p>
-              {blogs.length === 0 && !searchTerm && (
-                <Link to="/blogs/new" className="empty-state-action-blogs">
-                  <Plus size={20} />
-                  Create your first blog post
-                </Link>
-              )}
-            </div>
-          ) : (
-            filteredBlogs.map((blog) => {
-              const isPublished = blog.status === "published";
-              const isUpdating = updatingStatus === blog.blog_id;
+        {filteredBlogs.length === 0 ? (
+          <div className="empty-state-blogs">
+            <FileText className="empty-state-icon-blogs" size={64} />
+            <p className="empty-state-text-blogs">
+              {searchTerm ? "No blogs match your search" : "No blogs found"}
+            </p>
+            {blogs.length === 0 && !searchTerm && (
+              <Link to="/blogs/new" className="empty-state-action-blogs">
+                <Plus size={20} />
+                Create your first blog post
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="blogs-table-wrapper">
+            <table className="blogs-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Author</th>
+                  <th>Date</th>
+                  <th>Views</th>
+                  <th>Tags</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBlogs.map((blog) => {
+                  const isPublished = blog.status === "published";
+                  const isUpdating = updatingStatus === blog.blog_id;
 
-              return (
-                <div key={blog.blog_id} className="blog-card">
-                  {blog.featured_image_url && (
-                    <div className="blog-image-wrapper">
-                      <img
-                        src={blog.featured_image_url}
-                        alt={blog.title}
-                        className="blog-image"
-                      />
-                      <div className="blog-image-overlay">
-                        {getStatusBadge(blog.status || "draft")}
-                      </div>
-                    </div>
-                  )}
-                  <div className="blog-content">
-                    <div className="blog-header">
-                      <h3 className="blog-title" title={blog.title}>
-                        {blog.title}
-                      </h3>
-                      {!blog.featured_image_url && (
-                        <div className="blog-badges">
+                  return (
+                    <tr key={blog.blog_id}>
+                      <td>
+                        <div className="table-blog-title-cell">
+                          {blog.featured_image_url && (
+                            <img
+                              src={blog.featured_image_url}
+                              alt={blog.title}
+                              className="table-blog-thumbnail"
+                              onClick={() =>
+                                setImageModal({
+                                  isOpen: true,
+                                  imageUrl: blog.featured_image_url || "",
+                                  title: blog.title,
+                                })
+                              }
+                              style={{ cursor: "pointer" }}
+                            />
+                          )}
+                          <div className="table-blog-title-content">
+                            <h4 className="table-blog-title" title={blog.title}>
+                              {blog.title}
+                            </h4>
+                            {blog.excerpt && (
+                              <p className="table-blog-excerpt" title={blog.excerpt}>
+                                {blog.excerpt}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="table-blog-status">
                           {getStatusBadge(blog.status || "draft")}
                           {blog.category && (
                             <span className="badge category">
@@ -239,97 +273,91 @@ export default function Blogs() {
                             </span>
                           )}
                         </div>
-                      )}
-                    </div>
-
-                    {blog.excerpt && (
-                      <p className="blog-excerpt" title={blog.excerpt}>
-                        {blog.excerpt}
-                      </p>
-                    )}
-
-                    <div className="blog-meta">
-                      {blog.author_name && (
-                        <span className="blog-meta-item">
+                      </td>
+                      <td>
+                        <div className="table-blog-author">
                           <User size={14} />
-                          {blog.author_name}
-                        </span>
-                      )}
-                      {blog.created_at && (
-                        <span className="blog-meta-item">
+                          <span>{blog.author_name || blog.author || "N/A"}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="table-blog-date">
                           <Calendar size={14} />
-                          {formatDate(blog.created_at)}
-                        </span>
-                      )}
-                      {(blog.view_count !== undefined ||
-                        blog.views !== undefined) && (
-                        <span className="blog-meta-item">
+                          <span>{formatDate(blog.created_at || blog.date)}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="table-blog-views">
                           <TrendingUp size={14} />
-                          {blog.view_count || blog.views || 0} views
-                        </span>
-                      )}
-                    </div>
-
-                    {blog.tags && blog.tags.length > 0 && (
-                      <div className="blog-tags">
-                        {blog.tags.slice(0, 3).map((tag, index) => (
-                          <span key={index} className="tag">
-                            {tag}
-                          </span>
-                        ))}
-                        {blog.tags.length > 3 && (
-                          <span className="tag tag-more">
-                            +{blog.tags.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="blog-actions">
-                      <button
-                        onClick={() =>
-                          handleTogglePublish(
-                            blog.blog_id,
-                            blog.status || "draft"
-                          )
-                        }
-                        className={`action-btn ${
-                          isPublished ? "unpublish" : "publish"
-                        }`}
-                        title={isPublished ? "Unpublish" : "Publish"}
-                        type="button"
-                        disabled={isUpdating}
-                      >
-                        {isUpdating ? (
-                          <div className="action-btn-spinner"></div>
-                        ) : isPublished ? (
-                          <EyeOff size={18} />
+                          <span>{blog.view_count || blog.views || 0}</span>
+                        </div>
+                      </td>
+                      <td>
+                        {blog.tags && blog.tags.length > 0 ? (
+                          <div className="table-blog-tags">
+                            {blog.tags.slice(0, 2).map((tag, index) => (
+                              <span key={index} className="tag">
+                                {tag}
+                              </span>
+                            ))}
+                            {blog.tags.length > 2 && (
+                              <span className="tag tag-more">
+                                +{blog.tags.length - 2}
+                              </span>
+                            )}
+                          </div>
                         ) : (
-                          <Eye size={18} />
+                          <span className="table-no-tags">—</span>
                         )}
-                      </button>
-                      <Link
-                        to={`/blogs/${blog.blog_id}/edit`}
-                        className="action-btn edit-btn"
-                        title="Edit Blog"
-                      >
-                        <Edit size={18} />
-                      </Link>
-                      <button
-                        onClick={() => handleDeleteClick(blog)}
-                        className="action-btn delete-btn"
-                        title="Delete Blog"
-                        type="button"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+                      </td>
+                      <td>
+                        <div className="table-blog-actions">
+                          <button
+                            onClick={() =>
+                              handleTogglePublish(
+                                blog.blog_id,
+                                blog.status || "draft"
+                              )
+                            }
+                            className={`action-btn ${
+                              isPublished ? "unpublish" : "publish"
+                            }`}
+                            title={isPublished ? "Unpublish" : "Publish"}
+                            type="button"
+                            disabled={isUpdating}
+                          >
+                            {isUpdating ? (
+                              <div className="action-btn-spinner"></div>
+                            ) : isPublished ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
+                          </button>
+                          <Link
+                            to={`/blogs/${blog.blog_id}/edit`}
+                            className="action-btn edit-btn"
+                            title="Edit Blog"
+                          >
+                            <Edit size={18} />
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteClick(blog)}
+                            className="action-btn delete-btn"
+                            title="Delete Blog"
+                            type="button"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <DeleteModal
@@ -341,6 +369,32 @@ export default function Blogs() {
         itemName={deleteModal.blogTitle}
         isLoading={deleting}
       />
+
+      {/* Image Modal */}
+      {imageModal.isOpen && (
+        <div
+          className="image-modal-overlay-blogs"
+          onClick={() => setImageModal({ isOpen: false, imageUrl: "", title: "" })}
+        >
+          <div
+            className="image-modal-content-blogs"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="image-modal-close-blogs"
+              onClick={() => setImageModal({ isOpen: false, imageUrl: "", title: "" })}
+            >
+              ×
+            </button>
+            <img
+              src={imageModal.imageUrl}
+              alt={imageModal.title}
+              className="image-modal-img-blogs"
+            />
+            <p className="image-modal-title-blogs">{imageModal.title}</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }

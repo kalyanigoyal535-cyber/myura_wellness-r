@@ -1,6 +1,9 @@
 .blog-form-container {
   max-width: 1000px;
   margin: 0 auto;
+  width: 100%;
+  overflow-x: hidden;
+  padding: 0;
 }
 
 .blog-form-header {
@@ -190,13 +193,122 @@
   height: 400px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+  .blog-form-container {
+    padding: 0 16px;
+  }
+  
   .blog-form-card {
     padding: 24px;
   }
   
   .form-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .blog-form-container {
+    padding: 0 12px;
+  }
+  
+  .blog-form-header {
+    margin-bottom: 24px;
+    gap: 12px;
+  }
+  
+  .blog-form-title {
+    font-size: 24px;
+  }
+  
+  .blog-form-subtitle {
+    font-size: 14px;
+  }
+  
+  .blog-form-card {
+    padding: 20px;
+    border-radius: var(--radius);
+  }
+  
+  .form-grid {
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .form-group {
+    gap: 6px;
+  }
+  
+  .form-label {
+    font-size: 13px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  
+  .form-textarea {
+    min-height: 80px;
+  }
+  
+  .help-text {
+    font-size: 11px;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+  
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .blog-form-container {
+    padding: 0 8px;
+  }
+  
+  .blog-form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .blog-form-title {
+    font-size: 20px;
+  }
+  
+  .blog-form-subtitle {
+    font-size: 13px;
+  }
+  
+  .blog-form-card {
+    padding: 16px;
+  }
+  
+  .form-grid {
+    gap: 12px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .back-btn {
+    width: 36px;
+    height: 36px;
   }
 }
 

@@ -16,7 +16,7 @@ import {
 import "../styles/MyAccount.css";
 
 export default function MyAccount() {
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<{

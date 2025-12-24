@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -13,14 +13,16 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
-  UserCircle,
+  Search,
+  Bell,
+  type LucideIcon,
 } from "lucide-react";
 import "../styles/Layout.css";
 
 interface MenuItem {
   path: string;
   label: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
 }
 
 const menuItems: MenuItem[] = [
@@ -39,6 +41,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [notificationSidebarOpen, setNotificationSidebarOpen] = useState<boolean>(false);
 
   const handleLogout = () => {
     logout();
@@ -154,6 +157,30 @@ export default function Layout() {
           >
             <Menu size={24} />
           </button>
+          {sidebarCollapsed && (
+            <h1 className="header-logo-layout">Myura Admin</h1>
+          )}
+          <div className="header-spacer-layout"></div>
+          <div className="header-right-layout">
+            <div className="header-search-container-layout">
+              <Search size={18} className="search-icon-layout" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="header-search-input-layout"
+              />
+            </div>
+            <div className="header-actions-layout">
+              <button 
+                className="notification-btn-layout" 
+                title="Notifications"
+                onClick={() => setNotificationSidebarOpen(!notificationSidebarOpen)}
+              >
+                <Bell size={20} />
+                <span className="notification-badge-layout">3</span>
+              </button>
+            </div>
+          </div>
         </header>
         <main className="page-content-layout">
           <Outlet />
@@ -164,6 +191,59 @@ export default function Layout() {
         <div
           className="sidebar-overlay-layout"
           onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Notification Sidebar */}
+      <div
+        className={`notification-sidebar-layout ${
+          notificationSidebarOpen ? "open" : ""
+        }`}
+      >
+        <div className="notification-sidebar-header-layout">
+          <h2 className="notification-sidebar-title-layout">Notifications</h2>
+          <button
+            className="notification-sidebar-close-layout"
+            onClick={() => setNotificationSidebarOpen(false)}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+        <div className="notification-sidebar-content-layout">
+          <div className="notification-item-layout">
+            <div className="notification-item-icon-layout">
+              <Bell size={18} />
+            </div>
+            <div className="notification-item-details-layout">
+              <p className="notification-item-title-layout">New Order Received</p>
+              <p className="notification-item-time-layout">2 minutes ago</p>
+            </div>
+          </div>
+          <div className="notification-item-layout">
+            <div className="notification-item-icon-layout">
+              <MessageSquare size={18} />
+            </div>
+            <div className="notification-item-details-layout">
+              <p className="notification-item-title-layout">New Contact Message</p>
+              <p className="notification-item-time-layout">15 minutes ago</p>
+            </div>
+          </div>
+          <div className="notification-item-layout">
+            <div className="notification-item-icon-layout">
+              <Users size={18} />
+            </div>
+            <div className="notification-item-details-layout">
+              <p className="notification-item-title-layout">New User Registered</p>
+              <p className="notification-item-time-layout">1 hour ago</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {notificationSidebarOpen && (
+        <div
+          className="notification-sidebar-overlay-layout"
+          onClick={() => setNotificationSidebarOpen(false)}
         />
       )}
     </div>

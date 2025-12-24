@@ -18,8 +18,7 @@ export default function BlogForm(): React.JSX.Element {
     BlogFormData & {
       author_id?: number;
       status?: string;
-      meta_title?: string;
-      meta_description?: string;
+      date?: string;
     }
   >({
     title: "",
@@ -30,10 +29,9 @@ export default function BlogForm(): React.JSX.Element {
     author_id: undefined,
     published: false,
     status: "draft",
-    tags: [],
+    tags: [] as string[] | string,
     category: "",
-    meta_title: "",
-    meta_description: "",
+    date: new Date().toISOString().split("T")[0],
   });
 
   useEffect(() => {
@@ -76,10 +74,17 @@ export default function BlogForm(): React.JSX.Element {
         author_id: blog.author_id,
         published: isPublished,
         status: blog.status || (isPublished ? "published" : "draft"),
-        tags: Array.isArray(blog.tags) ? blog.tags : [],
+        tags: Array.isArray(blog.tags)
+          ? blog.tags
+          : typeof blog.tags === "string"
+          ? blog.tags
+          : [],
         category: blog.category || "",
-        meta_title: blog.meta_title || "",
-        meta_description: blog.meta_description || "",
+        date: blog.date
+          ? new Date(blog.date).toISOString().split("T")[0]
+          : blog.created_at
+          ? new Date(blog.created_at).toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0],
         featured_image: blog.featured_image_url ? null : undefined,
       });
     } catch (err) {
@@ -103,11 +108,9 @@ export default function BlogForm(): React.JSX.Element {
   };
 
   const handleTagsChange = (e: TextareaChangeEvent): void => {
-    const tags = e.target.value
-      .split(",")
-      .map((tag: string) => tag.trim())
-      .filter((tag: string) => tag);
-    setFormData({ ...formData, tags });
+    const value = e.target.value;
+    // Keep the value exactly as entered (preserve backend format)
+    setFormData({ ...formData, tags: value });
   };
 
   const handleMetaDescriptionChange = (e: TextareaChangeEvent): void => {
@@ -149,14 +152,33 @@ export default function BlogForm(): React.JSX.Element {
             data.append(formKey, value);
           }
         } else if (formKey === "tags") {
-          data.append(formKey, JSON.stringify(value || []));
+          // If tags is already a string (from backend), use it as-is
+          // If it's an array, stringify it
+          if (typeof value === "string") {
+            data.append(formKey, value);
+          } else if (Array.isArray(value)) {
+            data.append(formKey, JSON.stringify(value));
+          } else {
+            data.append(formKey, JSON.stringify([]));
+          }
         } else if (formKey === "published") {
           const status = value ? "published" : "draft";
           data.append("status", status);
-        } else if (formKey === "meta_title" && value) {
-          data.append("meta_title", String(value));
-        } else if (formKey === "meta_description" && value) {
-          data.append("meta_description", String(value));
+        } else if (formKey === "date" && value) {
+          data.append("date", String(value));
+        } else if (formKey === "slug") {
+          // Auto-generate slug from title if not provided
+          const slug = formData.slug || generateSlug(formData.title);
+          if (slug) {
+            data.append("slug", slug);
+          }
+        } else if (formKey === "content") {
+          // Content is required but we'll keep it for backend
+          if (value) {
+            data.append("content", String(value));
+          } else {
+            data.append("content", "");
+          }
         } else if (value !== null && value !== "" && value !== undefined) {
           if (typeof value === "string") {
             data.append(formKey, value);
@@ -234,38 +256,6 @@ export default function BlogForm(): React.JSX.Element {
           </div>
 
           <div className="form-group">
-            <label htmlFor="slug" className="form-label required">
-              Slug
-            </label>
-            <input
-              id="slug"
-              type="text"
-              name="slug"
-              value={formData.slug}
-              onChange={handleChange}
-              required
-              className="form-input"
-              placeholder="blog-post-url-slug"
-            />
-            <p className="help-text">URL-friendly version of the title</p>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="category" className="form-label">
-              Category
-            </label>
-            <input
-              id="category"
-              type="text"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="e.g., Health, Wellness"
-            />
-          </div>
-
-          <div className="form-group">
             <label htmlFor="author" className="form-label">
               Author
             </label>
@@ -277,6 +267,29 @@ export default function BlogForm(): React.JSX.Element {
               onChange={handleChange}
               className="form-input"
               placeholder="Author name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="date" className="form-label">
+              Date
+            </label>
+            <input
+              id="date"
+              type="date"
+              name="date"
+              value={
+                formData.date
+                  ? new Date(formData.date).toISOString().split("T")[0]
+                  : new Date().toISOString().split("T")[0]
+              }
+              onChange={(e) => {
+                setFormData({
+                  ...formData,
+                  date: e.target.value,
+                });
+              }}
+              className="form-input"
             />
           </div>
 
@@ -316,76 +329,31 @@ export default function BlogForm(): React.JSX.Element {
         </div>
 
         <div className="form-group">
-          <label htmlFor="meta_title" className="form-label">
-            Meta Title (SEO)
-          </label>
-          <input
-            id="meta_title"
-            type="text"
-            name="meta_title"
-            value={formData.meta_title || ""}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="SEO title for search engines"
-          />
-          <p className="help-text">
-            Title for search engines (leave empty to use blog title)
-          </p>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="meta_description" className="form-label">
-            Meta Description (SEO)
-          </label>
-          <textarea
-            id="meta_description"
-            name="meta_description"
-            value={formData.meta_description || ""}
-            onChange={handleMetaDescriptionChange}
-            rows={2}
-            className="form-textarea"
-            placeholder="SEO description for search engines"
-            maxLength={160}
-          />
-          <p className="help-text">
-            Description for search engines (
-            {formData.meta_description?.length || 0}/160 characters)
-          </p>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="content" className="form-label required">
-            Content
-          </label>
-          <textarea
-            id="content"
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            required
-            rows={15}
-            className="form-textarea content-textarea"
-            placeholder="Write your blog post content here..."
-          />
-        </div>
-
-        <div className="form-group">
           <label htmlFor="tags" className="form-label">
-            Tags (comma-separated)
+            Tags
           </label>
           <textarea
             id="tags"
-            value={(formData.tags || []).join(", ")}
+            value={
+              typeof formData.tags === "string"
+                ? formData.tags
+                : Array.isArray(formData.tags)
+                ? JSON.stringify(formData.tags)
+                : ""
+            }
             onChange={handleTagsChange}
             rows={2}
             className="form-textarea"
-            placeholder="health, wellness, nutrition"
+            placeholder='["health", "wellness", "nutrition"]'
           />
+          <p className="help-text">
+            Enter tags as JSON array format, e.g., ["tag1", "tag2"]
+          </p>
         </div>
 
         <div className="form-group">
           <label htmlFor="featured_image" className="form-label">
-            Featured Image
+            Featured Image (Thumbnail)
           </label>
           <input
             id="featured_image"
@@ -400,6 +368,7 @@ export default function BlogForm(): React.JSX.Element {
             }}
             className="form-input"
           />
+          <p className="help-text">Image will be displayed in the blog table</p>
         </div>
 
         <div className="form-actions">
