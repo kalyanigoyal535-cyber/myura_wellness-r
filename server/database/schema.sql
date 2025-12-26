@@ -55,6 +55,27 @@ CREATE TABLE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- =====================================================
+-- Table: addresses
+-- =====================================================
+CREATE TABLE
+  IF NOT EXISTS `addresses` (
+    `address_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `address_type` ENUM ('home', 'work', 'other') DEFAULT 'home',
+    `full_name` VARCHAR(100) NOT NULL,
+    `phone_number` VARCHAR(20) NOT NULL,
+    `address_line_1` VARCHAR(255) NOT NULL,
+    `address_line_2` VARCHAR(255) DEFAULT NULL,
+    `city` VARCHAR(100) NOT NULL,
+    `state` VARCHAR(100) NOT NULL,
+    `postal_code` VARCHAR(20) NOT NULL,
+    `country` VARCHAR(100) DEFAULT 'India',
+    `is_default` BOOLEAN DEFAULT 0,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- =====================================================
 -- Table: social_logins
 -- =====================================================
 CREATE TABLE
