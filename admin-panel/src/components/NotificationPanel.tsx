@@ -5,7 +5,6 @@ import {
   Users,
   ShoppingCart,
   MessageSquare,
-  Settings,
   Check,
   CheckCheck,
   Trash2,

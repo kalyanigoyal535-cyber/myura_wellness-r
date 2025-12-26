@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Navigate } from "react-router-dom";
 import { productsApi } from "../services/products";
+import { Product } from "../services/types";
 import { apiProductToFrontend } from "../utils/productConverter";
 import { ProductRecord } from "../data/products";
 import ResponsiveProductImage from "../components/ResponsiveProductImage";
@@ -27,11 +28,19 @@ const ProductDetailDynamic: React.FC = () => {
         let productData: Product | null = null;
 
         // First try slug-based lookup
-        productData = await productsApi.getProductBySlug(id);
+        try {
+          productData = await productsApi.getProductBySlug(id);
+        } catch (err) {
+          // Slug lookup failed, will try ID below
+        }
 
         // If not found by slug, try numeric ID
         if (!productData && !isNaN(Number(id))) {
-          productData = await productsApi.getProduct(parseInt(id));
+          try {
+            productData = await productsApi.getProduct(parseInt(id));
+          } catch (err) {
+            // ID lookup also failed, will be handled below
+          }
         }
 
         if (productData) {
@@ -92,7 +101,6 @@ const ProductDetailDynamic: React.FC = () => {
           <div>
             <ResponsiveProductImage
               image={product.image}
-              alt={product.name}
               className="w-full rounded-lg"
             />
           </div>

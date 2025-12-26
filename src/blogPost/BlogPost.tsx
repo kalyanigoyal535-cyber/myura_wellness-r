@@ -80,10 +80,10 @@ const BlogPost: React.FC = () => {
         <div className="relative rounded-xl overflow-hidden shadow-lg mb-8">
           <img
             src={
-              blog.featured_image_url ||
-              blog.thumbnail_url ||
-              blog.featured_image ||
-              blog.thumbnail ||
+              getImageUrl(blog.featured_image_url) ||
+              getImageUrl(blog.thumbnail_url) ||
+              getImageUrl(blog.featured_image) ||
+              getImageUrl(blog.thumbnail) ||
               ""
             }
             alt={blog.title}

@@ -18,7 +18,19 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
       {/* Image wrapper */}
       <div className="relative h-56 md:h-64 overflow-hidden">
         <img
-          src={blog.featured_image_url || blog.thumbnail_url || blog.featured_image || blog.thumbnail || ''}
+          src={(() => {
+            const imageUrl = blog.featured_image_url || blog.thumbnail_url || blog.featured_image || blog.thumbnail || '';
+            if (!imageUrl) return '';
+            if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+              return imageUrl;
+            }
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
+            const baseUrl = API_BASE_URL.replace('/api', '');
+            if (imageUrl.startsWith('/uploads/')) {
+              return `${baseUrl}${imageUrl}`;
+            }
+            return `${baseUrl}/uploads/${imageUrl}`;
+          })()}
           alt={blog.title}
           className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
         />

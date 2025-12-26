@@ -7,7 +7,6 @@ import {
   Check,
   CheckCheck,
   Trash2,
-  X,
 } from "lucide-react";
 import { Notification } from "../types";
 import { notificationService } from "../services/notifications";

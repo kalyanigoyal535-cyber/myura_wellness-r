@@ -14,13 +14,19 @@ export const MainCard = ({ blogs = [] }: MainCardProps) => {
   const sideBlogs = blogs.slice(1, 3);
 
   const getImageUrl = (blog: Blog) => {
-    return (
-      blog.featured_image_url ||
-      blog.thumbnail_url ||
-      blog.featured_image ||
-      blog.thumbnail ||
-      ""
-    );
+    // Return full URL if already a URL, otherwise construct it
+    const imageUrl = blog.featured_image_url || blog.thumbnail_url || blog.featured_image || blog.thumbnail || "";
+    if (!imageUrl) return "";
+    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+      return imageUrl;
+    }
+    // If it's a relative path, construct full URL
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api";
+    const baseUrl = API_BASE_URL.replace("/api", "");
+    if (imageUrl.startsWith("/uploads/")) {
+      return `${baseUrl}${imageUrl}`;
+    }
+    return `${baseUrl}/uploads/${imageUrl}`;
   };
 
   return (
