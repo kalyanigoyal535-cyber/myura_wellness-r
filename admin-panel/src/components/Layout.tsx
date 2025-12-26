@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Search,
   Bell,
+  Tag,
   type LucideIcon,
 } from "lucide-react";
 import "../styles/Layout.css";
@@ -30,6 +31,7 @@ const menuItems: MenuItem[] = [
   { path: "/products", label: "Products", icon: Package },
   { path: "/categories", label: "Categories", icon: FolderTree },
   { path: "/orders", label: "Orders", icon: ShoppingCart },
+  { path: "/coupons", label: "Coupons", icon: Tag },
   { path: "/blogs", label: "Blogs", icon: FileText },
   { path: "/users", label: "Users", icon: Users },
   { path: "/contacts", label: "Contacts", icon: MessageSquare },

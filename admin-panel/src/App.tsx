@@ -15,6 +15,8 @@ import Users from './pages/Users';
 import Contacts from './pages/Contacts';
 import Blogs from './pages/Blogs';
 import BlogForm from './pages/BlogForm';
+import Coupons from './pages/Coupons';
+import CouponForm from './pages/CouponForm';
 import MyAccount from './pages/MyAccount';
 import Layout from './components/Layout';
 
@@ -70,6 +72,9 @@ function AppRoutes() {
         <Route path="blogs" element={<Blogs />} />
         <Route path="blogs/new" element={<BlogForm />} />
         <Route path="blogs/:id/edit" element={<BlogForm />} />
+        <Route path="coupons" element={<Coupons />} />
+        <Route path="coupons/new" element={<CouponForm />} />
+        <Route path="coupons/:id/edit" element={<CouponForm />} />
         <Route path="account" element={<MyAccount />} />
       </Route>
     </Routes>
