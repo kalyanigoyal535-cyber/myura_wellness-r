@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import images from "../../images/images";
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
@@ -34,7 +34,8 @@ const Signup = () => {
       .required("Required"),
   });
 
-  const handleSubmit = async (values: SignupValues, helpers: FormikHelpers<SignupValues>) => {
+  const handleSubmit = async (
+    values: SignupValues  ) : Promise<void> => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -51,7 +52,11 @@ const Signup = () => {
       // Redirect to home
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -61,18 +66,17 @@ const Signup = () => {
     <div className="grid grid-cols-1 md:grid-cols-12 min-h-screen">
       {/* Image Section – EXACT same layout as Login */}
       <div className="col-span-12 md:col-span-6 flex justify-center order-2 md:order-2">
-  <img
-    src={images.LoginImage}
-    alt="Offer desktop"
-    className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
-  />
-  <img
-    src={images.MobileLoginImage}
-    alt="Offer mobile"
-    className="block md:hidden w-full mt-8 md:mt-0 h-auto object-contain rounded-lg"
-  />
-</div>
-
+        <img
+          src={images.LoginImage}
+          alt="Offer desktop"
+          className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
+        />
+        <img
+          src={images.MobileLoginImage}
+          alt="Offer mobile"
+          className="block md:hidden w-full mt-8 md:mt-0 h-auto object-contain rounded-lg"
+        />
+      </div>
 
       {/* Signup Section – mirror Login section */}
       <div className="col-span-12 md:col-span-6 flex flex-col items-center md:justify-center order-1 md:order-1">
@@ -102,7 +106,11 @@ const Signup = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
+          {({
+            handleSubmit,
+          }: {
+            handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
+          }) => (
             <Form
               onSubmit={handleSubmit}
               className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4"

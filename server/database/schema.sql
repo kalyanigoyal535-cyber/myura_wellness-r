@@ -46,6 +46,8 @@ CREATE TABLE
       utf8mb4 COLLATE utf8mb4_bin,
       `is_verified` TINYINT (1) DEFAULT 0,
       `status` ENUM ('Active', 'Inactive', 'Blocked') DEFAULT 'Active',
+      `reset_token` VARCHAR(255) DEFAULT NULL,
+      `reset_token_expiry` TIMESTAMP NULL,
       `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       `date_joined` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

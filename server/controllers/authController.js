@@ -5,81 +5,8 @@ import { generateTokens, verifyRefreshToken } from "../utils/jwt.js";
 import { sendSuccess, sendError, sendBadRequest } from "../utils/response.js";
 import { getImageUrl } from "../utils/imageUrl.js";
 
-// Register
-export const register = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const {
-      email,
-      password,
-      first_name,
-      last_name,
-      username,
-      phone,
-      phone_number,
-    } = req.body;
-
-    // Check if user exists
-    const [existing] = await pool.execute(
-      "SELECT id FROM user WHERE email = ?",
-      [email]
-    );
-
-    if (existing.length > 0) {
-      return sendBadRequest(res, "User already exists");
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
-    const [result] = await pool.execute(
-      `INSERT INTO user (email, username, first_name, last_name, password, phone, phone_number, status) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'Active')`,
-      [
-        email,
-        username || null,
-        first_name || null,
-        last_name || null,
-        hashedPassword,
-        phone || null,
-        phone_number || null,
-      ]
-    );
-
-    const userId = result.insertId;
-
-    // Generate tokens
-    const { accessToken, refreshToken } = generateTokens(userId);
-
-    return sendSuccess(
-      res,
-      {
-        user: {
-          id: userId,
-          email,
-          username: username || null,
-          first_name: first_name || null,
-          last_name: last_name || null,
-        },
-        access: accessToken,
-        refresh: refreshToken,
-      },
-      "User registered successfully",
-      201
-    );
-  } catch (error) {
-    console.error("Register error:", error);
-    return sendError(res, "Registration failed", 500);
-  }
-};
-
-// Login - Check admins table first for admin login
-export const login = async (req, res) => {
+// Admin Login - Only for admins
+export const adminLogin = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -134,48 +61,37 @@ export const login = async (req, res) => {
   }
 };
 
-// Get current user
+// Get current admin user
 export const getCurrentUser = async (req, res) => {
   try {
-    // Check if user is admin (has name field or is_staff/is_superuser)
-    if (req.user.is_staff || req.user.is_superuser || req.user.name) {
-      // Fetch full admin data from admins table
-      const [admins] = await pool.execute(
-        "SELECT id, email, name, photo, is_verified FROM admins WHERE id = ?",
-        [req.user.id]
-      );
-
-      if (admins.length > 0) {
-        const admin = admins[0];
-        return sendSuccess(res, {
-          id: admin.id,
-          email: admin.email,
-          name: admin.name,
-          photo: admin.photo ? getImageUrl(req, admin.photo, "admins") : null,
-          is_verified: admin.is_verified,
-          is_staff: true,
-          is_superuser: true,
-        });
-      }
+    // This endpoint is only for admins
+    if (!req.user.is_staff && !req.user.is_superuser) {
+      return sendError(res, "Admin access required", 403);
     }
 
-    // Regular user - return user table data
+    // Fetch full admin data from admins table
+    const [admins] = await pool.execute(
+      "SELECT id, email, name, photo, is_verified FROM admins WHERE id = ?",
+      [req.user.id]
+    );
+
+    if (admins.length === 0) {
+      return sendError(res, "Admin not found", 404);
+    }
+
+    const admin = admins[0];
     return sendSuccess(res, {
-      id: req.user.id,
-      email: req.user.email,
-      username: req.user.username,
-      first_name: req.user.first_name,
-      last_name: req.user.last_name,
-      phone: req.user.phone,
-      phone_number: req.user.phone_number,
-      is_verified: req.user.is_verified,
-      status: req.user.status,
-      is_staff: req.user.is_staff || false,
-      is_superuser: req.user.is_superuser || false,
+      id: admin.id,
+      email: admin.email,
+      name: admin.name,
+      photo: admin.photo ? getImageUrl(req, admin.photo, "admins") : null,
+      is_verified: admin.is_verified,
+      is_staff: true,
+      is_superuser: true,
     });
   } catch (error) {
-    console.error("Get user error:", error);
-    return sendError(res, "Failed to get user", 500);
+    console.error("Get admin error:", error);
+    return sendError(res, "Failed to get admin", 500);
   }
 };
 
