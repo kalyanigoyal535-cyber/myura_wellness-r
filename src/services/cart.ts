@@ -39,7 +39,6 @@ const clearStoredCartId = (): void => {
 export const cartApi = {
   getCart: async (): Promise<Cart> => {
     try {
-      console.log('[Cart API] Fetching cart...');
       const cartId = getStoredCartId();
       const config = cartId ? {
         headers: {
@@ -47,20 +46,17 @@ export const cartApi = {
         },
       } : undefined;
       const response = await apiClient.get<Cart>('/cart/', config);
-      console.log('[Cart API] Get cart response:', response.data);
       if (response.data.id) {
         storeCartId(response.data.id);
       }
       return response.data;
     } catch (error) {
-      console.error('[Cart API] Get cart error:', error);
       throw new Error(getErrorMessage(error));
     }
   },
 
   addToCart: async (productId: number, quantity: number = 1): Promise<Cart> => {
     try {
-      console.log('[Cart API] Adding to cart:', { productId, quantity });
       const cartId = getStoredCartId();
       const config = cartId ? {
         headers: {
@@ -71,7 +67,6 @@ export const cartApi = {
         product_id: productId,
         quantity,
       }, config);
-      console.log('[Cart API] Add to cart response:', response.data);
       if (response.data.id) {
         storeCartId(response.data.id);
       }

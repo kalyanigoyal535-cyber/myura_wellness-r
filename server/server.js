@@ -11,6 +11,7 @@ import productRoutes from './routes/products.js';
 import categoryRoutes from './routes/categories.js';
 import blogRoutes from './routes/blogs.js';
 import adminRoutes from './routes/admin.js';
+import cartRoutes from './routes/cart.js';
 import { submitContact } from './controllers/contactController.js';
 
 dotenv.config();
@@ -79,6 +80,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Contact form endpoint (public)
