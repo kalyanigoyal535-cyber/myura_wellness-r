@@ -36,7 +36,7 @@ export interface PasswordResetConfirm {
 export const authApi = {
   register: async (data: RegisterData): Promise<AuthResponse> => {
     try {
-      const response = await apiClient.post<AuthResponse>('/auth/register/', data);
+      const response = await apiClient.post<AuthResponse>('/user/register/', data);
       if (response.data.tokens) {
         localStorage.setItem('access_token', response.data.tokens.access);
         localStorage.setItem('refresh_token', response.data.tokens.refresh);
@@ -52,7 +52,7 @@ export const authApi = {
 
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-      const response = await apiClient.post<any>('/auth/login/', credentials);
+      const response = await apiClient.post<any>('/user/login/', credentials);
       const data = response.data;
       
       let accessToken: string | null = null;
@@ -94,7 +94,7 @@ export const authApi = {
 
   logout: async (): Promise<void> => {
     try {
-      await apiClient.post('/auth/logout/');
+      await apiClient.post('/user/logout/');
     } catch (error) {
       console.error('Logout API error:', error);
     } finally {
@@ -106,7 +106,7 @@ export const authApi = {
 
   getProfile: async (): Promise<User> => {
     try {
-      const response = await apiClient.get<User>('/auth/user/');
+      const response = await apiClient.get<User>('/user/profile/');
       localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
@@ -116,7 +116,7 @@ export const authApi = {
 
   updateProfile: async (data: UpdateProfileData): Promise<User> => {
     try {
-      const response = await apiClient.put<User>('/auth/user/', data);
+      const response = await apiClient.put<User>('/user/profile/', data);
       localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
@@ -154,7 +154,7 @@ export const authApi = {
 
   requestPasswordReset: async (data: PasswordResetRequest): Promise<{ message: string }> => {
     try {
-      const response = await apiClient.post<{ message: string }>('/auth/password/reset/', {
+      const response = await apiClient.post<{ message: string }>('/user/password/reset/', {
         email: data.email,
       });
       return response.data;
@@ -165,7 +165,7 @@ export const authApi = {
 
   confirmPasswordReset: async (data: PasswordResetConfirm): Promise<{ message: string }> => {
     try {
-      const response = await apiClient.post<{ message: string }>('/auth/password/reset/confirm/', {
+      const response = await apiClient.post<{ message: string }>('/user/password/reset/confirm/', {
         uid: data.uid,
         token: data.token,
         new_password: data.new_password,
