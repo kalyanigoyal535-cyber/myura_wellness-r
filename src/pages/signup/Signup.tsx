@@ -6,6 +6,7 @@ import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import { Eye, EyeOff } from "lucide-react";
 
 interface SignupValues {
   firstName: string;
@@ -34,7 +35,10 @@ const Signup = () => {
       .required("Required"),
   });
 
-  const handleSubmit = async (values: SignupValues, helpers: FormikHelpers<SignupValues>) => {
+  const handleSubmit = async (
+    values: SignupValues,
+    helpers: FormikHelpers<SignupValues>
+  ) => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -51,28 +55,32 @@ const Signup = () => {
       // Redirect to home
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 min-h-screen">
       {/* Image Section – EXACT same layout as Login */}
       <div className="col-span-12 md:col-span-6 flex justify-center order-2 md:order-2">
-  <img
-    src={images.LoginImage}
-    alt="Offer desktop"
-    className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
-  />
-  <img
-    src={images.MobileLoginImage}
-    alt="Offer mobile"
-    className="block md:hidden w-full mt-8 md:mt-0 h-auto object-contain rounded-lg"
-  />
-</div>
-
+        <img
+          src={images.LoginImage}
+          alt="Offer desktop"
+          className="hidden md:block w-full h-auto md:h-[85vh] object-cover md:object-contain md:rounded-lg rounded-lg"
+        />
+        <img
+          src={images.MobileLoginImage}
+          alt="Offer mobile"
+          className="block md:hidden w-full mt-8 md:mt-0 h-auto object-contain rounded-lg"
+        />
+      </div>
 
       {/* Signup Section – mirror Login section */}
       <div className="col-span-12 md:col-span-6 flex flex-col items-center md:justify-center order-1 md:order-1">
@@ -102,7 +110,11 @@ const Signup = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
+          {({
+            handleSubmit,
+          }: {
+            handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
+          }) => (
             <Form
               onSubmit={handleSubmit}
               className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4"
@@ -151,12 +163,33 @@ const Signup = () => {
 
               <div>
                 <label>Password</label>
-                <Field
-                  name="password"
-                  as={Input}
-                  placeholder="Password"
-                  type="password"
-                />
+                <Field name="password">
+                  {({ field }: any) => (
+                    <Input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      rightSection={
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="cursor-pointer text-gray-600"
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }
+                        >
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      }
+                      rightSectionPointerEvents="all"
+                    />
+                  )}
+                </Field>
+
                 <ErrorMessage
                   name="password"
                   component="p"
@@ -166,12 +199,38 @@ const Signup = () => {
 
               <div>
                 <label>Confirm Password</label>
-                <Field
-                  name="password2"
-                  as={Input}
-                  placeholder="Confirm Password"
-                  type="password"
-                />
+
+                <Field name="password2">
+                  {({ field }: any) => (
+                    <Input
+                      {...field}
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm Password"
+                      rightSection={
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword((prev) => !prev)
+                          }
+                          className="cursor-pointer text-gray-600"
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide password"
+                              : "Show password"
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      }
+                      rightSectionPointerEvents="all"
+                    />
+                  )}
+                </Field>
+
                 <ErrorMessage
                   name="password2"
                   component="p"
