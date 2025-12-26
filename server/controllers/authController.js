@@ -24,7 +24,7 @@ export const adminLogin = async (req, res) => {
     );
 
     if (admins.length === 0) {
-      return sendError(res, "Access denied. Admin account required.", 401);
+      return sendError(res, "Admin not found", 401);
     }
 
     const admin = admins[0];

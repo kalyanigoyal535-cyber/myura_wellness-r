@@ -6,6 +6,7 @@ import { sendSuccess, sendError, sendBadRequest } from "../utils/response.js";
 import { getImageUrl } from "../utils/imageUrl.js";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "../utils/email.js";
+import { createNotification } from "./notificationController.js";
 
 // Register user
 export const register = async (req, res) => {
@@ -61,6 +62,19 @@ export const register = async (req, res) => {
     );
 
     const userId = result.insertId;
+
+    // Create notification for admin about new user registration
+    const userName =
+      first_name && last_name
+        ? `${first_name} ${last_name}`
+        : username || email;
+    await createNotification(
+      "user_registered",
+      "New User Registered",
+      `${userName} (${email}) has registered on the platform`,
+      userId,
+      "user"
+    );
 
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(userId);

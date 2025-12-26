@@ -19,6 +19,7 @@ export const getProducts = async (req, res) => {
     let query = `
       SELECT 
         p.*,
+        p.slug as product_slug,
         c.id as category_id,
         c.name as category_name,
         c.headline as category_headline,
@@ -124,6 +125,7 @@ export const getProducts = async (req, res) => {
     // Format products
     const formattedProducts = products.map((p) => ({
       id: p.product_id,
+      slug: p.product_slug || p.slug,
       name: p.name,
       headline: p.headline,
       price: parseFloat(p.price),
@@ -213,6 +215,7 @@ export const getProduct = async (req, res) => {
 
     const product = {
       id: p.product_id,
+      slug: p.slug,
       name: p.name,
       headline: p.headline,
       price: parseFloat(p.price),
