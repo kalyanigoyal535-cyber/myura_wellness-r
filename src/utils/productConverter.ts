@@ -59,12 +59,11 @@ export const apiProductToFrontend = (apiProduct: ApiProduct): ProductRecord => {
     ],
   }));
 
-  // Use category ID (slug) as the product ID for routing compatibility
-  // Fallback to numeric ID if category is not available
-  const productId = apiProduct.category?.id || String(apiProduct.id);
+  // Use product slug for routing if available, otherwise use category slug or numeric ID
+  const productId = apiProduct.slug || apiProduct.category?.slug || String(apiProduct.id);
   
   return {
-    id: productId, // Category slug for routing
+    id: productId, // Product slug for routing (e.g., 'pro-mens-multivitamin')
     numericId: apiProduct.id, // Numeric ID for API operations (cart, etc.)
     name: apiProduct.name,
     headline: apiProduct.headline || '',

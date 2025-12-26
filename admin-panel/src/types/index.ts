@@ -37,7 +37,7 @@ export interface Admin {
 export interface Product {
   product_id: number;
   slug?: string;
-  category_id: string;
+  category_id: number; // Changed from string to INT
   name: string;
   headline?: string;
   price: number;
@@ -66,7 +66,7 @@ export interface Product {
 
 // Product Category Types (matching new schema)
 export interface ProductCategory {
-  id: string;
+  id: number; // Changed from string to INT
   name: string;
   slug: string;
   headline?: string;

@@ -39,15 +39,44 @@ export const getProducts = async (req, res) => {
     const params = [];
 
     if (category) {
-      query += " AND p.category_id = ?";
-      params.push(category);
+      // Support both numeric ID and slug
+      const isNumeric = /^\d+$/.test(category);
+      if (isNumeric) {
+        query += " AND p.category_id = ?";
+        params.push(parseInt(category));
+      } else {
+        query +=
+          " AND p.category_id = (SELECT id FROM categories WHERE slug = ?)";
+        params.push(category);
+      }
     }
 
     if (categories) {
       const categoryList = categories.split(",").map((c) => c.trim());
-      query +=
-        " AND p.category_id IN (" + categoryList.map(() => "?").join(",") + ")";
-      params.push(...categoryList);
+      const numericIds = categoryList
+        .filter((c) => /^\d+$/.test(c))
+        .map((c) => parseInt(c));
+      const slugs = categoryList.filter((c) => !/^\d+$/.test(c));
+
+      if (numericIds.length > 0 && slugs.length > 0) {
+        query +=
+          " AND (p.category_id IN (" +
+          numericIds.map(() => "?").join(",") +
+          ") OR p.category_id IN (SELECT id FROM categories WHERE slug IN (" +
+          slugs.map(() => "?").join(",") +
+          ")))";
+        params.push(...numericIds, ...slugs);
+      } else if (numericIds.length > 0) {
+        query +=
+          " AND p.category_id IN (" + numericIds.map(() => "?").join(",") + ")";
+        params.push(...numericIds);
+      } else if (slugs.length > 0) {
+        query +=
+          " AND p.category_id IN (SELECT id FROM categories WHERE slug IN (" +
+          slugs.map(() => "?").join(",") +
+          "))";
+        params.push(...slugs);
+      }
     }
 
     if (min_price) {
@@ -152,7 +181,8 @@ export const getProducts = async (req, res) => {
       image: p.image,
       image_url: getImageUrl(req, p.image),
       category: {
-        id: p.category_id,
+        id: parseInt(p.category_id), // Ensure it's an integer
+        slug: p.category_slug || null, // Add slug if available
         name: p.category_name,
         headline: p.category_headline,
         description: p.category_description,
@@ -184,6 +214,7 @@ export const getProduct = async (req, res) => {
       `SELECT 
         p.*,
         c.id as category_id,
+        c.slug as category_slug,
         c.name as category_name,
         c.headline as category_headline,
         c.description as category_description,
@@ -259,7 +290,8 @@ export const getProduct = async (req, res) => {
         order: img.order,
       })),
       category: {
-        id: p.category_id,
+        id: parseInt(p.category_id), // Ensure it's an integer
+        slug: p.category_slug || null, // Add slug if available
         name: p.category_name,
         headline: p.category_headline,
         description: p.category_description,

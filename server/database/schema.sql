@@ -92,7 +92,7 @@ CREATE TABLE
 -- =====================================================
 CREATE TABLE
   IF NOT EXISTS `categories` (
-    `id` VARCHAR(200) PRIMARY KEY,
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(200) NOT NULL,
     `slug` VARCHAR(200) UNIQUE NOT NULL,
     `headline` VARCHAR(300) DEFAULT NULL,
@@ -112,7 +112,7 @@ CREATE TABLE
   IF NOT EXISTS `products` (
     `product_id` INT AUTO_INCREMENT PRIMARY KEY,
     `slug` VARCHAR(255) UNIQUE NULL,
-    `category_id` VARCHAR(200) NOT NULL,
+    `category_id` INT NOT NULL,
     `name` VARCHAR(200) NOT NULL,
     `headline` VARCHAR(300) DEFAULT NULL,
     `price` DECIMAL(10, 2) NOT NULL CHECK (`price` >= 0),

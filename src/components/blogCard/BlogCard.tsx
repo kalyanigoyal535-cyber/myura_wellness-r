@@ -1,15 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+import { Blog } from "../../services/blogs";
+
 interface BlogCardProps {
-  blog?: {
-    thumbnail: string;
-    title: string;
-    excerpt: string;
-    author: string;
-    date: string;
-    slug: string;
-  };
+  blog?: Blog;
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
@@ -23,7 +18,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
       {/* Image wrapper */}
       <div className="relative h-56 md:h-64 overflow-hidden">
         <img
-          src={blog.thumbnail}
+          src={blog.featured_image_url || blog.thumbnail_url || blog.featured_image || blog.thumbnail || ''}
           alt={blog.title}
           className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
         />
@@ -38,12 +33,12 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
           {blog.title}
         </h1>
         <p className="text-gray-600 text-sm mb-3 line-clamp-3">
-          {blog.excerpt}
+          {blog.excerpt || blog.content || ''}
         </p>
 
         <div className="flex justify-between items-center text-xs md:text-sm text-gray-500">
-          <p>{blog.date}</p>
-          <p className="underline">{blog.author}</p>
+          <p>{blog.date || blog.published_at || blog.created_at}</p>
+          <p className="underline">{blog.author || blog.author_name || 'Admin'}</p>
         </div>
       </div>
     </Link>

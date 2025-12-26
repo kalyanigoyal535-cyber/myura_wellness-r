@@ -7,7 +7,7 @@ export const getBlogs = async (req, res) => {
   try {
     const { published, category, search, page = 1, page_size = 20 } = req.query;
     
-    let query = 'SELECT blog_id as id, title, slug, content as excerpt, content, featured_image, author_id, status, meta_title, meta_description, tags, view_count as views, created_at, updated_at FROM blogs WHERE 1=1';
+    let query = 'SELECT blog_id as id, title, slug, subtitle, excerpt, content, featured_image, thumbnail, author_id, status, meta_title, meta_description, tags, view_count as views, date, created_at, updated_at FROM blogs WHERE 1=1';
     const params = [];
 
     if (published !== undefined) {
@@ -59,24 +59,78 @@ export const getBlogs = async (req, res) => {
     const [countResult] = await pool.execute(countQuery, countParams);
     const total = countResult[0].total;
 
-    const formattedBlogs = blogs.map(blog => ({
-      id: blog.id,
-      title: blog.title,
-      slug: blog.slug,
-      excerpt: blog.excerpt,
-      content: blog.content,
-      featured_image: blog.featured_image,
-      featured_image_url: blog.featured_image 
-        ? `${req.protocol}://${req.get('host')}/uploads/blogs/${blog.featured_image}`
-        : null,
-      author_id: blog.author_id,
-      published: blog.status === 'published',
-      published_at: blog.status === 'published' ? blog.created_at : null,
-      tags: JSON.parse(blog.tags || '[]'),
-      views: blog.views || 0,
-      created_at: blog.created_at,
-      updated_at: blog.updated_at,
-    }));
+    // Get author names for all blogs
+    const authorIds = [...new Set(blogs.map(b => b.author_id))];
+    const authorMap = new Map();
+    if (authorIds.length > 0) {
+      const placeholders = authorIds.map(() => '?').join(',');
+      const [authors] = await pool.execute(
+        `SELECT id, name FROM admins WHERE id IN (${placeholders})`,
+        authorIds
+      );
+      authors.forEach(a => authorMap.set(a.id, a.name));
+    }
+
+    const formattedBlogs = blogs.map(async blog => {
+      const authorName = authorMap.get(blog.author_id) || null;
+      
+      // Parse content blocks if available
+      let contentBlocks = null;
+      try {
+        const [blogWithBlocks] = pool.execute(
+          'SELECT content_blocks FROM blogs WHERE blog_id = ?',
+          [blog.id]
+        );
+        if (blogWithBlocks.length > 0 && blogWithBlocks[0].content_blocks) {
+          contentBlocks = JSON.parse(blogWithBlocks[0].content_blocks);
+          // Update image paths in content blocks
+          if (contentBlocks && Array.isArray(contentBlocks)) {
+            contentBlocks = contentBlocks.map(block => {
+              if (block.type === 'image' && block.src) {
+                return {
+                  ...block,
+                  src: block.src.startsWith('http') 
+                    ? block.src 
+                    : `${req.protocol}://${req.get('host')}/uploads/blogs/${block.src}`,
+                };
+              }
+              return block;
+            });
+          }
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+
+      return {
+        id: blog.id,
+        title: blog.title,
+        slug: blog.slug,
+        subtitle: blog.subtitle || null,
+        excerpt: blog.excerpt || null,
+        content: blog.content,
+        content_blocks: contentBlocks,
+        featured_image: blog.featured_image,
+        featured_image_url: blog.featured_image 
+          ? `${req.protocol}://${req.get('host')}/uploads/blogs/${blog.featured_image}`
+          : null,
+        thumbnail: blog.thumbnail || blog.featured_image,
+        thumbnail_url: (blog.thumbnail || blog.featured_image)
+          ? `${req.protocol}://${req.get('host')}/uploads/blogs/${blog.thumbnail || blog.featured_image}`
+          : null,
+        author_id: blog.author_id,
+        author: authorName,
+        author_name: authorName,
+        published: blog.status === 'published',
+        published_at: blog.status === 'published' ? blog.created_at : null,
+        tags: JSON.parse(blog.tags || '[]'),
+        views: blog.views || 0,
+        view_count: blog.views || 0,
+        date: blog.date || blog.created_at,
+        created_at: blog.created_at,
+        updated_at: blog.updated_at,
+      };
+    });
 
     return sendSuccess(res, {
       count: formattedBlogs.length,
@@ -111,20 +165,66 @@ export const getBlog = async (req, res) => {
       [blog.id]
     );
 
+    // Get author name
+    const [admins] = await pool.execute(
+      'SELECT name FROM admins WHERE id = ?',
+      [blog.author_id]
+    );
+    const authorName = admins.length > 0 ? admins[0].name : null;
+
+    // Parse content blocks and update image URLs
+    let contentBlocks = null;
+    try {
+      const [blogWithBlocks] = await pool.execute(
+        'SELECT content_blocks, subtitle, excerpt, date, author FROM blogs WHERE blog_id = ?',
+        [blog.id]
+      );
+      if (blogWithBlocks.length > 0) {
+        contentBlocks = blogWithBlocks[0].content_blocks ? JSON.parse(blogWithBlocks[0].content_blocks) : null;
+        // Update image paths in content blocks
+        if (contentBlocks && Array.isArray(contentBlocks)) {
+          contentBlocks = contentBlocks.map(block => {
+            if (block.type === 'image' && block.src) {
+              return {
+                ...block,
+                src: block.src.startsWith('http') 
+                  ? block.src 
+                  : `${req.protocol}://${req.get('host')}/uploads/blogs/${block.src}`,
+              };
+            }
+            return block;
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing content blocks:', e);
+    }
+
     return sendSuccess(res, {
       id: blog.id,
       title: blog.title,
       slug: blog.slug,
+      subtitle: blog.subtitle || null,
+      excerpt: blog.excerpt || null,
       content: blog.content,
+      content_blocks: contentBlocks,
       featured_image: blog.featured_image,
       featured_image_url: blog.featured_image 
         ? `${req.protocol}://${req.get('host')}/uploads/blogs/${blog.featured_image}`
         : null,
+      thumbnail: blog.featured_image,
+      thumbnail_url: blog.featured_image 
+        ? `${req.protocol}://${req.get('host')}/uploads/blogs/${blog.featured_image}`
+        : null,
       author_id: blog.author_id,
+      author: authorName,
+      author_name: authorName,
       published: blog.status === 'published',
       published_at: blog.status === 'published' ? blog.created_at : null,
       tags: JSON.parse(blog.tags || '[]'),
       views: (blog.views || 0) + 1,
+      view_count: (blog.views || 0) + 1,
+      date: blog.date || blog.created_at,
       created_at: blog.created_at,
       updated_at: blog.updated_at,
     });

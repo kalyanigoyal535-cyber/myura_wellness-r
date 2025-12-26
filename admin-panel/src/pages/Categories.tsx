@@ -24,7 +24,7 @@ export default function Categories(): React.JSX.Element {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
-    categoryId: string | null;
+    categoryId: number | null;
     categoryName: string;
   }>({
     isOpen: false,
@@ -196,7 +196,7 @@ export default function Categories(): React.JSX.Element {
               <thead>
                 <tr>
                   <th>Category</th>
-                  <th>ID/Slug</th>
+                  <th>Slug</th>
                   <th>Headline</th>
                   <th>Accent Gradient</th>
                   <th>Hero Tagline</th>
@@ -246,9 +246,9 @@ export default function Categories(): React.JSX.Element {
                       <td>
                         <span
                           className="table-category-id"
-                          title={category.id || category.slug}
+                          title={category.slug}
                         >
-                          {category.id || category.slug || "—"}
+                          {category.slug}
                         </span>
                       </td>
                       <td>

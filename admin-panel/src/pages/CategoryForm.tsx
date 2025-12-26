@@ -16,7 +16,8 @@ export default function CategoryForm(): React.JSX.Element {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<CategoryFormData>({
-    id: "",
+    id: "", // Keep for backward compatibility but will use slug
+    slug: "",
     name: "",
     headline: "",
     description: "",
@@ -41,7 +42,8 @@ export default function CategoryForm(): React.JSX.Element {
       );
       const category = response.data;
       setFormData({
-        id: category.id || "",
+        id: category.id?.toString() || "",
+        slug: category.slug || "",
         name: category.name || "",
         headline: category.headline || "",
         description: category.description || "",
@@ -77,13 +79,30 @@ export default function CategoryForm(): React.JSX.Element {
 
     try {
       const data = new FormData();
+      // Generate slug from name if not provided
+      const slug =
+        formData.slug ||
+        formData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+
       Object.keys(formData).forEach((key) => {
         const formKey = key as keyof CategoryFormData;
         const value = formData[formKey];
 
         if (formKey === "image" && value) {
           data.append(formKey, value);
-        } else if (value !== null && value !== "" && value !== undefined) {
+        } else if (formKey === "slug") {
+          // Always send slug, not id
+          data.append("slug", slug);
+        } else if (
+          formKey !== "id" &&
+          value !== null &&
+          value !== "" &&
+          value !== undefined
+        ) {
+          // Skip id field, use slug instead
           data.append(formKey, value.toString());
         }
       });
@@ -138,25 +157,23 @@ export default function CategoryForm(): React.JSX.Element {
       <form onSubmit={handleSubmit} className="category-form-card">
         <div className="form-grid">
           <div className="form-group">
-            <label htmlFor="id" className="form-label required">
-              Category ID (Slug)
+            <label htmlFor="slug" className="form-label required">
+              Category Slug
             </label>
             <input
-              id="id"
+              id="slug"
               type="text"
-              name="id"
-              value={formData.id}
+              name="slug"
+              value={formData.slug || ""}
               onChange={handleChange}
               required
-              disabled={!!id}
               className="form-input"
               placeholder="e.g., dia-care"
             />
-            {!id && (
-              <p className="help-text">
-                This will be used as the URL slug (lowercase, hyphens)
-              </p>
-            )}
+            <p className="help-text">
+              URL-friendly identifier (lowercase, hyphens). Auto-generated from
+              name if left empty.
+            </p>
           </div>
 
           <div className="form-group">

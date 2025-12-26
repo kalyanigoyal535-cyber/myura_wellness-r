@@ -16,7 +16,8 @@ export const getCategories = async (req, res) => {
     );
 
     const formattedCategories = categories.map((cat) => ({
-      id: cat.id,
+      id: parseInt(cat.id), // Ensure it's an integer
+      slug: cat.slug,
       name: cat.name,
       headline: cat.headline,
       description: cat.description,
@@ -38,13 +39,22 @@ export const getCategories = async (req, res) => {
   }
 };
 
-// Get single category
+// Get single category by ID or slug
 export const getCategory = async (req, res) => {
   try {
-    const [categories] = await pool.execute(
-      "SELECT * FROM categories WHERE id = ?",
-      [req.params.id]
-    );
+    const categoryId = req.params.id;
+    const isNumeric = /^\d+$/.test(categoryId);
+
+    let query, params;
+    if (isNumeric) {
+      query = "SELECT * FROM categories WHERE id = ?";
+      params = [parseInt(categoryId)];
+    } else {
+      query = "SELECT * FROM categories WHERE slug = ?";
+      params = [categoryId];
+    }
+
+    const [categories] = await pool.execute(query, params);
 
     if (categories.length === 0) {
       return sendNotFound(res, "Category");
@@ -55,11 +65,12 @@ export const getCategory = async (req, res) => {
     // Get products count
     const [countResult] = await pool.execute(
       "SELECT COUNT(*) as count FROM products WHERE category_id = ?",
-      [req.params.id]
+      [cat.id]
     );
 
     return sendSuccess(res, {
-      id: cat.id,
+      id: parseInt(cat.id), // Ensure it's an integer
+      slug: cat.slug,
       name: cat.name,
       headline: cat.headline,
       description: cat.description,

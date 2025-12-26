@@ -22,7 +22,8 @@ export interface AuthResponse {
 
 // Product Types
 export interface ProductCategory {
-  id: string;
+  id: number; // Changed from string to number
+  slug?: string; // Add slug for backward compatibility
   name: string;
   headline?: string;
   description?: string;
@@ -44,6 +45,7 @@ export interface ProductImage {
 
 export interface Product {
   id: number;
+  slug?: string;
   category: ProductCategory;
   name: string;
   headline?: string;

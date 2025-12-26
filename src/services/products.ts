@@ -45,10 +45,24 @@ export const productsApi = {
     }
   },
 
-  getProduct: async (id: number): Promise<Product> => {
+  getProduct: async (id: number | string): Promise<Product> => {
     try {
+      // Support both numeric ID and slug
       const response = await apiClient.get<Product>(`/products/${id}/`);
       return response.data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
+  },
+
+  getProductBySlug: async (slug: string): Promise<Product | null> => {
+    try {
+      // Search for product by slug
+      const allProducts = await productsApi.getProducts({ search: slug });
+      const found = allProducts.results?.find(
+        (p) => p.slug?.toLowerCase() === slug.toLowerCase()
+      );
+      return found || null;
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }
