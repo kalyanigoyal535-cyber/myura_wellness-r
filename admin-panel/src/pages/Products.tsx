@@ -83,6 +83,15 @@ export default function Products(): React.JSX.Element {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              className="search-clear-btn"
+            >
+              ×
+            </button>
+          )}
         </div>
       </div>
 
@@ -92,19 +101,21 @@ export default function Products(): React.JSX.Element {
         </div>
       )}
 
-      <div className="products-table-container">
-        {filteredProducts.length === 0 ? (
-          <div className="empty-state">
-            <Package className="empty-state-icon" size={48} />
-            <p className="empty-state-text">No products found</p>
-            {products.length === 0 && (
-              <Link to="/products/new" className="empty-state-action">
-                <Plus size={20} />
-                Create your first product
-              </Link>
-            )}
-          </div>
-        ) : (
+      {filteredProducts.length === 0 ? (
+        <div className="empty-state-products">
+          <Package className="empty-state-icon-products" size={64} />
+          <p className="empty-state-text-products">
+            {searchTerm ? "No products match your search" : "No products found"}
+          </p>
+          {products.length === 0 && !searchTerm && (
+            <Link to="/products/new" className="empty-state-action-products">
+              <Plus size={20} />
+              Create your first product
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="products-table-container">
           <div className="table-wrapper">
             <table className="products-table">
               <thead>
@@ -208,8 +219,8 @@ export default function Products(): React.JSX.Element {
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

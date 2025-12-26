@@ -76,6 +76,32 @@
 .search-input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.search-clear-btn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .products-loading {
@@ -269,6 +295,52 @@
   background-color: #fee2e2;
 }
 
+/* Empty State */
+.empty-state-products {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  min-height: 400px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-state-icon-products {
+  color: var(--text-tertiary);
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.empty-state-text-products {
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.empty-state-action-products {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.empty-state-action-products:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
 @media (max-width: 768px) {
   .products-table {
     font-size: 12px;
@@ -282,6 +354,20 @@
   .product-info {
     flex-direction: column;
     align-items: flex-start;
+  }
+  
+  .empty-state-products {
+    padding: 60px 20px;
+    min-height: 300px;
+  }
+  
+  .empty-state-icon-products {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .empty-state-text-products {
+    font-size: 16px;
   }
 }
 
