@@ -1,23 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import api from '../services/api';
-import { ArrowLeft, Save } from 'lucide-react';
-import { CategoryFormData, ProductCategory, InputChangeEvent, TextareaChangeEvent, FormSubmitEvent } from '../types';
-import '../styles/CategoryForm.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../services/api";
+import { ArrowLeft, Save } from "lucide-react";
+import {
+  CategoryFormData,
+  ProductCategory,
+  InputChangeEvent,
+  TextareaChangeEvent,
+  FormSubmitEvent,
+} from "../types";
+import "../styles/CategoryForm.css";
 
 export default function CategoryForm(): React.JSX.Element {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<CategoryFormData>({
-    id: '',
-    name: '',
-    headline: '',
-    description: '',
-    accent_gradient: '',
-    hero_tagline: '',
+    id: "",
+    name: "",
+    headline: "",
+    description: "",
+    accent_gradient: "",
+    hero_tagline: "",
     image: null,
   });
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -29,20 +36,24 @@ export default function CategoryForm(): React.JSX.Element {
     if (!id) return;
     try {
       setLoading(true);
-      const response = await api.get<ProductCategory>(`/admin/categories/${id}`);
+      const response = await api.get<ProductCategory>(
+        `/admin/categories/${id}`
+      );
       const category = response.data;
       setFormData({
-        id: category.id || '',
-        name: category.name || '',
-        headline: category.headline || '',
-        description: category.description || '',
-        accent_gradient: category.accent_gradient || '',
-        hero_tagline: category.hero_tagline || '',
+        id: category.id || "",
+        name: category.name || "",
+        headline: category.headline || "",
+        description: category.description || "",
+        accent_gradient: category.accent_gradient || "",
+        hero_tagline: category.hero_tagline || "",
         image: null,
       });
+      // Set existing image URL for display
+      setExistingImageUrl(category.image_url || null);
     } catch (err) {
-      alert('Failed to load category');
-      navigate('/categories');
+      alert("Failed to load category");
+      navigate("/categories");
     } finally {
       setLoading(false);
     }
@@ -69,28 +80,28 @@ export default function CategoryForm(): React.JSX.Element {
       Object.keys(formData).forEach((key) => {
         const formKey = key as keyof CategoryFormData;
         const value = formData[formKey];
-        
-        if (formKey === 'image' && value) {
+
+        if (formKey === "image" && value) {
           data.append(formKey, value);
-        } else if (value !== null && value !== '' && value !== undefined) {
+        } else if (value !== null && value !== "" && value !== undefined) {
           data.append(formKey, value.toString());
         }
       });
 
       if (id) {
         await api.patch(`/admin/categories/${id}`, data, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+          headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await api.post('/admin/categories', data, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+        await api.post("/admin/categories", data, {
+          headers: { "Content-Type": "multipart/form-data" },
         });
       }
 
-      navigate('/categories');
+      navigate("/categories");
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: string } } };
-      alert(error.response?.data?.error || 'Failed to save category');
+      alert(error.response?.data?.error || "Failed to save category");
     } finally {
       setLoading(false);
     }
@@ -108,7 +119,7 @@ export default function CategoryForm(): React.JSX.Element {
     <div className="category-form-container">
       <div className="category-form-header">
         <button
-          onClick={() => navigate('/categories')}
+          onClick={() => navigate("/categories")}
           className="back-btn"
           type="button"
         >
@@ -116,10 +127,10 @@ export default function CategoryForm(): React.JSX.Element {
         </button>
         <div>
           <h1 className="category-form-title">
-            {id ? 'Edit Category' : 'New Category'}
+            {id ? "Edit Category" : "New Category"}
           </h1>
           <p className="category-form-subtitle">
-            {id ? 'Update category information' : 'Create a new category'}
+            {id ? "Update category information" : "Create a new category"}
           </p>
         </div>
       </div>
@@ -225,35 +236,54 @@ export default function CategoryForm(): React.JSX.Element {
           <label htmlFor="image" className="form-label">
             Category Image
           </label>
+          {existingImageUrl && !formData.image && (
+            <div style={{ marginBottom: "12px" }}>
+              <img
+                src={existingImageUrl}
+                alt="Current category image"
+                style={{
+                  maxWidth: "200px",
+                  maxHeight: "200px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--border)",
+                }}
+              />
+            </div>
+          )}
           <input
             id="image"
             type="file"
             name="image"
             accept="image/*"
-            onChange={handleChange}
+            onChange={(e) => {
+              handleChange(e);
+              if (e.target.files?.[0]) {
+                setExistingImageUrl(null); // Clear existing image when new one is selected
+              }
+            }}
             className="form-input"
           />
+          <p className="help-text">
+            {existingImageUrl
+              ? "Upload a new image to replace the current one"
+              : "Upload category image"}
+          </p>
         </div>
 
         <div className="form-actions">
           <button
             type="button"
-            onClick={() => navigate('/categories')}
+            onClick={() => navigate("/categories")}
             className="cancel-btn"
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="save-btn"
-          >
+          <button type="submit" disabled={loading} className="save-btn">
             <Save size={18} />
-            {loading ? 'Saving...' : 'Save Category'}
+            {loading ? "Saving..." : "Save Category"}
           </button>
         </div>
       </form>
     </div>
   );
 }
-
