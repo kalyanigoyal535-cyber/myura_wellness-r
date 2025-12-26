@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -18,6 +18,8 @@ import {
   Tag,
   type LucideIcon,
 } from "lucide-react";
+import NotificationPanel from "./NotificationPanel";
+import { notificationService } from "../services/notifications";
 import "../styles/Layout.css";
 
 interface MenuItem {
@@ -43,7 +45,26 @@ export default function Layout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
-  const [notificationSidebarOpen, setNotificationSidebarOpen] = useState<boolean>(false);
+  const [notificationSidebarOpen, setNotificationSidebarOpen] =
+    useState<boolean>(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  // Fetch unread notification count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const data = await notificationService.getUnreadCount();
+        setUnreadCount(data.unread_count);
+      } catch (error) {
+        console.error("Failed to fetch unread count:", error);
+      }
+    };
+
+    fetchUnreadCount();
+    // Poll every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -121,9 +142,9 @@ export default function Layout() {
           >
             <div className="user-avatar-layout">
               {(user as any)?.photo ? (
-                <img 
-                  src={(user as any).photo} 
-                  alt="Avatar" 
+                <img
+                  src={(user as any).photo}
+                  alt="Avatar"
                   className="user-avatar-image-layout"
                 />
               ) : (
@@ -182,13 +203,19 @@ export default function Layout() {
               />
             </div>
             <div className="header-actions-layout">
-              <button 
-                className="notification-btn-layout" 
+              <button
+                className="notification-btn-layout"
                 title="Notifications"
-                onClick={() => setNotificationSidebarOpen(!notificationSidebarOpen)}
+                onClick={() =>
+                  setNotificationSidebarOpen(!notificationSidebarOpen)
+                }
               >
                 <Bell size={20} />
-                <span className="notification-badge-layout">3</span>
+                {unreadCount > 0 && (
+                  <span className="notification-badge-layout">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>
@@ -205,58 +232,12 @@ export default function Layout() {
         />
       )}
 
-      {/* Notification Sidebar */}
-      <div
-        className={`notification-sidebar-layout ${
-          notificationSidebarOpen ? "open" : ""
-        }`}
-      >
-        <div className="notification-sidebar-header-layout">
-          <h2 className="notification-sidebar-title-layout">Notifications</h2>
-          <button
-            className="notification-sidebar-close-layout"
-            onClick={() => setNotificationSidebarOpen(false)}
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-        <div className="notification-sidebar-content-layout">
-          <div className="notification-item-layout">
-            <div className="notification-item-icon-layout">
-              <Bell size={18} />
-            </div>
-            <div className="notification-item-details-layout">
-              <p className="notification-item-title-layout">New Order Received</p>
-              <p className="notification-item-time-layout">2 minutes ago</p>
-            </div>
-          </div>
-          <div className="notification-item-layout">
-            <div className="notification-item-icon-layout">
-              <MessageSquare size={18} />
-            </div>
-            <div className="notification-item-details-layout">
-              <p className="notification-item-title-layout">New Contact Message</p>
-              <p className="notification-item-time-layout">15 minutes ago</p>
-            </div>
-          </div>
-          <div className="notification-item-layout">
-            <div className="notification-item-icon-layout">
-              <Users size={18} />
-            </div>
-            <div className="notification-item-details-layout">
-              <p className="notification-item-title-layout">New User Registered</p>
-              <p className="notification-item-time-layout">1 hour ago</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {notificationSidebarOpen && (
-        <div
-          className="notification-sidebar-overlay-layout"
-          onClick={() => setNotificationSidebarOpen(false)}
-        />
-      )}
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={notificationSidebarOpen}
+        onClose={() => setNotificationSidebarOpen(false)}
+        onUnreadCountChange={setUnreadCount}
+      />
     </div>
   );
 }

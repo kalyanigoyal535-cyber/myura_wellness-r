@@ -260,6 +260,27 @@ export interface BlogFormData {
   date?: string;
 }
 
+// Notification Types
+export interface Notification {
+  id: number;
+  type: 'user_registered' | 'order_placed' | 'order_updated' | 'contact_submission' | 'system';
+  title: string;
+  message: string;
+  related_id?: number | null;
+  related_type?: string | null;
+  is_read: boolean;
+  read_at?: string | null;
+  created_at: string;
+}
+
+export interface NotificationResponse {
+  notifications: Notification[];
+  total: number;
+  unread_count: number;
+  limit: number;
+  offset: number;
+}
+
 // Event Handler Types
 export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 export type TextareaChangeEvent = React.ChangeEvent<HTMLTextAreaElement>;

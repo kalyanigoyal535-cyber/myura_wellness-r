@@ -400,3 +400,29 @@ CREATE TABLE
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`author_id`) REFERENCES `admins` (`id`) ON DELETE CASCADE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- =====================================================
+-- Table: notifications
+-- =====================================================
+CREATE TABLE
+  IF NOT EXISTS `notifications` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `type` ENUM (
+      'user_registered',
+      'order_placed',
+      'order_updated',
+      'contact_submission',
+      'system'
+    ) NOT NULL DEFAULT 'system',
+    `title` VARCHAR(255) NOT NULL,
+    `message` TEXT NOT NULL,
+    `related_id` INT DEFAULT NULL COMMENT 'ID of related entity (user_id, order_id, etc.)',
+    `related_type` VARCHAR(50) DEFAULT NULL COMMENT 'Type of related entity (user, order, etc.)',
+    `is_read` TINYINT (1) DEFAULT 0,
+    `read_at` TIMESTAMP NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX `idx_type` (`type`),
+    INDEX `idx_is_read` (`is_read`),
+    INDEX `idx_created_at` (`created_at`),
+    INDEX `idx_related` (`related_type`, `related_id`)
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

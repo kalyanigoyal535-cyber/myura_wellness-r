@@ -1,24 +1,25 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './pages/Login';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Dashboard from './pages/Dashboard';
-import Products from './pages/Products';
-import ProductForm from './pages/ProductForm';
-import Categories from './pages/Categories';
-import CategoryForm from './pages/CategoryForm';
-import Orders from './pages/Orders';
-import OrderDetail from './pages/OrderDetail';
-import Users from './pages/Users';
-import Contacts from './pages/Contacts';
-import Blogs from './pages/Blogs';
-import BlogForm from './pages/BlogForm';
-import Coupons from './pages/Coupons';
-import CouponForm from './pages/CouponForm';
-import MyAccount from './pages/MyAccount';
-import Layout from './components/Layout';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard";
+import Products from "./pages/Products";
+import ProductForm from "./pages/ProductForm";
+import Categories from "./pages/Categories";
+import CategoryForm from "./pages/CategoryForm";
+import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
+import Users from "./pages/Users";
+import Contacts from "./pages/Contacts";
+import Blogs from "./pages/Blogs";
+import BlogForm from "./pages/BlogForm";
+import Coupons from "./pages/Coupons";
+import CouponForm from "./pages/CouponForm";
+import Notifications from "./pages/Notifications";
+import MyAccount from "./pages/MyAccount";
+import Layout from "./components/Layout";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -26,21 +27,23 @@ interface ProtectedRouteProps {
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, loading } = useAuth();
-  
+
   if (loading) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        background: 'var(--stone-50)' 
-      }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--stone-50)",
+        }}
+      >
         <div className="loading-spinner"></div>
       </div>
     );
   }
-  
+
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
@@ -75,6 +78,7 @@ function AppRoutes() {
         <Route path="coupons" element={<Coupons />} />
         <Route path="coupons/new" element={<CouponForm />} />
         <Route path="coupons/:id/edit" element={<CouponForm />} />
+        <Route path="notifications" element={<Notifications />} />
         <Route path="account" element={<MyAccount />} />
       </Route>
     </Routes>
@@ -92,4 +96,3 @@ function App() {
 }
 
 export default App;
-
