@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { LogOut, User } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface LoginValues {
   email: string;
@@ -20,6 +21,7 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
@@ -28,7 +30,10 @@ const Login = () => {
       .required("Password is required"),
   });
 
-  const handleSubmit = async (values: LoginValues, helpers: FormikHelpers<LoginValues>) => {
+  const handleSubmit = async (
+    values: LoginValues,
+    helpers: FormikHelpers<LoginValues>
+  ) => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -38,7 +43,9 @@ const Login = () => {
       // Redirect to home or previous page
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Login failed. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -54,7 +61,9 @@ const Login = () => {
       // Optionally redirect to home
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Logout failed. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Logout failed. Please try again."
+      );
     } finally {
       setIsLoggingOut(false);
     }
@@ -84,8 +93,10 @@ const Login = () => {
         {isAuthenticated && user ? (
           // Logged in state - show user info and logout button
           <div className="w-10/12 md:w-6/12">
-            <h1 className="text-2xl font-semibold underline mb-4">You're Logged In</h1>
-            
+            <h1 className="text-2xl font-semibold underline mb-4">
+              You're Logged In
+            </h1>
+
             {error && (
               <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
                 {error}
@@ -105,7 +116,9 @@ const Login = () => {
                   </h2>
                   <p className="text-sm text-slate-600">{user.email}</p>
                   {user.phone_number && (
-                    <p className="text-sm text-slate-600">{user.phone_number}</p>
+                    <p className="text-sm text-slate-600">
+                      {user.phone_number}
+                    </p>
                   )}
                 </div>
               </div>
@@ -159,7 +172,11 @@ const Login = () => {
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ handleSubmit }: { handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void }) => (
+              {({
+                handleSubmit,
+              }: {
+                handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
+              }) => (
                 <Form
                   onSubmit={handleSubmit}
                   className="flex flex-col w-10/12 md:w-6/12 mt-6 space-y-4"
@@ -178,12 +195,31 @@ const Login = () => {
                   {/* Password */}
                   <div>
                     <label className="block mb-1 font-medium">Password</label>
-                    <Field
-                      name="password"
-                      as={Input}
-                      type="password"
-                      placeholder="Password"
-                    />
+
+                    <Field name="password">
+                      {({ field }: any) => (
+                        <Input
+                          {...field}
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Password"
+                          rightSection={
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword((prev) => !prev)}
+                              className="cursor-pointer text-gray-600"
+                            >
+                              {showPassword ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </button>
+                          }
+                          rightSectionPointerEvents="all"
+                        />
+                      )}
+                    </Field>
+
                     <ErrorMessage
                       name="password"
                       component="p"
@@ -206,7 +242,10 @@ const Login = () => {
                 </Form>
               )}
             </Formik>
-            <Link to="/forgot-password" className="text-sm text-blue-800 underline my-2">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-800 underline my-2"
+            >
               Forgot password?
             </Link>
           </>
