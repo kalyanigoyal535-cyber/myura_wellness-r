@@ -11,6 +11,8 @@ import Categories from "./pages/Categories";
 import CategoryForm from "./pages/CategoryForm";
 import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
+import Carts from "./pages/Carts";
+import CartDetail from "./pages/CartDetail";
 import Users from "./pages/Users";
 import Contacts from "./pages/Contacts";
 import Blogs from "./pages/Blogs";
@@ -70,6 +72,8 @@ function AppRoutes() {
         <Route path="categories/:id/edit" element={<CategoryForm />} />
         <Route path="orders" element={<Orders />} />
         <Route path="orders/:id" element={<OrderDetail />} />
+        <Route path="carts" element={<Carts />} />
+        <Route path="carts/:id" element={<CartDetail />} />
         <Route path="users" element={<Users />} />
         <Route path="contacts" element={<Contacts />} />
         <Route path="blogs" element={<Blogs />} />

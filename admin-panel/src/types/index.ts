@@ -119,6 +119,35 @@ export interface OrderItem {
   product_name?: string;
 }
 
+// Cart Types
+export interface Cart {
+  cart_id: number;
+  id?: number; // Keep for compatibility
+  user_id?: number;
+  session_key?: string;
+  created_at: string;
+  updated_at?: string;
+  // Computed/joined fields
+  user_email?: string;
+  items?: CartItem[];
+  total_amount?: number;
+  items_count?: number;
+}
+
+export interface CartItem {
+  cart_item_id: number;
+  id?: number; // Keep for compatibility
+  cart_id: number;
+  product_id: number;
+  quantity: number;
+  created_at: string;
+  // Computed/joined fields
+  product?: Product;
+  product_name?: string;
+  product_price?: number;
+  subtotal?: number;
+}
+
 export interface ShippingAddress {
   full_name: string;
   phone_number: string;
@@ -139,6 +168,7 @@ export interface ContactSubmission {
   subject: string;
   message: string;
   is_read: boolean;
+  is_resolved?: boolean;
   created_at: string;
 }
 

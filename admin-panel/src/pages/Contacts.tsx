@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Search, Mail, Check } from 'lucide-react';
+import { Search, Mail, Check, CheckCircle, Trash2 } from 'lucide-react';
 import { ContactSubmission } from '../types';
 import '../styles/Contacts.css';
 
@@ -31,6 +31,28 @@ export default function Contacts() {
       fetchContacts();
     } catch (err) {
       alert('Failed to mark as read');
+    }
+  };
+
+  const handleMarkResolved = async (id: number) => {
+    try {
+      await api.patch(`/admin/contacts/${id}/mark_resolved`);
+      fetchContacts();
+    } catch (err) {
+      alert('Failed to mark as resolved');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this contact submission?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/admin/contacts/${id}`);
+      fetchContacts();
+    } catch (err) {
+      alert('Failed to delete contact');
     }
   };
 
@@ -78,7 +100,7 @@ export default function Contacts() {
           filteredContacts.map((contact) => (
             <div
               key={contact.id}
-              className={`contact-card ${!contact.is_read ? 'unread' : ''}`}
+              className={`contact-card ${!contact.is_read ? 'unread' : ''} ${contact.is_resolved ? 'resolved' : ''}`}
             >
               <div className="contact-card-header">
                 <div className="contact-info">
@@ -87,21 +109,45 @@ export default function Contacts() {
                     {!contact.is_read && (
                       <span className="new-badge">New</span>
                     )}
+                    {contact.is_resolved && (
+                      <span className="resolved-badge">Resolved</span>
+                    )}
                   </div>
                   <div className="contact-details">
                     <span>{contact.email}</span>
                     {contact.phone_number && <span>{contact.phone_number}</span>}
                   </div>
                 </div>
-                {!contact.is_read && (
+                <div className="contact-actions">
+                  {!contact.is_read && (
+                    <button
+                      onClick={() => handleMarkRead(contact.id)}
+                      className="action-btn mark-read-btn"
+                      title="Mark as Read"
+                    >
+                      <Check size={16} />
+                      Mark Read
+                    </button>
+                  )}
+                  {!contact.is_resolved && (
+                    <button
+                      onClick={() => handleMarkResolved(contact.id)}
+                      className="action-btn mark-resolved-btn"
+                      title="Mark as Resolved"
+                    >
+                      <CheckCircle size={16} />
+                      Resolve
+                    </button>
+                  )}
                   <button
-                    onClick={() => handleMarkRead(contact.id)}
-                    className="mark-read-btn"
+                    onClick={() => handleDelete(contact.id)}
+                    className="action-btn delete-btn"
+                    title="Delete"
                   >
-                    <Check size={16} />
-                    Mark Read
+                    <Trash2 size={16} />
+                    Delete
                   </button>
-                )}
+                </div>
               </div>
               <div className="contact-subject">
                 <span className="subject-label">Subject: </span>

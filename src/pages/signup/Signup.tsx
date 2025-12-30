@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import images from "../../images/images";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
@@ -35,7 +35,8 @@ const Signup = () => {
       .required("Required"),
   });
 
-  const handleSubmit = async (values: SignupValues, helpers: FormikHelpers<SignupValues>) => {
+  const handleSubmit = async (values: SignupValues,
+    helpers: FormikHelpers<SignupValues>  ) : Promise<void> => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -47,6 +48,7 @@ const Signup = () => {
         first_name: values.firstName,
         last_name: values.lastName,
       });
+      helpers.resetForm();
       // Merge guest cart with user cart after registration
       await syncCart();
       // Redirect to home
@@ -59,6 +61,7 @@ const Signup = () => {
       );
     } finally {
       setIsSubmitting(false);
+      helpers.setSubmitting(false);
     }
   };
   const [showPassword, setShowPassword] = useState(false);

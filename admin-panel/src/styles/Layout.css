@@ -278,12 +278,18 @@
   overflow-x: hidden;
   width: calc(100% - 280px);
   max-width: calc(100vw - 280px);
+  padding-top: 65px;
 }
 
 .main-content-layout.sidebar-collapsed {
   margin-left: 80px;
   width: calc(100% - 80px);
   max-width: calc(100vw - 80px);
+}
+
+.main-content-layout.sidebar-collapsed .top-header-layout {
+  left: 80px;
+  width: calc(100% - 80px);
 }
 
 @media (max-width: 768px) {
@@ -299,6 +305,11 @@
     max-width: 100vw;
   }
   
+  .top-header-layout {
+    left: 0;
+    width: 100%;
+  }
+  
   .page-content-layout {
     padding: 16px;
   }
@@ -312,10 +323,14 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 280px;
+  right: 0;
   z-index: 100;
   min-height: 65px;
+  width: calc(100% - 280px);
+  transition: left 0.3s ease, width 0.3s ease;
 }
 
 .menu-toggle-layout {

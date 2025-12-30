@@ -19,6 +19,8 @@ import {
   getUsers,
   getContacts,
   markContactRead,
+  markContactResolved,
+  deleteContact,
   getBlogs,
   getBlog,
   createBlog,
@@ -26,6 +28,9 @@ import {
   deleteBlog,
   updateProfile,
   resetPassword,
+  getCarts,
+  getCart,
+  deleteCart,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -52,12 +57,19 @@ router.get('/orders', authenticate, requireAdmin, getOrders);
 router.get('/orders/:id', authenticate, requireAdmin, getOrder);
 router.patch('/orders/:id/update_status', authenticate, requireAdmin, updateOrderStatus);
 
+// Admin Carts Routes
+router.get('/carts', authenticate, requireAdmin, getCarts);
+router.get('/carts/:id', authenticate, requireAdmin, getCart);
+router.delete('/carts/:id', authenticate, requireAdmin, deleteCart);
+
 // Admin Users Routes
 router.get('/users', authenticate, requireAdmin, getUsers);
 
 // Admin Contacts Routes
 router.get('/contacts', authenticate, requireAdmin, getContacts);
 router.patch('/contacts/:id/mark_read', authenticate, requireAdmin, markContactRead);
+router.patch('/contacts/:id/mark_resolved', authenticate, requireAdmin, markContactResolved);
+router.delete('/contacts/:id', authenticate, requireAdmin, deleteContact);
 
 // Admin Blogs Routes
 router.get('/blogs', authenticate, requireAdmin, getBlogs);

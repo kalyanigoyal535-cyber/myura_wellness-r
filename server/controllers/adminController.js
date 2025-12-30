@@ -96,7 +96,10 @@ export const getDashboardStats = async (req, res) => {
 export const getProducts = async (req, res) => {
   try {
     const [products] = await pool.execute(
-      `SELECT p.*, c.name as category_name 
+      `SELECT p.*, c.id as cat_id, c.name as cat_name, c.slug as cat_slug,
+              c.headline as cat_headline, c.description as cat_description,
+              c.accent_gradient as cat_accent_gradient, c.hero_tagline as cat_hero_tagline,
+              c.image_url as cat_image_url, c.status as cat_status, c.created_at as cat_created_at
        FROM products p 
        LEFT JOIN categories c ON p.category_id = c.id 
        ORDER BY p.created_at DESC`
@@ -104,15 +107,50 @@ export const getProducts = async (req, res) => {
 
     return sendSuccess(res, {
       count: products.length,
-      results: products.map((p) => ({
-        ...p,
-        id: p.product_id,
-        price: parseFloat(p.price),
-        original_price: p.original_price ? parseFloat(p.original_price) : null,
-        rating: parseFloat(p.rating),
-        notes: JSON.parse(p.notes || "[]"),
-        benefits: JSON.parse(p.benefits || "[]"),
-      })),
+      results: products.map((p) => {
+        const product = {
+          ...p,
+          id: p.product_id,
+          price: parseFloat(p.price),
+          original_price: p.original_price ? parseFloat(p.original_price) : null,
+          rating: parseFloat(p.rating),
+          notes: JSON.parse(p.notes || "[]"),
+          benefits: JSON.parse(p.benefits || "[]"),
+          image_url: p.image
+            ? `${req.protocol}://${req.get("host")}/uploads/${p.image}`
+            : null,
+        };
+
+        // Structure category as nested object if category exists
+        if (p.cat_id && p.cat_name) {
+          product.category = {
+            id: p.cat_id,
+            name: p.cat_name,
+            slug: p.cat_slug || null,
+            headline: p.cat_headline || null,
+            description: p.cat_description || null,
+            accent_gradient: p.cat_accent_gradient || null,
+            hero_tagline: p.cat_hero_tagline || null,
+            image_url: p.cat_image_url || null,
+            status: p.cat_status || 'active',
+            created_at: p.cat_created_at || null,
+          };
+        }
+
+        // Remove temporary category fields from product object
+        delete product.cat_id;
+        delete product.cat_name;
+        delete product.cat_slug;
+        delete product.cat_headline;
+        delete product.cat_description;
+        delete product.cat_accent_gradient;
+        delete product.cat_hero_tagline;
+        delete product.cat_image_url;
+        delete product.cat_status;
+        delete product.cat_created_at;
+
+        return product;
+      }),
     });
   } catch (error) {
     console.error("Get admin products error:", error);
@@ -627,13 +665,30 @@ export const getUsers = async (req, res) => {
 // Contacts
 export const getContacts = async (req, res) => {
   try {
-    const [contacts] = await pool.execute(
-      "SELECT * FROM contact_submissions ORDER BY created_at DESC"
-    );
+    // Check if is_resolved column exists, if not the query will still work
+    let query = "SELECT * FROM contact_submissions ORDER BY created_at DESC";
+    
+    // Try to include is_resolved if it exists
+    try {
+      const [test] = await pool.execute("SHOW COLUMNS FROM contact_submissions LIKE 'is_resolved'");
+      if (test.length === 0) {
+        // Column doesn't exist, add it
+        await pool.execute(
+          "ALTER TABLE contact_submissions ADD COLUMN is_resolved TINYINT(1) DEFAULT 0"
+        );
+      }
+    } catch (err) {
+      // Ignore if column already exists or other error
+    }
+
+    const [contacts] = await pool.execute(query);
 
     return sendSuccess(res, {
       count: contacts.length,
-      results: contacts,
+      results: contacts.map((contact) => ({
+        ...contact,
+        is_resolved: contact.is_resolved || 0,
+      })),
     });
   } catch (error) {
     console.error("Get admin contacts error:", error);
@@ -652,6 +707,54 @@ export const markContactRead = async (req, res) => {
   } catch (error) {
     console.error("Mark contact read error:", error);
     return sendError(res, "Failed to mark contact as read", 500);
+  }
+};
+
+export const markContactResolved = async (req, res) => {
+  try {
+    // First check if is_resolved column exists, if not add it
+    try {
+      await pool.execute(
+        "UPDATE contact_submissions SET is_resolved = 1 WHERE id = ?",
+        [req.params.id]
+      );
+    } catch (err) {
+      // Column doesn't exist, add it first
+      await pool.execute(
+        "ALTER TABLE contact_submissions ADD COLUMN is_resolved TINYINT(1) DEFAULT 0"
+      );
+      await pool.execute(
+        "UPDATE contact_submissions SET is_resolved = 1 WHERE id = ?",
+        [req.params.id]
+      );
+    }
+
+    return sendSuccess(res, {}, "Contact marked as resolved");
+  } catch (error) {
+    console.error("Mark contact resolved error:", error);
+    return sendError(res, "Failed to mark contact as resolved", 500);
+  }
+};
+
+export const deleteContact = async (req, res) => {
+  try {
+    const [contacts] = await pool.execute(
+      "SELECT id FROM contact_submissions WHERE id = ?",
+      [req.params.id]
+    );
+
+    if (contacts.length === 0) {
+      return sendNotFound(res, "Contact");
+    }
+
+    await pool.execute("DELETE FROM contact_submissions WHERE id = ?", [
+      req.params.id,
+    ]);
+
+    return sendSuccess(res, {}, "Contact deleted successfully");
+  } catch (error) {
+    console.error("Delete contact error:", error);
+    return sendError(res, "Failed to delete contact", 500);
   }
 };
 
@@ -1150,5 +1253,136 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Reset password error:", error);
     return sendError(res, "Failed to reset password", 500);
+  }
+};
+
+// Carts
+export const getCarts = async (req, res) => {
+  try {
+    const [carts] = await pool.execute(
+      `SELECT c.*, u.email as user_email,
+              COUNT(ci.cart_item_id) as items_count,
+              COALESCE(SUM(ci.quantity * p.price), 0) as total_amount
+       FROM cart c
+       LEFT JOIN user u ON c.user_id = u.id
+       LEFT JOIN cart_items ci ON c.cart_id = ci.cart_id
+       LEFT JOIN products p ON ci.product_id = p.product_id
+       GROUP BY c.cart_id
+       ORDER BY c.created_at DESC`
+    );
+
+    return sendSuccess(res, {
+      count: carts.length,
+      results: carts.map((cart) => ({
+        cart_id: cart.cart_id,
+        id: cart.cart_id, // Keep for compatibility
+        user_id: cart.user_id,
+        session_key: cart.session_key,
+        user_email: cart.user_email || null,
+        items_count: parseInt(cart.items_count) || 0,
+        total_amount: parseFloat(cart.total_amount) || 0,
+        created_at: cart.created_at,
+        updated_at: cart.updated_at,
+      })),
+    });
+  } catch (error) {
+    console.error("Get admin carts error:", error);
+    return sendError(res, "Failed to fetch carts", 500);
+  }
+};
+
+export const getCart = async (req, res) => {
+  try {
+    const cartId = req.params.id;
+
+    // Get cart
+    const [carts] = await pool.execute(
+      `SELECT c.*, u.email as user_email
+       FROM cart c
+       LEFT JOIN user u ON c.user_id = u.id
+       WHERE c.cart_id = ?`,
+      [cartId]
+    );
+
+    if (carts.length === 0) {
+      return sendNotFound(res, "Cart");
+    }
+
+    const cart = carts[0];
+
+    // Get cart items with product details
+    const [cartItems] = await pool.execute(
+      `SELECT ci.*, p.name as product_name, p.price as product_price,
+              p.image as product_image, p.slug as product_slug,
+              (ci.quantity * p.price) as subtotal
+       FROM cart_items ci
+       LEFT JOIN products p ON ci.product_id = p.product_id
+       WHERE ci.cart_id = ?
+       ORDER BY ci.created_at DESC`,
+      [cartId]
+    );
+
+    // Calculate total
+    const totalAmount = cartItems.reduce(
+      (sum, item) => sum + parseFloat(item.subtotal || 0),
+      0
+    );
+
+    return sendSuccess(res, {
+      cart_id: cart.cart_id,
+      id: cart.cart_id, // Keep for compatibility
+      user_id: cart.user_id,
+      session_key: cart.session_key,
+      user_email: cart.user_email || null,
+      created_at: cart.created_at,
+      updated_at: cart.updated_at,
+      items: cartItems.map((item) => ({
+        cart_item_id: item.cart_item_id,
+        id: item.cart_item_id, // Keep for compatibility
+        cart_id: item.cart_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        product_name: item.product_name,
+        product_price: parseFloat(item.product_price) || 0,
+        subtotal: parseFloat(item.subtotal) || 0,
+        product_image: item.product_image
+          ? `${req.protocol}://${req.get("host")}/uploads/${item.product_image}`
+          : null,
+        product_slug: item.product_slug,
+        created_at: item.created_at,
+      })),
+      items_count: cartItems.length,
+      total_amount: totalAmount,
+    });
+  } catch (error) {
+    console.error("Get admin cart error:", error);
+    return sendError(res, "Failed to fetch cart", 500);
+  }
+};
+
+export const deleteCart = async (req, res) => {
+  try {
+    const cartId = req.params.id;
+
+    // Check if cart exists
+    const [carts] = await pool.execute(
+      "SELECT cart_id FROM cart WHERE cart_id = ?",
+      [cartId]
+    );
+
+    if (carts.length === 0) {
+      return sendNotFound(res, "Cart");
+    }
+
+    // Delete cart items first (cascade should handle this, but being explicit)
+    await pool.execute("DELETE FROM cart_items WHERE cart_id = ?", [cartId]);
+
+    // Delete cart
+    await pool.execute("DELETE FROM cart WHERE cart_id = ?", [cartId]);
+
+    return sendSuccess(res, {}, "Cart deleted successfully");
+  } catch (error) {
+    console.error("Delete cart error:", error);
+    return sendError(res, "Failed to delete cart", 500);
   }
 };
