@@ -106,8 +106,11 @@ export const cartApi = {
         },
       } : undefined;
       const response = await apiClient.delete<Cart>(`/cart/items/${itemId}/`, config);
+      // If cart is deleted (id is null), clear stored cart ID
       if (response.data.id) {
         storeCartId(response.data.id);
+      } else {
+        clearStoredCartId();
       }
       return response.data;
     } catch (error) {
@@ -124,6 +127,7 @@ export const cartApi = {
         },
       } : undefined;
       await apiClient.delete('/cart/', config);
+      // Clear stored cart ID since cart is deleted
       clearStoredCartId();
     } catch (error) {
       throw new Error(getErrorMessage(error));

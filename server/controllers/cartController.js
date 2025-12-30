@@ -70,34 +70,83 @@ async function getOrCreateCart(
 ) {
   let cart;
 
-  // If cartId is provided, try to get that cart
+  // Priority 1: If cartId is provided, try to get that cart (most reliable)
   if (cartId) {
     const [carts] = await pool.execute("SELECT * FROM cart WHERE cart_id = ?", [
       cartId,
     ]);
     if (carts.length > 0) {
       cart = carts[0];
+      // If this cart doesn't have user_id but user is now authenticated, update it
+      if (cart && userId && !cart.user_id) {
+        await pool.execute(
+          "UPDATE cart SET user_id = ? WHERE cart_id = ?",
+          [userId, cart.cart_id]
+        );
+        const [updatedCarts] = await pool.execute(
+          "SELECT * FROM cart WHERE cart_id = ?",
+          [cart.cart_id]
+        );
+        if (updatedCarts.length > 0) {
+          cart = updatedCarts[0];
+        }
+      }
+      return cart;
     }
   }
 
-  // If no cart found and user is authenticated, try to get user's cart
+  // Priority 2: If user is authenticated, try to get user's cart
   if (!cart && userId) {
-    const [carts] = await pool.execute("SELECT * FROM cart WHERE user_id = ?", [
-      userId,
-    ]);
-    if (carts.length > 0) {
-      cart = carts[0];
-    }
-  }
-
-  // If no cart found and sessionKey is provided, try to get session cart
-  if (!cart && sessionKey) {
     const [carts] = await pool.execute(
-      "SELECT * FROM cart WHERE session_key = ?",
-      [sessionKey]
+      "SELECT * FROM cart WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+      [userId]
     );
     if (carts.length > 0) {
       cart = carts[0];
+      return cart;
+    }
+  }
+
+  // Priority 3: If sessionKey is provided, try to get session cart
+  if (!cart && sessionKey) {
+    const [carts] = await pool.execute(
+      "SELECT * FROM cart WHERE session_key = ? AND (user_id IS NULL OR user_id = ?) ORDER BY created_at DESC LIMIT 1",
+      [sessionKey, userId || null]
+    );
+    if (carts.length > 0) {
+      cart = carts[0];
+      // If user is now authenticated, update the cart
+      if (cart && userId && !cart.user_id) {
+        await pool.execute(
+          "UPDATE cart SET user_id = ? WHERE cart_id = ?",
+          [userId, cart.cart_id]
+        );
+        const [updatedCarts] = await pool.execute(
+          "SELECT * FROM cart WHERE cart_id = ?",
+          [cart.cart_id]
+        );
+        if (updatedCarts.length > 0) {
+          cart = updatedCarts[0];
+        }
+      }
+      return cart;
+    }
+  }
+
+  // Priority 4: For guest users, check for most recent session cart (within last 1 hour)
+  // This prevents creating duplicate carts when cartId is not yet stored
+  if (!cart && !userId) {
+    const [recentCarts] = await pool.execute(
+      `SELECT * FROM cart 
+       WHERE user_id IS NULL 
+       AND session_key IS NOT NULL 
+       AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
+       ORDER BY created_at DESC 
+       LIMIT 1`
+    );
+    if (recentCarts.length > 0) {
+      cart = recentCarts[0];
+      return cart;
     }
   }
 
@@ -310,6 +359,25 @@ export const removeCartItem = async (req, res) => {
     // Delete item
     await pool.execute("DELETE FROM cart_items WHERE cart_item_id = ?", [id]);
 
+    // Check if cart is now empty
+    const [remainingItems] = await pool.execute(
+      "SELECT COUNT(*) as count FROM cart_items WHERE cart_id = ?",
+      [cart.cart_id]
+    );
+
+    // If cart is empty, delete the cart
+    if (remainingItems[0].count === 0) {
+      await pool.execute("DELETE FROM cart WHERE cart_id = ?", [cart.cart_id]);
+      // Return empty cart response
+      return sendSuccess(res, {
+        id: null,
+        items: [],
+        total_items: 0,
+        total_amount: "0.00",
+        created_at: null,
+      });
+    }
+
     // Return updated cart
     const updatedCart = await getOrCreateCart(userId, cart.cart_id, null);
     const cartData = await formatCartResponse(req, updatedCart);
@@ -335,12 +403,16 @@ export const clearCart = async (req, res) => {
       cart.cart_id,
     ]);
 
+    // Delete the cart since it's now empty
+    await pool.execute("DELETE FROM cart WHERE cart_id = ?", [cart.cart_id]);
+
+    // Return empty cart response
     return sendSuccess(res, {
-      id: cart.cart_id,
+      id: null,
       items: [],
       total_items: 0,
       total_amount: "0.00",
-      created_at: cart.created_at,
+      created_at: null,
     });
   } catch (error) {
     console.error("Clear cart error:", error);

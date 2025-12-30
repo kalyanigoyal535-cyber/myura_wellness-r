@@ -206,9 +206,21 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       next.delete(id);
       return next;
     });
-    await new Promise(resolve => setTimeout(resolve, 400));
-    removeItem(id);
-    setRemovingId(null);
+    try {
+      await removeItem(id);
+      // Wait for animation to complete before clearing removing state
+      await new Promise(resolve => setTimeout(resolve, 400));
+    } catch (error) {
+      console.error('Failed to remove item:', error);
+      // Re-add to visible items if removal failed
+      setVisibleItems((prev) => {
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      });
+    } finally {
+      setRemovingId(null);
+    }
   };
 
   const handleUpdateQty = async (id: string, newQty: number) => {

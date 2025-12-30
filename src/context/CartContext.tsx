@@ -269,8 +269,9 @@ export const useCart = (): CartContextValue => {
   // Sync cart from backend on mount and when auth state changes
   useEffect(() => {
     const initializeCart = async () => {
+      // Always sync when auth state changes to ensure cart is associated with user
+      await syncCart();
       if (!isInitialized) {
-        await syncCart();
         setIsInitialized(true);
       }
     };
