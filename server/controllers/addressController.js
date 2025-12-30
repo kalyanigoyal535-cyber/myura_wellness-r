@@ -38,11 +38,12 @@ export const getAddresses = async (req, res) => {
       [userId]
     );
 
-    return sendSuccess(res, addresses);
+    // Return addresses as array directly
+    return res.status(200).json(addresses);
   } catch (error) {
     // If table doesn't exist, return empty array
     if (error.code === "ER_NO_SUCH_TABLE") {
-      return sendSuccess(res, []);
+      return res.status(200).json([]);
     }
     console.error("Get addresses error:", error);
     return sendError(res, "Failed to fetch addresses", 500);

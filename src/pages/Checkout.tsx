@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   ShoppingBag,
@@ -21,6 +21,10 @@ import { useAuth } from '../context/AuthContext';
 import { ordersApi } from '../services/orders';
 import { phonepeApi, cashfreeApi } from '../services/payment';
 import { getProductById, productCatalog, type ProductRecord } from '../data/products';
+import { authApi } from '../services/auth';
+import { addressesApi } from '../services/addresses';
+import type { Address } from '../services/types';
+import { couponsApi, type Coupon } from '../services/coupons';
 
 type CheckoutForm = {
   name: string;
@@ -46,26 +50,7 @@ const initialForm: CheckoutForm = {
   updatesOptIn: true,
 };
 
-const COUPONS = [
-  {
-    code: 'EXCLUSIVEBOTTLE',
-    minSubtotal: 899,
-    reward: 'Free glass bottle will be added to your order.',
-    description: 'Add products worth ₹899/- to unlock a complimentary Minimalist glass bottle (limited time).',
-  },
-  {
-    code: 'TRAVEL799',
-    minSubtotal: 799,
-    reward: 'Free travel pouch will be added.',
-    description: 'Spend ₹799/- and receive an exclusive travel pouch for your skincare minis.',
-  },
-  {
-    code: 'OAT599',
-    minSubtotal: 599,
-    reward: 'Enjoy a free 50ml oat extract cleanser.',
-    description: 'Cross ₹599/- to unlock a refreshing oat cleanser mini on the house.',
-  },
-];
+// Coupons will be fetched dynamically from API
 
 const Checkout: React.FC = () => {
   const { items, subtotal, clear, syncCart } = useCart();
@@ -82,6 +67,9 @@ const Checkout: React.FC = () => {
   const [redirectingToPayment, setRedirectingToPayment] = useState(false);
   const [showCouponModal, setShowCouponModal] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [loadingUserData, setLoadingUserData] = useState(false);
 
   const productNameToSlugMap: Record<string, string> = {
     'DIA CARE': 'dia-care',
@@ -197,12 +185,129 @@ const Checkout: React.FC = () => {
 
 
   const shipping = subtotal > 799 || subtotal === 0 ? 0 : 49;
-  const total = subtotal + shipping;
-
+  
+  // Find selected coupon detail
   const selectedCouponDetail = useMemo(
-    () => COUPONS.find((coupon) => coupon.code === appliedCoupon) ?? null,
-    [appliedCoupon]
+    () => coupons.find((coupon) => coupon.code === appliedCoupon) ?? null,
+    [appliedCoupon, coupons]
   );
+  
+  // Calculate discount from applied coupon
+  const discountAmount = useMemo(() => {
+    if (!appliedCoupon || !selectedCouponDetail) return 0;
+    
+    // Ensure all values are numbers (handle both string and number types from API)
+    const discountValue = typeof selectedCouponDetail.discount_value === 'number' 
+      ? selectedCouponDetail.discount_value 
+      : parseFloat(String(selectedCouponDetail.discount_value)) || 0;
+    const maxDiscount = selectedCouponDetail.max_discount 
+      ? (typeof selectedCouponDetail.max_discount === 'number'
+          ? selectedCouponDetail.max_discount
+          : parseFloat(String(selectedCouponDetail.max_discount)) || null)
+      : null;
+    
+    if (selectedCouponDetail.discount_type === 'percentage') {
+      const discount = (subtotal * discountValue) / 100;
+      if (maxDiscount !== null && discount > maxDiscount) {
+        return Number(maxDiscount) || 0;
+      }
+      return Number(discount) || 0;
+    } else {
+      return Number(discountValue) || 0;
+    }
+  }, [appliedCoupon, selectedCouponDetail, subtotal]);
+  
+  const total = subtotal + shipping - discountAmount;
+
+  // Fetch user data and address when logged in
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!isAuthenticated) return;
+
+      try {
+        setLoadingUserData(true);
+        // Fetch user profile
+        const userProfile = await authApi.getProfile();
+        
+        // Pre-fill form with user details
+        if (userProfile) {
+          setForm((prev) => ({
+            ...prev,
+            name: userProfile.first_name && userProfile.last_name 
+              ? `${userProfile.first_name} ${userProfile.last_name}`.trim()
+              : userProfile.username || userProfile.email || prev.name,
+            email: userProfile.email || prev.email,
+            phone: userProfile.phone_number || (userProfile as any).phone || prev.phone,
+          }));
+        }
+
+        // Fetch default address
+        try {
+          const addressesResponse = await addressesApi.getAddresses();
+          // Handle different response formats - ensure it's always an array
+          let addresses: Address[] = [];
+          if (Array.isArray(addressesResponse)) {
+            addresses = addressesResponse;
+          } else if (addressesResponse && typeof addressesResponse === 'object') {
+            if (Array.isArray((addressesResponse as any).results)) {
+              addresses = (addressesResponse as any).results;
+            } else if (Array.isArray((addressesResponse as any).data)) {
+              addresses = (addressesResponse as any).data;
+            }
+          }
+          
+          if (addresses.length > 0) {
+            const defaultAddress = addresses.find((addr: Address) => addr.is_default) || addresses[0];
+            
+            if (defaultAddress) {
+              // Remove +91 prefix if present in phone number
+              let phoneNumber = defaultAddress.phone_number || '';
+              if (phoneNumber.startsWith('+91')) {
+                phoneNumber = phoneNumber.substring(3);
+              }
+              
+              setForm((prev) => ({
+                ...prev,
+                name: defaultAddress.full_name || prev.name,
+                phone: phoneNumber || prev.phone,
+                address: defaultAddress.address_line_1 || prev.address,
+                city: defaultAddress.city || prev.city,
+                state: defaultAddress.state || prev.state,
+                postalCode: defaultAddress.postal_code || prev.postalCode,
+              }));
+            }
+          }
+        } catch (err) {
+          // Address API might not be available, ignore
+          console.log('Could not fetch addresses:', err);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+      } finally {
+        setLoadingUserData(false);
+      }
+    };
+
+    fetchUserData();
+  }, [isAuthenticated]);
+
+  // Fetch active coupons
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        setLoadingCoupons(true);
+        const activeCoupons = await couponsApi.getActiveCoupons();
+        setCoupons(activeCoupons);
+      } catch (err) {
+        console.error('Failed to fetch coupons:', err);
+        setCoupons([]);
+      } finally {
+        setLoadingCoupons(false);
+      }
+    };
+
+    fetchCoupons();
+  }, []);
 
   const handleFormChange = (field: keyof CheckoutForm, value: string | boolean) => {
     setForm((prev) => ({
@@ -211,7 +316,7 @@ const Checkout: React.FC = () => {
     }));
   };
 
-  const handleApplyCoupon = (code?: string) => {
+  const handleApplyCoupon = async (code?: string) => {
     const normalized = (code || couponInput).trim().toUpperCase();
 
     if (!normalized) {
@@ -219,21 +324,25 @@ const Checkout: React.FC = () => {
       return;
     }
 
-    const coupon = COUPONS.find((c) => c.code === normalized);
+    try {
+      // Validate coupon using API
+      const validation = await couponsApi.validateCoupon(normalized, subtotal);
+      
+      if (!validation.valid) {
+        setCouponMessage('Invalid coupon code or minimum order amount not met.');
+        return;
+      }
 
-    if (!coupon) {
-      setCouponMessage('Coupon not found. Please try a different code.');
-      return;
+      setAppliedCoupon(normalized);
+      const discountValue = typeof validation.discount_amount === 'string' 
+        ? parseFloat(validation.discount_amount) 
+        : validation.discount_amount || 0;
+      setCouponMessage(`${normalized} applied! Discount: ₹${discountValue.toFixed(2)}`);
+      setCouponInput('');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to validate coupon';
+      setCouponMessage(errorMessage);
     }
-
-    if (subtotal < coupon.minSubtotal) {
-      setCouponMessage(`Add ₹${coupon.minSubtotal - subtotal} more to unlock ${coupon.code}.`);
-      return;
-    }
-
-    setAppliedCoupon(coupon.code);
-    setCouponMessage(`${coupon.code} applied! ${coupon.reward}`);
-    setCouponInput('');
   };
 
   const isFormValid =
@@ -281,6 +390,18 @@ const Checkout: React.FC = () => {
         country: 'India',
       };
 
+      // Prepare coupon data if applied
+      const couponData = appliedCoupon && selectedCouponDetail ? {
+        id: selectedCouponDetail.id,
+        code: selectedCouponDetail.code,
+        name: selectedCouponDetail.name,
+        description: selectedCouponDetail.description,
+        discount_type: selectedCouponDetail.discount_type,
+        discount_value: selectedCouponDetail.discount_value,
+        max_discount: selectedCouponDetail.max_discount,
+        discount_amount: discountAmount,
+      } : null;
+
       // For COD, create order directly
       if (form.paymentMethod === 'cod') {
         const orderData = {
@@ -288,6 +409,8 @@ const Checkout: React.FC = () => {
           payment_method: 'cod',
           payment_status: 'pending' as 'pending' | 'paid' | 'failed',
           payment_id: '',
+          applied_coupon: couponData,
+          discount_amount: discountAmount,
         };
 
         const order = await ordersApi.createOrder(orderData);
@@ -311,6 +434,8 @@ const Checkout: React.FC = () => {
         payment_method: paymentGateway,
         payment_status: 'pending' as 'pending' | 'paid' | 'failed',
         payment_id: '',
+        applied_coupon: couponData,
+        discount_amount: discountAmount,
       };
 
       // Create order in database
@@ -610,16 +735,16 @@ const Checkout: React.FC = () => {
                       {shipping === 0 ? <span className="text-emerald-600">Free</span> : `₹${shipping}`}
                     </span>
                   </div>
-                  {selectedCouponDetail && (
+                  {discountAmount > 0 && selectedCouponDetail && (
                     <div className="flex justify-between text-emerald-700">
-                      <span>{selectedCouponDetail.code}</span>
-                      <span className="font-semibold">Gift added</span>
+                      <span>Discount ({selectedCouponDetail.code})</span>
+                      <span className="font-semibold">-₹{(Number(discountAmount) || 0).toFixed(2)}</span>
                     </div>
                   )}
                   <div className="h-px bg-slate-200" />
                   <div className="flex justify-between text-base font-semibold text-slate-900">
                     <span>Total</span>
-                    <span>₹{total.toLocaleString()}</span>
+                    <span>₹{Math.max(0, total).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -636,7 +761,7 @@ const Checkout: React.FC = () => {
                   onClick={() => setShowCouponModal(true)}
                   className="text-xs font-semibold text-slate-600 hover:text-slate-900"
                 >
-                  View all ({COUPONS.length})
+                  View all ({coupons.length})
                 </button>
               </div>
 
@@ -664,7 +789,7 @@ const Checkout: React.FC = () => {
               {couponMessage && <p className="text-xs text-slate-500">{couponMessage}</p>}
               {appliedCoupon && selectedCouponDetail && (
                 <p className="text-xs text-emerald-600 font-medium">
-                  {selectedCouponDetail.reward}
+                  {selectedCouponDetail.description || `${selectedCouponDetail.code} applied successfully!`}
                 </p>
               )}
             </section>
@@ -688,31 +813,52 @@ const Checkout: React.FC = () => {
               </button>
             </div>
             <div className="max-h-[70vh] overflow-y-auto p-5 space-y-3">
-              {COUPONS.map((coupon) => (
-                <div
-                  key={coupon.code}
-                  className="border border-slate-200 rounded-xl p-4 space-y-2 shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">{coupon.code}</p>
-                      <p className="text-xs text-slate-500">Spend ₹{coupon.minSubtotal}+ </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleApplyCoupon(coupon.code);
-                        setShowCouponModal(false);
-                      }}
-                      className="text-xs font-semibold text-slate-900 hover:text-slate-700"
+              {loadingCoupons ? (
+                <div className="text-center py-8 text-slate-500">Loading coupons...</div>
+              ) : coupons.length === 0 ? (
+                <div className="text-center py-8 text-slate-500">No coupons available</div>
+              ) : (
+                coupons.map((coupon) => {
+                  const discountText = coupon.discount_type === 'percentage'
+                    ? `${coupon.discount_value}% OFF`
+                    : `₹${coupon.discount_value} OFF`;
+                  
+                  return (
+                    <div
+                      key={coupon.id}
+                      className="border border-slate-200 rounded-xl p-4 space-y-2 shadow-sm"
                     >
-                      {appliedCoupon === coupon.code ? 'Applied' : 'Apply'}
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-500">{coupon.description}</p>
-                  <p className="text-[11px] text-slate-400">{coupon.reward}</p>
-                </div>
-              ))}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{coupon.code}</p>
+                          <p className="text-xs text-emerald-600 font-medium">{discountText}</p>
+                          {coupon.min_order_amount > 0 && (
+                            <p className="text-xs text-slate-500">Min. order: ₹{coupon.min_order_amount}</p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleApplyCoupon(coupon.code);
+                            setShowCouponModal(false);
+                          }}
+                          className="text-xs font-semibold text-slate-900 hover:text-slate-700 px-3 py-1 rounded border border-slate-300 hover:border-slate-400"
+                        >
+                          {appliedCoupon === coupon.code ? 'Applied' : 'Apply'}
+                        </button>
+                      </div>
+                      {coupon.description && (
+                        <p className="text-xs text-slate-500">{coupon.description}</p>
+                      )}
+                      {coupon.valid_to && (
+                        <p className="text-[11px] text-slate-400">
+                          Valid until: {new Date(coupon.valid_to).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

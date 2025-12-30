@@ -248,6 +248,8 @@ export const createOrder = async (req, res) => {
       payment_method = "cod",
       payment_status = "pending",
       payment_id = null,
+      applied_coupon = null,
+      discount_amount = 0,
     } = req.body;
 
     // Get user's cart
@@ -287,8 +289,23 @@ export const createOrder = async (req, res) => {
 
     const shippingFee = payment_method === "cod" ? 50 : 0; // COD fee
     const codFee = payment_method === "cod" ? 30 : 0; // COD handling fee
-    const discountAmount = 0; // Can be calculated from coupon if applied
-    const totalAmount = subtotal + shippingFee + codFee - discountAmount;
+    
+    // Use discount_amount from request if provided, otherwise calculate from coupon
+    let finalDiscountAmount = parseFloat(discount_amount) || 0;
+    
+    // If coupon is provided but discount_amount is not, calculate it
+    if (applied_coupon && finalDiscountAmount === 0) {
+      if (applied_coupon.discount_type === "percentage") {
+        finalDiscountAmount = (subtotal * parseFloat(applied_coupon.discount_value)) / 100;
+        if (applied_coupon.max_discount && finalDiscountAmount > parseFloat(applied_coupon.max_discount)) {
+          finalDiscountAmount = parseFloat(applied_coupon.max_discount);
+        }
+      } else {
+        finalDiscountAmount = parseFloat(applied_coupon.discount_value) || 0;
+      }
+    }
+    
+    const totalAmount = subtotal + shippingFee + codFee - finalDiscountAmount;
 
     // Get shipping address
     let finalShippingAddress = shipping_address;
@@ -318,8 +335,9 @@ export const createOrder = async (req, res) => {
         shipping_fee,
         cod_fee,
         discount_amount,
-        total_amount
-      ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?)`,
+        total_amount,
+        applied_coupon
+      ) VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         orderNumber,
         userId,
@@ -329,8 +347,9 @@ export const createOrder = async (req, res) => {
         JSON.stringify(finalShippingAddress),
         shippingFee,
         codFee,
-        discountAmount,
+        finalDiscountAmount,
         totalAmount,
+        applied_coupon ? JSON.stringify(applied_coupon) : null,
       ]
     );
 

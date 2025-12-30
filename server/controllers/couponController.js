@@ -173,25 +173,33 @@ export const validateCoupon = async (req, res) => {
       return sendBadRequest(res, "This coupon has reached its usage limit");
     }
 
+    // Parse numeric values from database (they might be strings)
+    const minOrderAmount = parseFloat(coupon.min_order_amount) || 0;
+    const discountValue = parseFloat(coupon.discount_value) || 0;
+    const maxDiscount = coupon.max_discount ? parseFloat(coupon.max_discount) : null;
+    const orderAmount = parseFloat(order_amount || 0);
+
     // Check minimum order amount
-    if (order_amount && coupon.min_order_amount > parseFloat(order_amount)) {
+    if (order_amount && minOrderAmount > orderAmount) {
       return sendBadRequest(
         res,
-        `Minimum order amount of ₹${coupon.min_order_amount} required for this coupon`
+        `Minimum order amount of ₹${minOrderAmount} required for this coupon`
       );
     }
 
     // Calculate discount
     let discountAmount = 0;
     if (coupon.discount_type === "percentage") {
-      discountAmount =
-        (parseFloat(order_amount || 0) * coupon.discount_value) / 100;
-      if (coupon.max_discount && discountAmount > coupon.max_discount) {
-        discountAmount = coupon.max_discount;
+      discountAmount = (orderAmount * discountValue) / 100;
+      if (maxDiscount !== null && discountAmount > maxDiscount) {
+        discountAmount = maxDiscount;
       }
     } else {
-      discountAmount = coupon.discount_value;
+      discountAmount = discountValue;
     }
+
+    // Ensure discountAmount is a number
+    discountAmount = parseFloat(discountAmount) || 0;
 
     return sendSuccess(res, {
       coupon: {
@@ -200,8 +208,8 @@ export const validateCoupon = async (req, res) => {
         name: coupon.name,
         description: coupon.description,
         discount_type: coupon.discount_type,
-        discount_value: coupon.discount_value,
-        max_discount: coupon.max_discount,
+        discount_value: discountValue,
+        max_discount: maxDiscount,
       },
       discount_amount: discountAmount.toFixed(2),
       valid: true,
