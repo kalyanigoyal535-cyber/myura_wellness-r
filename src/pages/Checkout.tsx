@@ -69,7 +69,6 @@ const Checkout: React.FC = () => {
   const [orderError, setOrderError] = useState<string | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loadingCoupons, setLoadingCoupons] = useState(false);
-  const [loadingUserData, setLoadingUserData] = useState(false);
 
   const productNameToSlugMap: Record<string, string> = {
     'DIA CARE': 'dia-care',
@@ -225,7 +224,6 @@ const Checkout: React.FC = () => {
       if (!isAuthenticated) return;
 
       try {
-        setLoadingUserData(true);
         // Fetch user profile
         const userProfile = await authApi.getProfile();
         
@@ -283,8 +281,6 @@ const Checkout: React.FC = () => {
         }
       } catch (err) {
         console.error('Failed to fetch user data:', err);
-      } finally {
-        setLoadingUserData(false);
       }
     };
 

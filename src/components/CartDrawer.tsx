@@ -1,10 +1,12 @@
-import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
+import React, {  useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { X, Plus, Minus, ShoppingBag, Gift, Sparkles, ArrowRight, Star, Leaf, Heart, Flower2, Tag, Copy, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Plus, Minus, ShoppingBag, Gift, Sparkles, ArrowRight, Heart, Tag, Copy, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ResponsiveProductImage, { ResponsiveImageDescriptor } from './ResponsiveProductImage';
-import { getProductById, productCatalog, type ProductRecord } from '../data/products';
+import { getProductById, type ProductRecord } from '../data/products';
+import { productsApi } from '../services/products';
+import { apiProductsToFrontend } from '../utils/productConverter';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -23,6 +25,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [carouselScrollPosition, setCarouselScrollPosition] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [alsoBoughtProducts, setAlsoBoughtProducts] = useState<ProductRecord[]>([]);
+  const [loadingAlsoBought, setLoadingAlsoBought] = useState(false);
 
   // Map product names to static product slugs for image lookup
   const productNameToSlugMap: Record<string, string> = {
@@ -91,13 +95,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         product = getProductById(slug);
       }
       
-      // If still not found, search by name in product catalog
-      if (!product) {
-        product = productCatalog.find(p => {
-          const productName = p.name.toUpperCase().trim();
-          return productName === normalizedName;
-        }) || null;
-      }
+      // If still not found, return null (product will be fetched from API if needed)
+      // No need to search static catalog as we're using dynamic products
     }
     
     return product || null;
@@ -253,50 +252,40 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     setShowCouponModal(false);
   };
 
-  const alsoBoughtProducts = [
-    {
-      id: 'dia-care',
-      name: 'Dia Care',
-      price: 1190,
-      tag: 'Blood sugar balance',
-      image: '/products/DiaCare/main.png',
-    },
-    {
-      id: 'liver-detox',
-      name: 'Liver Detox Formula',
-      price: 1320,
-      tag: 'Liver detoxification',
-      image: '/products/LiverDetox/main.png',
-    },
-    {
-      id: 'bone-joint-support',
-      name: 'Bone & Joint Support',
-      price: 1299,
-      tag: 'Joint mobility',
-      image: '/products/BoneJoint/main.png',
-    },
-    {
-      id: 'gut-and-digestion',
-      name: 'Gut and Digestion',
-      price: 980,
-      tag: 'Digestive wellness',
-      image: '/products/Gut & Digestions/main.png',
-    },
-    {
-      id: 'womens-health-plus',
-      name: "Women's Health Plus",
-      price: 1260,
-      tag: 'Hormonal balance',
-      image: '/products/Women_s Health Plus/main.png',
-    },
-    {
-      id: 'mens-vitality-booster',
-      name: "Men's Vitality Booster",
-      price: 1599,
-      tag: 'Energy & stamina',
-      image: '/products/Men_s Vitalty Boost/main.jpg',
-    },
-  ];
+  // Fetch "also bought" products from API
+  useEffect(() => {
+    const fetchAlsoBoughtProducts = async () => {
+      try {
+        setLoadingAlsoBought(true);
+        // Fetch featured products or popular products
+        const response = await productsApi.getProducts({ 
+          in_stock: true,
+          page: 1 
+        });
+        
+        const allProducts = apiProductsToFrontend(response.results || []);
+        
+        // Filter out products already in cart
+        const filteredProducts = items.length > 0
+          ? allProducts.filter((product) => 
+              !items.some((cartItem) => String(cartItem.id) === String(product.numericId))
+            )
+          : allProducts;
+        
+        // Take first 6 products
+        setAlsoBoughtProducts(filteredProducts.slice(0, 6));
+      } catch (err) {
+        console.error('Failed to fetch also bought products:', err);
+        setAlsoBoughtProducts([]);
+      } finally {
+        setLoadingAlsoBought(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchAlsoBoughtProducts();
+    }
+  }, [isOpen, items]);
 
   return (
     <>
@@ -536,53 +525,56 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   className="flex gap-3 overflow-x-auto scroll-smooth pb-2 px-8 hide-scrollbar"
                   onScroll={(e) => setCarouselScrollPosition(e.currentTarget.scrollLeft)}
                 >
-                  {alsoBoughtProducts.map((product) => {
-                    const productData = getProductById(product.id);
-                    return (
-                      <Link
-                        key={product.id}
-                        to={`/product/${product.id}`}
-                        onClick={onClose}
-                        className="group relative flex flex-col w-[140px] flex-shrink-0 p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50/50 overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        
-                        <div className="relative w-full aspect-square rounded-lg bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 overflow-hidden shadow-md group-hover:shadow-xl transition-all mb-2">
-                          {productData?.image ? (
-                            <ResponsiveProductImage
-                              image={productData.image}
-                              className="w-full h-full"
-                              imgClassName="object-contain p-1.5"
-                            />
-                          ) : (
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-full h-full object-contain p-1.5"
-                              loading="lazy"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                              }}
-                            />
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </div>
+                  {loadingAlsoBought ? (
+                    <div className="flex items-center justify-center w-full py-8">
+                      <p className="text-xs text-slate-500">Loading products...</p>
+                    </div>
+                  ) : alsoBoughtProducts.length === 0 ? (
+                    <div className="flex items-center justify-center w-full py-8">
+                      <p className="text-xs text-slate-500">No products available</p>
+                    </div>
+                  ) : (
+                    alsoBoughtProducts.map((product) => {
+                      return (
+                        <Link
+                          key={product.id}
+                          to={`/product/${product.id}`}
+                          onClick={onClose}
+                          className="group relative flex flex-col w-[140px] flex-shrink-0 p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50/50 overflow-hidden"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          
+                          <div className="relative w-full aspect-square rounded-lg bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 overflow-hidden shadow-md group-hover:shadow-xl transition-all mb-2">
+                            {product.image ? (
+                              <ResponsiveProductImage
+                                image={product.image}
+                                className="w-full h-full"
+                                imgClassName="object-contain p-1.5"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                                <ShoppingBag className="h-8 w-8 text-slate-400" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          </div>
 
-                        <div className="flex-1 flex flex-col relative z-10">
+                          <div className="flex-1 flex flex-col relative z-10">
                           <h4 className="text-[10px] font-bold text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-2 uppercase tracking-wide mb-1">
                             {product.name}
                           </h4>
-                          <p className="text-[9px] text-slate-500 mb-2 font-medium line-clamp-1">{product.tag}</p>
+                          {product.headline && (
+                            <p className="text-[9px] text-slate-500 mb-2 font-medium line-clamp-1">{product.headline}</p>
+                          )}
                           
                           <div className="flex flex-col items-start mb-2">
-                            {productData && productData.originalPrice > product.price ? (
+                            {product.originalPrice && product.originalPrice > product.price ? (
                               <>
                                 <span className="text-xs font-bold text-slate-900">
                                   ₹{product.price.toLocaleString()}
                                 </span>
                                 <span className="text-[9px] text-slate-400 line-through">
-                                  ₹{productData.originalPrice.toLocaleString()}
+                                  ₹{product.originalPrice.toLocaleString()}
                                 </span>
                               </>
                             ) : (
@@ -596,23 +588,22 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              if (productData) {
-                                addItem({
-                                  id: productData.id,
-                                  name: productData.name,
-                                  price: productData.price,
-                                  image: productData.image?.fallback || product.image,
-                                });
-                              }
+                              addItem({
+                                id: String(product.numericId || product.id),
+                                name: product.name,
+                                price: product.price,
+                                image: product.image?.fallback || '',
+                              });
                             }}
-                            className="w-full px-2 py-1.5 text-[9px] font-semibold text-white bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg hover:from-slate-900 hover:to-slate-900 transition-all shadow-sm hover:shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="w-full px-2 py-1.5 text-[9px] font-semibold text-white bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg hover:from-slate-900 hover:to-slate-900 shadow-sm hover:shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             Quick Add
                           </button>
                         </div>
                       </Link>
                     );
-                  })}
+                  })
+                  )}
                 </div>
 
                 <button

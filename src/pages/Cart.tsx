@@ -3,7 +3,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Trash2, ArrowLeft, Plus, Minus, ShoppingBag, Sparkles, ShieldCheck, Truck, Gift, ArrowRight, Heart, Star, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import ResponsiveProductImage, { ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
-import { getProductById, productCatalog, type ProductRecord } from '../data/products';
+import { getProductById, type ProductRecord } from '../data/products';
+import { productsApi } from '../services/products';
+import { apiProductsToFrontend } from '../utils/productConverter';
 
 // Helper to convert string URL to ResponsiveImageDescriptor
 const urlToImageDescriptor = (url: string, alt: string): ResponsiveImageDescriptor => {
@@ -36,6 +38,8 @@ const Cart: React.FC = () => {
   const [updatingQty, setUpdatingQty] = useState<string | null>(null);
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   const [productImages, setProductImages] = useState<Map<string, string>>(new Map());
+  const [recommendedProducts, setRecommendedProducts] = useState<ProductRecord[]>([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   
   // Map product names to static product slugs for image lookup
   // This is more reliable than ID mapping since IDs can change
@@ -200,11 +204,37 @@ const Cart: React.FC = () => {
     });
   };
 
-  const recommendedProducts = useMemo(() => {
-    if (items.length === 0) return productCatalog.slice(0, 4);
-    return productCatalog
-      .filter((product) => !items.some((cartItem) => cartItem.id === product.id))
-      .slice(0, 4);
+  // Fetch recommended products from API
+  useEffect(() => {
+    const fetchRecommendedProducts = async () => {
+      try {
+        setLoadingRecommendations(true);
+        // Fetch featured products or products not in cart
+        const response = await productsApi.getProducts({ 
+          in_stock: true,
+          page: 1 
+        });
+        
+        const allProducts = apiProductsToFrontend(response.results || []);
+        
+        // Filter out products already in cart
+        const filteredProducts = items.length > 0
+          ? allProducts.filter((product) => 
+              !items.some((cartItem) => String(cartItem.id) === String(product.numericId))
+            )
+          : allProducts;
+        
+        // Take first 4 products
+        setRecommendedProducts(filteredProducts.slice(0, 4));
+      } catch (err) {
+        console.error('Failed to fetch recommended products:', err);
+        setRecommendedProducts([]);
+      } finally {
+        setLoadingRecommendations(false);
+      }
+    };
+
+    fetchRecommendedProducts();
   }, [items]);
 
   return (
