@@ -6,6 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import { Eye, EyeOff } from "lucide-react";
 
 interface SignupValues {
   firstName: string;
@@ -34,8 +35,7 @@ const Signup = () => {
       .required("Required"),
   });
 
-  const handleSubmit = async (
-    values: SignupValues  ) : Promise<void> => {
+  const handleSubmit = async (values: SignupValues, helpers: FormikHelpers<SignupValues>) => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -61,7 +61,8 @@ const Signup = () => {
       setIsSubmitting(false);
     }
   };
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 min-h-screen">
       {/* Image Section – EXACT same layout as Login */}
@@ -159,12 +160,33 @@ const Signup = () => {
 
               <div>
                 <label>Password</label>
-                <Field
-                  name="password"
-                  as={Input}
-                  placeholder="Password"
-                  type="password"
-                />
+                <Field name="password">
+                  {({ field }: any) => (
+                    <Input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      rightSection={
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="cursor-pointer text-gray-600"
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }
+                        >
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      }
+                      rightSectionPointerEvents="all"
+                    />
+                  )}
+                </Field>
+
                 <ErrorMessage
                   name="password"
                   component="p"
@@ -174,12 +196,38 @@ const Signup = () => {
 
               <div>
                 <label>Confirm Password</label>
-                <Field
-                  name="password2"
-                  as={Input}
-                  placeholder="Confirm Password"
-                  type="password"
-                />
+
+                <Field name="password2">
+                  {({ field }: any) => (
+                    <Input
+                      {...field}
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm Password"
+                      rightSection={
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword((prev) => !prev)
+                          }
+                          className="cursor-pointer text-gray-600"
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide password"
+                              : "Show password"
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      }
+                      rightSectionPointerEvents="all"
+                    />
+                  )}
+                </Field>
+
                 <ErrorMessage
                   name="password2"
                   component="p"
