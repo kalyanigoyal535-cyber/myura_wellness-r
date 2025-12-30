@@ -7,6 +7,7 @@ import {
 } from "../utils/response.js";
 import { getImageUrl } from "../utils/imageUrl.js";
 import crypto from "crypto";
+import { createNotification } from "./notificationController.js";
 
 // Generate unique order number
 function generateOrderNumber() {
@@ -343,6 +344,22 @@ export const createOrder = async (req, res) => {
         [orderId, item.product_id, item.quantity, item.price]
       );
     }
+
+    // Get user email for notification
+    const [users] = await pool.execute(
+      "SELECT email FROM user WHERE id = ?",
+      [userId]
+    );
+    const userEmail = users.length > 0 ? users[0].email : "Unknown";
+
+    // Create notification for admin about new order
+    await createNotification(
+      "order_placed",
+      "New Order Placed",
+      `Order ${orderNumber} placed by ${userEmail} for ₹${totalAmount.toFixed(2)}`,
+      orderId,
+      "order"
+    );
 
     // Clear cart after order creation
     await pool.execute(`DELETE FROM cart_items WHERE cart_id = ?`, [cartId]);

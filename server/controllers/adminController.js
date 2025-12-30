@@ -9,6 +9,7 @@ import {
 import { buildUpdateQuery, executeQuery } from "../utils/query.js";
 import { processImage, deleteImage } from "../utils/imageProcessor.js";
 import { getImageUrl } from "../utils/imageUrl.js";
+import { createNotification } from "./notificationController.js";
 
 // Dashboard Stats
 export const getDashboardStats = async (req, res) => {
@@ -630,10 +631,37 @@ export const updateOrderStatus = async (req, res) => {
 
     values.push(req.params.id);
 
+    // Get order details for notification
+    const [orders] = await pool.execute(
+      `SELECT o.order_number, o.order_status, u.email as user_email
+       FROM orders o
+       LEFT JOIN user u ON o.user_id = u.id
+       WHERE o.order_id = ?`,
+      [req.params.id]
+    );
+
+    if (orders.length === 0) {
+      return sendNotFound(res, "Order");
+    }
+
+    const order = orders[0];
+    const oldStatus = order.order_status;
+
     await pool.execute(
       `UPDATE orders SET ${updateFields.join(", ")} WHERE order_id = ?`,
       values
     );
+
+    // Create notification if status changed
+    if (orderStatus && orderStatus !== oldStatus) {
+      await createNotification(
+        "order_updated",
+        "Order Status Updated",
+        `Order ${order.order_number} status changed to ${orderStatus}`,
+        parseInt(req.params.id),
+        "order"
+      );
+    }
 
     return sendSuccess(res, {}, "Order status updated successfully");
   } catch (error) {

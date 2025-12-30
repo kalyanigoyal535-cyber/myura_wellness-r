@@ -2,6 +2,7 @@ import pool from "../config/database.js";
 import { sendSuccess, sendError, sendNotFound } from "../utils/response.js";
 import { getImageUrl } from "../utils/imageUrl.js";
 import crypto from "crypto";
+import { createNotification } from "./notificationController.js";
 
 // Helper function to format cart response
 async function formatCartResponse(req, cart) {
@@ -112,6 +113,23 @@ async function getOrCreateCart(
       [result.insertId]
     );
     cart = newCarts[0];
+
+    // Create notification for admin if it's a user cart (not session cart)
+    if (userId) {
+      const [users] = await pool.execute(
+        "SELECT email FROM user WHERE id = ?",
+        [userId]
+      );
+      const userEmail = users.length > 0 ? users[0].email : "Unknown";
+      
+      await createNotification(
+        "system",
+        "New Cart Created",
+        `A new cart was created by user ${userEmail}`,
+        cart.cart_id,
+        "cart"
+      );
+    }
   }
 
   return cart;
