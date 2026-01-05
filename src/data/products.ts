@@ -586,8 +586,9 @@ const productMap = productCatalog.reduce<Record<string, ProductRecord>>((acc, pr
   return acc;
 }, {});
 
-export const getProductById = (id: string | undefined | null) =>
-  id ? productMap[id] ?? null : null;
+export const getProductById = (id: string | undefined | null) => {
+  return id ? productMap[id] ?? null : null;
+}
 
 export const getRelatedProducts = (id: string, limit = 4) =>
   productCatalog.filter((product) => product.id !== id).slice(0, limit);

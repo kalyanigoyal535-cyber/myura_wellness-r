@@ -110,13 +110,13 @@ export const getProducts = async (req, res) => {
       count: products.length,
       results: products.map((p) => {
         const product = {
-          ...p,
-          id: p.product_id,
-          price: parseFloat(p.price),
-          original_price: p.original_price ? parseFloat(p.original_price) : null,
-          rating: parseFloat(p.rating),
-          notes: JSON.parse(p.notes || "[]"),
-          benefits: JSON.parse(p.benefits || "[]"),
+        ...p,
+        id: p.product_id,
+        price: parseFloat(p.price),
+        original_price: p.original_price ? parseFloat(p.original_price) : null,
+        rating: parseFloat(p.rating),
+        notes: JSON.parse(p.notes || "[]"),
+        benefits: JSON.parse(p.benefits || "[]"),
           image_url: p.image
             ? `${req.protocol}://${req.get("host")}/uploads/${p.image}`
             : null,

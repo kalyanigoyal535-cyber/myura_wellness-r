@@ -80,7 +80,7 @@ async function getOrCreateCart(
       // If this cart doesn't have user_id but user is now authenticated, update it
       if (cart && userId && !cart.user_id) {
         await pool.execute(
-          "UPDATE cart SET user_id = ? WHERE cart_id = ?",
+          "UPDATE cart SET user_id = ?, session_key = NULL WHERE cart_id = ?",
           [userId, cart.cart_id]
         );
         const [updatedCarts] = await pool.execute(
@@ -118,7 +118,7 @@ async function getOrCreateCart(
       // If user is now authenticated, update the cart
       if (cart && userId && !cart.user_id) {
         await pool.execute(
-          "UPDATE cart SET user_id = ? WHERE cart_id = ?",
+          "UPDATE cart SET user_id = ?, session_key = NULL WHERE cart_id = ?",
           [userId, cart.cart_id]
         );
         const [updatedCarts] = await pool.execute(
@@ -152,10 +152,12 @@ async function getOrCreateCart(
 
   // Create new cart if none exists
   if (!cart) {
-    const newSessionKey = sessionKey || crypto.randomBytes(20).toString("hex");
+    // Only generate session_key if user is not logged in
+    const finalSessionKey = userId ? null : (sessionKey || crypto.randomBytes(20).toString("hex"));
+    
     const [result] = await pool.execute(
       "INSERT INTO cart (user_id, session_key) VALUES (?, ?)",
-      [userId, newSessionKey]
+      [userId, finalSessionKey]
     );
     const [newCarts] = await pool.execute(
       "SELECT * FROM cart WHERE cart_id = ?",
