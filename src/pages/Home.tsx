@@ -1178,9 +1178,17 @@ const Home: React.FC = () => {
           <div className="mt-8 text-center" data-aos="fade-up" data-aos-delay="400">
             <Link
               to="/product"
-              className="group relative inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-700 px-10 py-4 text-base sm:text-lg font-bold text-white shadow-[0_28px_60px_-20px_rgba(217,119,6,0.6)] transition-all duration-300 hover:shadow-[0_36px_80px_-20px_rgba(217,119,6,0.75)] hover:scale-[1.02] overflow-hidden"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              className="group relative inline-flex items-center gap-3 rounded-full
+bg-[#D97708]
+px-10 py-4 text-base sm:text-lg font-bold text-white
+shadow-[0_28px_60px_-20px_rgba(217,119,8,0.55)]
+transition-all duration-300
+hover:bg-[#C66A07]
+hover:shadow-[0_36px_80px_-20px_rgba(217,119,8,0.7)]
+hover:scale-[1.02]
+overflow-hidden"
+ >
+              <span className=""></span>
               <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               <span className="relative inline-flex items-center gap-3">
                 Explore ProSeries Collection
