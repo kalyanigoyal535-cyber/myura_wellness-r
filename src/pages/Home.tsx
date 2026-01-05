@@ -1799,10 +1799,10 @@ overflow-hidden"
                   everyday balance, energy, and restoration.
                 </p>
                 <div
-                  className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch sm:gap-2.5"
-                  data-aos="fade-up"
-                  data-aos-delay="200"
-                >
+  className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+  data-aos="fade-up"
+  data-aos-delay="200"
+>
                   <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(17,44,59,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -1811,7 +1811,7 @@ overflow-hidden"
                       Clean Ingredients
                     </span>
                   </div>
-                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f9f4fb] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(66,19,53,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70  shadow-[0_18px_32px_-30px_rgba(66,19,53,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
@@ -1819,7 +1819,7 @@ overflow-hidden"
                       Traditionally Trusted Herbs
                     </span>
                   </div>
-                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f2f9f7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(87,133,122,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(87,133,122,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
@@ -1827,7 +1827,7 @@ overflow-hidden"
                       No Harmful Additives
                     </span>
                   </div>
-                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#fff7ed] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(251,146,60,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70  shadow-[0_18px_32px_-30px_rgba(251,146,60,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <Award className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
@@ -1835,7 +1835,7 @@ overflow-hidden"
                       Highly Result-Oriented
                     </span>
                   </div>
-                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#eff6ff] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(59,130,246,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70   shadow-[0_18px_32px_-30px_rgba(59,130,246,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <FlaskConical className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
@@ -1843,7 +1843,7 @@ overflow-hidden"
                       Lab Tested
                     </span>
                   </div>
-                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f0fdf4] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(34,197,94,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70  shadow-[0_18px_32px_-30px_rgba(34,197,94,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
@@ -1851,7 +1851,7 @@ overflow-hidden"
                       Verified Authentic Ingredients
                     </span>
                   </div>
-                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#fef3c7] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(234,179,8,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70  shadow-[0_18px_32px_-30px_rgba(234,179,8,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <BadgeCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
@@ -1859,7 +1859,7 @@ overflow-hidden"
                       GMP Certified
                     </span>
                   </div>
-                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#fce7f3] to-white border border-slate-100/70 shadow-[0_18px_32px_-30px_rgba(236,72,153,0.3)] px-3 py-2 sm:px-4">
+                  <div className="flex flex-1 items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f3f6f8] to-white border border-slate-100/70  shadow-[0_18px_32px_-30px_rgba(236,72,153,0.3)] px-3 py-2 sm:px-4">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#112c3b] to-[#2b4f73] text-white shadow-[0_10px_18px_rgba(17,44,59,0.3)]">
                       <Medal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
