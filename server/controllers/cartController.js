@@ -16,6 +16,7 @@ async function formatCartResponse(req, cart) {
       p.product_id,
       p.name,
       p.price,
+      p.original_price,
       p.image,
       p.in_stock
     FROM cart_items ci
@@ -43,6 +44,7 @@ async function formatCartResponse(req, cart) {
         id: item.product_id,
         name: item.name,
         price: item.price.toString(),
+        original_price: item.original_price ? item.original_price.toString() : null,
         image: item.image,
         image_url: getImageUrl(req, item.image),
         in_stock: item.in_stock,

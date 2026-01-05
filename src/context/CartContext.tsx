@@ -39,7 +39,8 @@ const apiCartItemToFrontend = (apiItem: ApiCartItem): CartItem => {
     id: String(product.id),
     name: product.name,
     price: parseFloat(product.price),
-    image: "",
+    originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
+    image: product.image_url || product.image || "",
     qty: apiItem.quantity,
   };
 };

@@ -15,12 +15,10 @@ import {
   X,
   Tag,
 } from 'lucide-react';
-import ResponsiveProductImage, { ResponsiveImageDescriptor } from '../components/ResponsiveProductImage';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { ordersApi } from '../services/orders';
 import { phonepeApi, cashfreeApi } from '../services/payment';
-import { getProductById, productCatalog, type ProductRecord } from '../data/products';
 import { authApi } from '../services/auth';
 import { addressesApi } from '../services/addresses';
 import type { Address } from '../services/types';
@@ -70,102 +68,6 @@ const Checkout: React.FC = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loadingCoupons, setLoadingCoupons] = useState(false);
 
-  const productNameToSlugMap: Record<string, string> = {
-    'DIA CARE': 'dia-care',
-    'LIVER DETOX FORMULA': 'liver-detox',
-    'BONE & JOINT SUPPORT': 'bone-joint-support',
-    'GUT AND DIGESTION': 'gut-and-digestion',
-    "WOMEN'S HEALTH PLUS": 'womens-health-plus',
-    "MEN'S VITALITY BOOSTER": 'mens-vitality-booster',
-    "PRO MEN'S MULTIVITAMIN": 'pro-mens-multivitamin',
-    "PRO WOMEN'S HEALTH PLUS": 'pro-womens-health-plus',
-  };
-
-  const proProductImageMap: Record<string, ResponsiveImageDescriptor> = {
-    "PRO MEN'S MULTIVITAMIN": {
-      alt: "PRO Men's Multivitamin supplement",
-      fallback: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-      sources: [
-        {
-          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-          media: '(min-width: 1024px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-          media: '(min-width: 768px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-          media: '(max-width: 767px)',
-        },
-      ],
-    },
-    "PRO WOMEN'S HEALTH PLUS": {
-      alt: "PRO Women's Health Plus supplement",
-      fallback: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-      sources: [
-        {
-          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-          media: '(min-width: 1024px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-          media: '(min-width: 768px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-          media: '(max-width: 767px)',
-        },
-      ],
-    },
-  };
-  
-  // Get product from static data by matching name or ID
-  const getProductForCartItem = (itemId: string, itemName?: string): ProductRecord | null => {
-    // First try direct lookup by ID (if it's a slug)
-    let product = getProductById(itemId);
-    
-    // If not found, try matching by product name
-    if (!product && itemName) {
-      const normalizedName = itemName.toUpperCase().trim();
-      
-      // Try the name-to-slug map first
-      const slug = productNameToSlugMap[normalizedName];
-      if (slug) {
-        product = getProductById(slug);
-      }
-      
-      // If still not found, search by name in product catalog
-      if (!product) {
-        product = productCatalog.find(p => {
-          const productName = p.name.toUpperCase().trim();
-          return productName === normalizedName;
-        }) || null;
-      }
-    }
-    
-    return product || null;
-  };
-
-  // Get product image for cart item (handles PRO products)
-  const getProductImageForCart = (itemId: string, itemName?: string): ResponsiveImageDescriptor | null => {
-    // First try to get product from static catalog
-    const product = getProductForCartItem(itemId, itemName);
-    if (product?.image) {
-      return product.image;
-    }
-    
-    // If not found, check if it's a PRO product
-    if (itemName) {
-      const normalizedName = itemName.toUpperCase().trim();
-      const proImage = proProductImageMap[normalizedName];
-      if (proImage) {
-        return proImage;
-      }
-    }
-    
-    return null;
-  };
   const openCartDrawer = () => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('myura:open-cart'));
@@ -691,16 +593,14 @@ const Checkout: React.FC = () => {
 
               <div className="p-5 space-y-4">
                 {items.map((item) => {
-                  // Get product image (handles both regular and PRO products)
-                  const productImage = getProductImageForCart(item.id, item.name);
                   return (
                     <div key={item.id} className="flex items-center gap-3">
                       <div className="w-16 h-16 rounded-xl border border-slate-100 bg-slate-50 overflow-hidden flex-shrink-0">
-                        {productImage ? (
-                          <ResponsiveProductImage
-                            image={productImage}
-                            className="w-full h-full"
-                            imgClassName="object-contain p-2"
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-contain p-2"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-slate-100">

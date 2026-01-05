@@ -1,12 +1,13 @@
-import React, {  useState, useEffect, useCallback, useRef } from 'react';
+import React, {  useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { X, Plus, Minus, ShoppingBag, Gift, Sparkles, ArrowRight, Heart, Tag, Copy, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Plus, Minus, ShoppingBag, Gift, Sparkles, ArrowRight, Heart, Tag, Copy, Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import ResponsiveProductImage, { ResponsiveImageDescriptor } from './ResponsiveProductImage';
-import { getProductById, type ProductRecord } from '../data/products';
+import ResponsiveProductImage from './ResponsiveProductImage';
+import { type ProductRecord } from '../data/products';
 import { productsApi } from '../services/products';
 import { apiProductsToFrontend } from '../utils/productConverter';
+import { couponsApi, type Coupon } from '../services/coupons';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -21,142 +22,58 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const [updatingQty, setUpdatingQty] = useState<string | null>(null);
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [showCouponModal, setShowCouponModal] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
-  const [carouselScrollPosition, setCarouselScrollPosition] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [alsoBoughtProducts, setAlsoBoughtProducts] = useState<ProductRecord[]>([]);
   const [loadingAlsoBought, setLoadingAlsoBought] = useState(false);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
 
-  // Map product names to static product slugs for image lookup
-  const productNameToSlugMap: Record<string, string> = {
-    'DIA CARE': 'dia-care',
-    'LIVER DETOX FORMULA': 'liver-detox',
-    'BONE & JOINT SUPPORT': 'bone-joint-support',
-    'GUT AND DIGESTION': 'gut-and-digestion',
-    "WOMEN'S HEALTH PLUS": 'womens-health-plus',
-    "MEN'S VITALITY BOOSTER": 'mens-vitality-booster',
-    "PRO MEN'S MULTIVITAMIN": 'pro-mens-multivitamin',
-    "PRO WOMEN'S HEALTH PLUS": 'pro-womens-health-plus',
-  };
+  // Find selected coupon detail
+  const selectedCouponDetail = useMemo(
+    () => coupons.find((coupon) => coupon.code === appliedCoupon) ?? null,
+    [appliedCoupon, coupons]
+  );
 
-  // Map PRO product names to their image paths
-  const proProductImageMap: Record<string, ResponsiveImageDescriptor> = {
-    "PRO MEN'S MULTIVITAMIN": {
-      alt: "PRO Men's Multivitamin supplement",
-      fallback: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-      sources: [
-        {
-          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-          media: '(min-width: 1024px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-          media: '(min-width: 768px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO MEN'S MULTIVITAMIN/optimized/main.png",
-          media: '(max-width: 767px)',
-        },
-      ],
-    },
-    "PRO WOMEN'S HEALTH PLUS": {
-      alt: "PRO Women's Health Plus supplement",
-      fallback: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-      sources: [
-        {
-          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-          media: '(min-width: 1024px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-          media: '(min-width: 768px)',
-        },
-        {
-          srcSet: "/Final Images/ProSeries/PRO WOMEN'S HEALTH PLUS/optimized/main.png",
-          media: '(max-width: 767px)',
-        },
-      ],
-    },
-  };
-
-  // Get product from static data by matching name or ID
-  const getProductForCartItem = (itemId: string, itemName?: string): ProductRecord | null => {
-    // First try direct lookup by ID (if it's a slug)
-    let product = getProductById(itemId);
+  const discountAmount = useMemo(() => {
+    if (!appliedCoupon || !selectedCouponDetail) return 0;
     
-    // If not found, try matching by product name
-    if (!product && itemName) {
-      const normalizedName = itemName.toUpperCase().trim();
-      
-      // Try the name-to-slug map first
-      const slug = productNameToSlugMap[normalizedName];
-      if (slug) {
-        product = getProductById(slug);
+    const discountValue = typeof selectedCouponDetail.discount_value === 'number' 
+      ? selectedCouponDetail.discount_value 
+      : parseFloat(String(selectedCouponDetail.discount_value)) || 0;
+    const maxDiscount = selectedCouponDetail.max_discount 
+      ? (typeof selectedCouponDetail.max_discount === 'number'
+          ? selectedCouponDetail.max_discount
+          : parseFloat(String(selectedCouponDetail.max_discount)) || null)
+      : null;
+    
+    if (selectedCouponDetail.discount_type === 'percentage') {
+      const discount = (subtotal * discountValue) / 100;
+      if (maxDiscount !== null && discount > maxDiscount) {
+        return Number(maxDiscount) || 0;
       }
-      
-      // If still not found, return null (product will be fetched from API if needed)
-      // No need to search static catalog as we're using dynamic products
+      return Number(discount) || 0;
+    } else {
+      return Number(discountValue) || 0;
     }
-    
-    return product || null;
-  };
-
-  // Get product image for cart item (handles PRO products)
-  const getProductImageForCart = (itemId: string, itemName?: string): ResponsiveImageDescriptor | null => {
-    // First try to get product from static catalog
-    const product = getProductForCartItem(itemId, itemName);
-    if (product?.image) {
-      return product.image;
-    }
-    
-    // If not found, check if it's a PRO product
-    if (itemName) {
-      const normalizedName = itemName.toUpperCase().trim();
-      const proImage = proProductImageMap[normalizedName];
-      if (proImage) {
-        return proImage;
-      }
-    }
-    
-    return null;
-  };
-
-  const availableCoupons = [
-    { code: 'FEST30', label: '30% OFF', description: 'Festive Essentials', detail: 'Signature adaptogenic blends for daily rituals.', accent: '#d97706', discount: 30 },
-    { code: 'Myura30', label: '30% OFF', description: 'Ritual Kits', detail: 'Hydrating care duos curated by Ayurvedic doctors.', accent: '#45576f', discount: 30 },
-    { code: 'MyuraWellness31', label: '31% OFF', description: 'Wellness Lab', detail: 'Lab-tested botanicals for holistic immunity.', accent: '#5f2454', discount: 31 },
-    { code: 'MyuraOffer35', label: '35% OFF', description: 'Curated Combos', detail: 'Layered nourishment for skin, gut & mind.', accent: '#8e3421', discount: 35 },
-    { code: 'MyuraMagic40', label: '40% OFF', description: 'Limited Drops', detail: 'Rare seasonal creations straight from the atelier.', accent: '#57857a', discount: 40 },
-    { code: 'MyuraGlow31', label: '31% OFF', description: 'Luminous Care', detail: 'Phyto-active glow routines with micro-ferments.', accent: '#616262', discount: 31 },
-    { code: 'MyuraZen34', label: '34% OFF', description: 'Mindful Picks', detail: 'Daily calm essentials to restore inner balance.', accent: '#a43f86', discount: 34 },
-    { code: 'MyuraHeals40', label: '40% OFF', description: 'Immune Shield', detail: 'Clinically dosed botanicals for rapid recovery.', accent: '#537790', discount: 40 },
-  ];
-
-  const getCouponDiscount = (code: string): number => {
-    const coupon = availableCoupons.find(c => c.code === code);
-    return coupon ? coupon.discount : 0;
-  };
-
-  const couponDiscountPercent = couponCode ? getCouponDiscount(couponCode) : 0;
-  const couponDiscountAmount = couponDiscountPercent > 0 ? (subtotal * couponDiscountPercent) / 100 : 0;
+  }, [appliedCoupon, selectedCouponDetail, subtotal]);
 
   const shipping = subtotal > 799 || subtotal === 0 ? 0 : 49;
-  // Apply coupon discount to subtotal
-  const discountedSubtotal = couponDiscountAmount > 0 ? subtotal - couponDiscountAmount : subtotal;
+  const discountedSubtotal = subtotal - discountAmount;
   const total = discountedSubtotal + shipping;
+
   const savings = items.reduce((acc, item) => {
-    const product = getProductForCartItem(item.id, item.name);
-    if (product && product.originalPrice > product.price) {
-      return acc + (product.originalPrice - product.price) * item.qty;
+    if (item.originalPrice && item.originalPrice > item.price) {
+      return acc + (item.originalPrice - item.price) * item.qty;
     }
     return acc;
   }, 0);
 
   const originalSubtotal = items.reduce((acc, item) => {
-    const product = getProductForCartItem(item.id, item.name);
-    if (product && product.originalPrice > product.price) {
-      return acc + product.originalPrice * item.qty;
+    if (item.originalPrice && item.originalPrice > item.price) {
+      return acc + item.originalPrice * item.qty;
     }
     return acc + item.price * item.qty;
   }, 0);
@@ -164,6 +81,26 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const discountPercent = originalSubtotal > 0 
     ? Math.round(((originalSubtotal - subtotal) / originalSubtotal) * 100) 
     : 0;
+
+  // Fetch active coupons
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        setLoadingCoupons(true);
+        const activeCoupons = await couponsApi.getActiveCoupons();
+        setCoupons(activeCoupons);
+      } catch (err) {
+        console.error('Failed to fetch coupons:', err);
+        setCoupons([]);
+      } finally {
+        setLoadingCoupons(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchCoupons();
+    }
+  }, [isOpen]);
 
 
 
@@ -209,7 +146,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     try {
       await removeItem(id);
       // Wait for animation to complete before clearing removing state
-      await new Promise(resolve => setTimeout(resolve, 400));
+    await new Promise(resolve => setTimeout(resolve, 400));
     } catch (error) {
       console.error('Failed to remove item:', error);
       // Re-add to visible items if removal failed
@@ -219,7 +156,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         return next;
       });
     } finally {
-      setRemovingId(null);
+    setRemovingId(null);
     }
   };
 
@@ -259,9 +196,24 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleApplyCoupon = (code: string) => {
-    setCouponCode(code);
+  const handleApplyCoupon = async (code?: string) => {
+    const normalized = (code || couponCode).trim().toUpperCase();
+
+    if (!normalized) return;
+
+    try {
+      const validation = await couponsApi.validateCoupon(normalized, subtotal);
+      
+      if (!validation.valid) {
+        alert('Invalid coupon code or minimum order amount not met.');
+        return;
+      }
+
+      setAppliedCoupon(normalized);
     setShowCouponModal(false);
+    } catch (err) {
+      console.error('Failed to validate coupon:', err);
+    }
   };
 
   // Fetch "also bought" products from API
@@ -361,8 +313,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
           ) : (
             <div className="px-5 py-3 space-y-3">
               {items.map((item, index) => {
-                const product = getProductForCartItem(item.id, item.name);
-                const productImage = getProductImageForCart(item.id, item.name);
                 const isRemoving = removingId === item.id;
                 const isVisible = visibleItems.has(item.id);
                 const isUpdating = updatingQty === item.id;
@@ -390,18 +340,16 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         className="flex-shrink-0 group/image"
                       >
                         <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-slate-50 to-white border border-slate-200 overflow-hidden shadow-md group-hover/image:shadow-lg group-hover/image:border-slate-300 transition-all duration-300">
-                          {productImage ? (
-                            <ResponsiveProductImage
-                              image={productImage}
-                              className="w-full h-full"
-                              imgClassName="object-contain"
-                            />
-                          ) : (
+                          {item.image ? (
                             <img
                               src={item.image}
                               alt={item.name}
                               className="w-full h-full object-contain"
                             />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                              <ShoppingBag className="h-6 w-6 text-slate-300" />
+                            </div>
                           )}
                         </div>
                       </Link>
@@ -428,12 +376,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                           </button>
                         </div>
 
-                        {product && product.originalPrice > product.price ? (
+                        {item.originalPrice && item.originalPrice > item.price ? (
                           <div className="flex items-center gap-1.5 mb-2">
                             <span className="text-sm font-bold text-slate-900">₹{item.price}</span>
-                            <span className="text-[10px] text-slate-400 line-through">₹{product.originalPrice}</span>
+                            <span className="text-[10px] text-slate-400 line-through">₹{item.originalPrice}</span>
                             <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
-                              ({Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF)
+                              ({Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF)
                             </span>
                           </div>
                         ) : (
@@ -535,7 +483,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                 <div
                   ref={carouselRef}
                   className="flex gap-3 overflow-x-auto scroll-smooth pb-2 px-8 hide-scrollbar"
-                  onScroll={(e) => setCarouselScrollPosition(e.currentTarget.scrollLeft)}
                 >
                   {loadingAlsoBought ? (
                     <div className="flex items-center justify-center w-full py-8">
@@ -547,31 +494,31 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                     </div>
                   ) : (
                     alsoBoughtProducts.map((product) => {
-                      return (
-                        <Link
-                          key={product.id}
-                          to={`/product/${product.id}`}
-                          onClick={onClose}
-                          className="group relative flex flex-col w-[140px] flex-shrink-0 p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50/50 overflow-hidden"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                          
-                          <div className="relative w-full aspect-square rounded-lg bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 overflow-hidden shadow-md group-hover:shadow-xl transition-all mb-2">
+                    return (
+                      <Link
+                        key={product.id}
+                        to={`/product/${product.id}`}
+                        onClick={onClose}
+                        className="group relative flex flex-col w-[140px] flex-shrink-0 p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50/50 overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-100/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <div className="relative w-full aspect-square rounded-lg bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 overflow-hidden shadow-md group-hover:shadow-xl transition-all mb-2">
                             {product.image ? (
-                              <ResponsiveProductImage
+                            <ResponsiveProductImage
                                 image={product.image}
-                                className="w-full h-full"
-                                imgClassName="object-contain p-1.5"
-                              />
-                            ) : (
+                              className="w-full h-full"
+                              imgClassName="object-contain p-1.5"
+                            />
+                          ) : (
                               <div className="w-full h-full flex items-center justify-center bg-slate-100">
                                 <ShoppingBag className="h-8 w-8 text-slate-400" />
                               </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                          </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
 
-                          <div className="flex-1 flex flex-col relative z-10">
+                        <div className="flex-1 flex flex-col relative z-10">
                           <h4 className="text-[10px] font-bold text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-2 uppercase tracking-wide mb-1">
                             {product.name}
                           </h4>
@@ -600,7 +547,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              addItem({
+                                addItem({
                                 id: String(product.numericId || product.id),
                                 name: product.name,
                                 price: product.price,
@@ -657,23 +604,23 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               <div className="flex items-center justify-between relative z-10">
                 <span className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Estimated Total</span>
                 <div className="text-right">
-                  {(discountPercent > 0 || couponDiscountAmount > 0) && (
+                  {(discountPercent > 0 || discountAmount > 0) && (
                     <span className="text-[9px] text-slate-400 line-through block mb-0.5">
                       ₹{(subtotal + shipping).toLocaleString()}
                     </span>
                   )}
-                  {couponDiscountAmount > 0 && (
+                  {discountAmount > 0 && (
                     <span className="text-[9px] text-slate-600 block mb-0.5 font-semibold">
-                      Coupon: -₹{Math.round(couponDiscountAmount).toLocaleString()}
+                      Coupon: -₹{Math.round(discountAmount).toLocaleString()}
                     </span>
                   )}
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-base font-bold text-slate-900 tracking-tight">
                       ₹{total.toLocaleString()}
                     </span>
-                    {(discountPercent > 0 || couponDiscountPercent > 0) && (
+                    {(discountPercent > 0 || appliedCoupon) && (
                       <span className="text-[9px] font-bold text-white bg-slate-800 px-1.5 py-0.5 rounded-md shadow-sm">
-                        {couponDiscountPercent > 0 ? couponDiscountPercent : discountPercent}% OFF
+                        {appliedCoupon ? (selectedCouponDetail?.discount_type === 'percentage' ? `${selectedCouponDetail.discount_value}% OFF` : `₹${selectedCouponDetail?.discount_value} OFF`) : `${discountPercent}% OFF`}
                       </span>
                     )}
                   </div>
@@ -756,22 +703,32 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {availableCoupons.map((coupon) => (
+                {loadingCoupons ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 text-slate-400 animate-spin mb-3" />
+                    <p className="text-sm text-slate-500">Loading coupons...</p>
+                  </div>
+                ) : coupons.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-sm text-slate-500">No coupons available at this moment.</p>
+                  </div>
+                ) : (
+                  coupons.map((coupon) => (
                   <div
                     key={coupon.code}
                     className="relative border-2 border-slate-200 rounded-xl p-4 hover:border-slate-300 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50/50"
-                    style={{ borderLeftColor: coupon.accent, borderLeftWidth: '4px' }}
+                      style={{ borderLeftColor: '#45576f', borderLeftWidth: '4px' }}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">{coupon.code}</span>
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-md text-white" style={{ backgroundColor: coupon.accent }}>
-                            {coupon.label}
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-md text-white bg-slate-700">
+                              {coupon.discount_type === 'percentage' ? `${coupon.discount_value}% OFF` : `₹${coupon.discount_value} OFF`}
                           </span>
-                        </div>
-                        <h3 className="text-sm font-semibold text-slate-900 mb-1">{coupon.description}</h3>
-                        <p className="text-xs text-slate-600">{coupon.detail}</p>
+                          </div>
+                          <h3 className="text-sm font-semibold text-slate-900 mb-1">{coupon.name}</h3>
+                          {coupon.description && <p className="text-xs text-slate-600">{coupon.description}</p>}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-200">
@@ -793,14 +750,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                       </button>
                       <button
                         onClick={() => handleApplyCoupon(coupon.code)}
-                        className="px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md hover:shadow-lg"
-                        style={{ backgroundColor: coupon.accent }}
+                          className="px-4 py-2 text-xs font-bold text-white rounded-lg transition-all shadow-md hover:shadow-lg bg-slate-800 hover:bg-slate-900"
                       >
                         Apply
                       </button>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
