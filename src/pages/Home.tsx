@@ -10,10 +10,7 @@ import type { KeenSliderInstance } from "keen-slider";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import {
-  Truck,
-  Shield,
-  Headphones,
-  CheckCircle,
+
   ArrowRight,
   ChevronLeft,
   ChevronRight,
@@ -28,6 +25,8 @@ import { useCart } from "../context/CartContext";
 import AboutMyuraWellness from "@/components/aboutMyuraWellness/AboutMyuraWellness";
 // import VideoSectionAboutPage from "@/components/videoSectionAboutPage";
 import VideoSectionAboutPage from "@/components/VideoSectionAboutPage";
+import MyuraAdvantage from "@/components/myuraAdvantage/MyuraAdvantage";
+import IntroTextStrip from "@/components/introTextStrip/IntroTextStrip";
 
 const PRODUCT_IMAGE_WIDTHS = [320, 640, 960] as const;
 
@@ -1320,46 +1319,7 @@ overflow-hidden"
         </section>
 
         {/* Intro Text Strip */}
-        <section className="relative py-8 sm:py-12">
-          <div className="absolute inset-0 bg-[#112c3b]"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(87,133,122,0.45),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(164,63,134,0.35),transparent_55%)] opacity-75"></div>
-          <div
-            className="relative w-full mx-auto px-4 sm:px-6 lg:px-8"
-            data-aos="zoom-in"
-            data-aos-delay="90"
-          >
-            <div className="relative overflow-hidden rounded-[1.75rem] sm:rounded-[2rem] border border-white/12 bg-white/10 backdrop-blur-2xl shadow-[0_42px_85px_-40px_rgba(17,44,59,0.85)] px-5 sm:px-8 lg:px-12 py-10 sm:py-12 text-center">
-              <div
-                className="absolute -top-10 -left-8 h-28 w-28 rounded-full bg-[#3e8]/22 blur-3xl animate-[softPulse_7s_ease-in-out_infinite]"
-                style={{ animationDelay: "1s" }}
-              ></div>
-              <div
-                className="absolute -bottom-12 -right-10 h-32 w-32 rounded-full bg-[#a43f86]/22 blur-3xl animate-[softPulse_5.5s_ease-in-out_infinite]"
-                style={{ animationDelay: "2.2s" }}
-              ></div>
-              <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_60%)] opacity-55"></div>
-
-              <div className="relative flex flex-col items-center gap-4">
-                <div
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-3.5 py-1 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.24em] text-white/80"
-                  data-aos="fade-up"
-                  data-aos-delay="120"
-                >
-                  <Sparkles className="h-4 w-4 text-emerald-200" />
-                  Signature Ritual
-                </div>
-
-                <h2
-                  className="whitespace-nowrap text-[1.35rem] xs:text-[1.5rem] sm:text-[2.05rem] lg:text-[2.5rem] font-sharp font-semibold leading-tight tracking-[0.002em] text-white drop-shadow-[0_14px_28px_rgba(17,44,59,0.35)] text-center lg:text-left"
-                  data-aos="fade-up"
-                  data-aos-delay="160"
-                >
-                  Your Wellness, Our Promise.
-                </h2>
-              </div>
-            </div>
-          </div>
-        </section>
+              <IntroTextStrip/>
         {/* Explore Products Section */}
         <section className="py-20 bg-stone-50">
           <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -1601,90 +1561,8 @@ overflow-hidden"
             </div>
           </div>
         </section>
-
         {/* Service Guarantees */}
-        <section className="relative py-14 sm:py-16 bg-gradient-to-b from-white via-slate-50 to-white overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-emerald-100/20 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute -top-20 right-24 h-40 w-40 rounded-full bg-emerald-200/20 blur-[100px]" />
-          <div className="absolute -bottom-16 left-16 h-32 w-32 rounded-full bg-sky-200/25 blur-[90px]" />
-          <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="text-center mb-8 sm:mb-10">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200/60 bg-white/70 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-700 shadow-[0_16px_40px_-34px_rgba(16,185,129,0.65)]">
-                Myura Advantages
-              </span>
-              <h2 className="mt-3 text-xl sm:text-2xl font-display font-semibold text-slate-900">
-                Concierge Care For Every Order
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
-              {[
-                {
-                  id: "shipping",
-                  label: "Free Shipping",
-                  sublabel: "₹699+ orders",
-                  icon: Truck,
-                  halo: "from-[#0F2A44]/85 to-[#0F2A44]/40",
-                  ring: "ring-[#0F2A44]/30",
-                },
-                {
-                  id: "secure",
-                  label: "Secure Payment",
-                  sublabel: "256-bit",
-                  icon: Shield,
-                  halo: "from-[#0F2A44]/85 to-[#0F2A44]/40",
-                  ring: "ring-[#0F2A44]/30",
-                },
-                {
-                  id: "guarantee",
-                  label: "30-Day Guarantee",
-                  sublabel: "Easy exchange",
-                  icon: CheckCircle,
-                  halo: "from-[#0F2A44]/85 to-[#0F2A44]/40",
-                  ring: "ring-[#0F2A44]/30",
-                },
-                {
-                  id: "support",
-                  label: "24/7 Support",
-                  sublabel: "Concierge help",
-                  icon: Headphones,
-                  halo: "from-[#0F2A44]/85 to-[#0F2A44]/40",
-                  ring: "ring-[#0F2A44]/30",
-                },
-              ].map(
-                ({ id, label, sublabel, icon: Icon, halo, ring }, index) => (
-                  <div
-                    key={id}
-                    className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/[0.9] shadow-[0_20px_55px_-42px_rgba(15,23,42,0.28)] backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_70px_-48px_rgba(15,23,42,0.38)]"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/25 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    <div className="relative flex flex-col gap-3 p-5 sm:p-6">
-                      <div className="flex items-center justify-between">
-                        <div
-                          className={`relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${halo} ring-4 ${ring} shadow-[0_18px_28px_-18px_rgba(16,185,129,0.35)] transition-transform duration-500 group-hover:scale-105`}
-                        >
-                          <Icon className="h-7 w-7 text-white" />
-                        </div>
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400/80">
-                          0{index + 1}
-                        </span>
-                      </div>
-                      <div className="space-y-0.5 text-left">
-                        <h3 className="text-base font-semibold text-slate-900 font-sharp">
-                          {label}
-                        </h3>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
-                          {sublabel}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="absolute -bottom-12 -right-12 h-24 w-24 rounded-full bg-emerald-200/35 blur-[70px] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </section>
-
+                <MyuraAdvantage/>
         {/* At Myura Wellness Section */}
               <AboutMyuraWellness/>
         {/* Video Section */}
