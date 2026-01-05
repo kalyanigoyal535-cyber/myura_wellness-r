@@ -70,30 +70,32 @@ const ResponsiveProductImage: React.FC<ResponsiveProductImageProps> = ({
             media={source.media}
           />
         ))}
-        <img
-          src={image.fallback}
-          srcSet={image.fallbackSrcSet}
-          alt={image.alt}
-          loading={resolvedLoading}
-          decoding="async"
-          width={image.width}
-          height={image.height}
-          className={combineClasses(
-            'block h-full w-full object-cover transition-opacity duration-500 ease-out',
-            isLoaded ? 'opacity-100' : 'opacity-0',
-            imgClassName
-          )}
-          onLoad={() => setIsLoaded(true)}
-          onError={(e) => {
-            // Log error in development
-            if (import.meta.env.DEV) {
-              console.error('Image failed to load:', image.fallback, e);
-            }
-            // Set loaded to true to hide placeholder even if image fails
-            setIsLoaded(true);
-          }}
-          fetchPriority={image.fetchPriority}
-        />
+        {image.fallback && (
+          <img
+            src={image.fallback}
+            srcSet={image.fallbackSrcSet}
+            alt={image.alt}
+            loading={resolvedLoading}
+            decoding="async"
+            width={image.width}
+            height={image.height}
+            className={combineClasses(
+              'block h-full w-full object-cover transition-opacity duration-500 ease-out',
+              isLoaded ? 'opacity-100' : 'opacity-0',
+              imgClassName
+            )}
+            onLoad={() => setIsLoaded(true)}
+            onError={(e) => {
+              // Log error in development
+              if (import.meta.env.DEV) {
+                console.error('Image failed to load:', image.fallback, e);
+              }
+              // Set loaded to true to hide placeholder even if image fails
+              setIsLoaded(true);
+            }}
+            fetchPriority={image.fetchPriority}
+          />
+        )}
       </picture>
     </div>
   );

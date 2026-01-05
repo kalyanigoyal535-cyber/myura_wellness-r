@@ -29,25 +29,38 @@ const Cart: React.FC = () => {
 
   // Track visible items for smooth entrance animations
   useEffect(() => {
+    // Add new items to visible set
     items.forEach((item) => {
       if (!visibleItems.has(item.id)) {
         // Delay each item's appearance for staggered effect
         setTimeout(() => {
-          setVisibleItems((prev) => new Set(prev).add(item.id));
+          setVisibleItems((prev) => {
+            if (prev.has(item.id)) return prev;
+            const next = new Set(prev);
+            next.add(item.id);
+            return next;
+          });
         }, 50);
       }
     });
     
     // Clean up removed items from visible set
     const itemIds = new Set(items.map((item) => item.id));
-    setVisibleItems((prev) => {
-      const next = new Set<string>();
-      prev.forEach((id) => {
-        if (itemIds.has(id)) next.add(id);
-      });
-      return next;
+    let hasRemoved = false;
+    visibleItems.forEach((id) => {
+      if (!itemIds.has(id)) hasRemoved = true;
     });
-  }, [items, visibleItems]);
+
+    if (hasRemoved) {
+      setVisibleItems((prev) => {
+        const next = new Set<string>();
+        prev.forEach((id) => {
+          if (itemIds.has(id)) next.add(id);
+        });
+        return next;
+      });
+    }
+  }, [items]);
 
   const handleRemove = async (id: string) => {
     setRemovingId(id);
@@ -200,7 +213,7 @@ const Cart: React.FC = () => {
                           className="block group/image"
                         >
                           <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/80 border border-slate-200/60 group-hover:border-slate-300 transition-all duration-300 shadow-sm group-hover:shadow-md">
-                            {item.image ? (
+                            {item.image && item.image !== "" ? (
                               <img
                                 src={item.image}
                                 alt={item.name}

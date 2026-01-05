@@ -596,7 +596,7 @@ const Checkout: React.FC = () => {
                   return (
                     <div key={item.id} className="flex items-center gap-3">
                       <div className="w-16 h-16 rounded-xl border border-slate-100 bg-slate-50 overflow-hidden flex-shrink-0">
-                        {item.image ? (
+                        {item.image && item.image !== "" ? (
                           <img
                             src={item.image}
                             alt={item.name}

@@ -107,15 +107,28 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (!isOpen) return;
     
+    // Add new items to visible set
     items.forEach((item) => {
       if (!visibleItems.has(item.id)) {
         setTimeout(() => {
-          setVisibleItems((prev) => new Set(prev).add(item.id));
+          setVisibleItems((prev) => {
+            if (prev.has(item.id)) return prev;
+            const next = new Set(prev);
+            next.add(item.id);
+            return next;
+          });
         }, 50);
       }
     });
 
+    // Remove old items from visible set
     const itemIds = new Set(items.map((item) => item.id));
+    let hasRemoved = false;
+    visibleItems.forEach((id) => {
+      if (!itemIds.has(id)) hasRemoved = true;
+    });
+
+    if (hasRemoved) {
     setVisibleItems((prev) => {
       const next = new Set<string>();
       prev.forEach((id) => {
@@ -123,7 +136,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       });
       return next;
     });
-  }, [items, isOpen, visibleItems]);
+    }
+  }, [items, isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -340,7 +354,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         className="flex-shrink-0 group/image"
                       >
                         <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-slate-50 to-white border border-slate-200 overflow-hidden shadow-md group-hover/image:shadow-lg group-hover/image:border-slate-300 transition-all duration-300">
-                          {item.image ? (
+                          {item.image && item.image !== "" ? (
                             <img
                               src={item.image}
                               alt={item.name}
@@ -726,7 +740,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             <span className="text-xs font-bold px-2 py-0.5 rounded-md text-white bg-slate-700">
                               {coupon.discount_type === 'percentage' ? `${coupon.discount_value}% OFF` : `₹${coupon.discount_value} OFF`}
                           </span>
-                          </div>
+                        </div>
                           <h3 className="text-sm font-semibold text-slate-900 mb-1">{coupon.name}</h3>
                           {coupon.description && <p className="text-xs text-slate-600">{coupon.description}</p>}
                       </div>
