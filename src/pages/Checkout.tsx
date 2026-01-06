@@ -221,6 +221,23 @@ const Checkout: React.FC = () => {
       ...prev,
       [field]: value,
     }));
+
+    // Update analytics guest info if name, email or phone changes
+    if (!isAuthenticated && (field === 'name' || field === 'email' || field === 'phone')) {
+      const name = field === 'name' ? String(value) : form.name;
+      const email = field === 'email' ? String(value) : form.email;
+      const phone = field === 'phone' ? String(value) : form.phone;
+      
+      if (name || email || phone) {
+        // Use a timeout to debounce analytics updates
+        const timeoutId = (window as any).analyticsDebounce;
+        if (timeoutId) clearTimeout(timeoutId);
+        
+        (window as any).analyticsDebounce = setTimeout(() => {
+          analytics.updateGuestInfo(email, name, phone);
+        }, 2000);
+      }
+    }
   };
 
   const handleApplyCoupon = async (code?: string) => {

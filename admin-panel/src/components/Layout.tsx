@@ -4,6 +4,10 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard,
   BarChart3,
+  TrendingUp,
+  Globe,
+  Users2,
+  Filter,
   Package,
   FolderTree,
   ShoppingCart,
@@ -28,11 +32,27 @@ interface MenuItem {
   path: string;
   label: string;
   icon: LucideIcon;
+  subItems?: {
+    path: string;
+    label: string;
+    icon: LucideIcon;
+  }[];
 }
 
 const menuItems: MenuItem[] = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/analytics", label: "Analytics", icon: BarChart3 },
+  { 
+    path: "/analytics", 
+    label: "Analytics", 
+    icon: BarChart3,
+    subItems: [
+      { path: "/analytics", label: "Overview", icon: BarChart3 },
+      { path: "/analytics/sales", label: "Sales", icon: TrendingUp },
+      { path: "/analytics/traffic", label: "Traffic", icon: Globe },
+      { path: "/analytics/customers", label: "Customer Leads", icon: Users2 },
+      { path: "/analytics/conversion", label: "Funnel", icon: Filter },
+    ]
+  },
   { path: "/products", label: "Products", icon: Package },
   { path: "/categories", label: "Categories", icon: FolderTree },
   { path: "/orders", label: "Orders", icon: ShoppingCart },
@@ -49,6 +69,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [notificationSidebarOpen, setNotificationSidebarOpen] =
     useState<boolean>(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -73,6 +94,28 @@ export default function Layout() {
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  // Expand active submenus on mount
+  useEffect(() => {
+    menuItems.forEach(item => {
+      if (item.subItems?.some(sub => location.pathname === sub.path)) {
+        if (!expandedItems.includes(item.label)) {
+          setExpandedItems(prev => [...prev, item.label]);
+        }
+      }
+    });
+  }, [location.pathname]);
+
+  const toggleExpand = (label: string) => {
+    if (sidebarCollapsed) {
+      setSidebarCollapsed(false);
+    }
+    setExpandedItems((prev) =>
+      prev.includes(label)
+        ? prev.filter((item) => item !== label)
+        : [...prev, label]
+    );
   };
 
   // Get display name: For admins use name, for users use first_name + last_name, or username, or email
@@ -120,20 +163,64 @@ export default function Layout() {
         <nav className="sidebar-nav-layout">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const hasSubItems = item.subItems && item.subItems.length > 0;
+            const isExpanded = expandedItems.includes(item.label);
+            const isActive = location.pathname === item.path || (hasSubItems && item.subItems?.some(sub => location.pathname === sub.path));
+
             return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`nav-item-layout ${isActive ? "active" : ""}`}
-                onClick={() => setSidebarOpen(false)}
-                title={sidebarCollapsed ? item.label : ""}
-              >
-                <Icon size={20} className="nav-icon-layout" />
-                {!sidebarCollapsed && (
-                  <span className="nav-label-layout">{item.label}</span>
+              <div key={item.label} className="nav-group-layout">
+                {hasSubItems ? (
+                  <div
+                    className={`nav-item-layout ${isActive ? "active" : ""} ${isExpanded ? "expanded" : ""}`}
+                    onClick={() => toggleExpand(item.label)}
+                    title={sidebarCollapsed ? item.label : ""}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <Icon size={20} className="nav-icon-layout" />
+                    {!sidebarCollapsed && (
+                      <>
+                        <span className="nav-label-layout">{item.label}</span>
+                        <ChevronRight 
+                          size={16} 
+                          className={`submenu-chevron ${isExpanded ? "rotated" : ""}`} 
+                        />
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    to={item.path}
+                    className={`nav-item-layout ${isActive ? "active" : ""}`}
+                    onClick={() => setSidebarOpen(false)}
+                    title={sidebarCollapsed ? item.label : ""}
+                  >
+                    <Icon size={20} className="nav-icon-layout" />
+                    {!sidebarCollapsed && (
+                      <span className="nav-label-layout">{item.label}</span>
+                    )}
+                  </Link>
                 )}
-              </Link>
+
+                {hasSubItems && isExpanded && !sidebarCollapsed && (
+                  <div className="submenu-layout">
+                    {item.subItems?.map((subItem) => {
+                      const SubIcon = subItem.icon;
+                      const isSubActive = location.pathname === subItem.path;
+                      return (
+                        <Link
+                          key={subItem.path}
+                          to={subItem.path}
+                          className={`submenu-item-layout ${isSubActive ? "active" : ""}`}
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          <SubIcon size={18} className="nav-icon-layout" />
+                          <span className="nav-label-layout">{subItem.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>

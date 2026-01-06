@@ -1,204 +1,262 @@
+:root {
+  --shopify-blue: #008060;
+  --shopify-blue-light: #f4f6f8;
+  --shopify-text: #202223;
+  --shopify-subtext: #6d7175;
+  --shopify-border: #e1e3e5;
+  --shopify-surface: #ffffff;
+  --shopify-bg: #f6f6f7;
+  --shopify-success: #008060;
+  --shopify-danger: #d72c0d;
+  --shopify-warning: #ffb900;
+  --shopify-primary: #3b82f6; /* Use standard blue for primary charts as per image */
+  --chart-blue: #00a0dc;
+  --chart-purple: #8b5cf6;
+  --chart-green: #10b981;
+  --chart-amber: #f59e0b;
+}
+
 .analytics-container {
   padding: 2rem;
-  background-color: #f8fafc;
+  background-color: var(--shopify-bg);
   min-height: 100vh;
+  color: var(--shopify-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .analytics-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--shopify-border);
 }
 
 .analytics-title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 0.25rem;
-}
-
-.analytics-subtitle {
-  color: #64748b;
-  font-size: 0.875rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--shopify-text);
+  margin: 0;
 }
 
 .date-selector {
   display: flex;
-  items-center: center;
+  align-items: center;
   gap: 0.5rem;
   background: white;
-  padding: 0.5rem 0.75rem;
-  border: 1px border #e2e8f0;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--shopify-border);
   border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  color: #64748b;
 }
 
 .date-selector select {
   border: none;
   background: transparent;
-  font-weight: 600;
-  color: #0f172a;
-  cursor: pointer;
   outline: none;
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.summary-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  border: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.summary-label {
-  color: #64748b;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-.summary-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 0.5rem;
-}
-
-.summary-growth {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
   font-weight: 600;
+  color: var(--shopify-text);
+  cursor: pointer;
 }
 
-.summary-growth.positive { color: #10b981; }
-.summary-growth.negative { color: #ef4444; }
-
-.summary-subtext {
-  font-size: 0.75rem;
-  color: #94a3b8;
-}
-
-.summary-icon {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.summary-icon.blue { background: #eff6ff; color: #3b82f6; }
-.summary-icon.purple { background: #faf5ff; color: #a855f7; }
-.summary-icon.green { background: #ecfdf5; color: #10b981; }
-.summary-icon.amber { background: #fffbeb; color: #f59e0b; }
-
-.charts-grid {
+.shopify-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
 
-.chart-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+.shopify-card {
+  background: var(--shopify-surface);
+  border-radius: 0.75rem;
+  border: 1px solid var(--shopify-border);
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
 }
 
-.chart-card.span-2 {
-  grid-column: span 2;
+.shopify-card.span-2 { grid-column: span 2; }
+.shopify-card.span-3 { grid-column: span 3; }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
-.chart-title {
-  font-size: 1.125rem;
+.card-title {
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #0f172a;
-  margin-bottom: 1.5rem;
+  color: var(--shopify-text);
+  margin: 0;
+  border-bottom: 1px dotted var(--shopify-subtext);
+  padding-bottom: 2px;
+  display: inline-block;
 }
 
-.chart-container {
-  width: 100%;
+.card-value-container {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
-.locations-list {
+.card-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--shopify-text);
+}
+
+.growth-indicator {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.growth-indicator.positive { color: var(--shopify-success); }
+.growth-indicator.negative { color: var(--shopify-danger); }
+
+.growth-indicator svg {
+  margin-right: 2px;
+}
+
+.card-subtext {
+  font-size: 0.75rem;
+  color: var(--shopify-subtext);
+  margin-bottom: 1rem;
+}
+
+/* Horizontal Bar List Styles */
+.shopify-bar-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 0.5rem;
 }
 
-.location-item {
+.bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bar-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--shopify-text);
+}
+
+.bar-container {
+  height: 24px;
+  background: #f1f2f3;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--chart-blue);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.bar-value-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.75rem;
+  color: var(--shopify-subtext);
 }
 
-.location-item:last-child {
-  border-bottom: none;
+/* Funnel Visualization */
+.funnel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.location-info {
+.funnel-step {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #334155;
-  font-weight: 500;
+  gap: 1rem;
 }
 
-.location-value {
-  font-weight: 600;
-  color: #0f172a;
+.funnel-bar-wrapper {
+  flex: 1;
+  height: 60px;
+  background: #eef2ff;
+  border-radius: 4px;
+  position: relative;
 }
 
-.empty-text {
+.funnel-bar {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.funnel-info {
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.funnel-label { font-size: 0.75rem; color: var(--shopify-subtext); }
+.funnel-percentage { font-size: 0.875rem; font-weight: 700; color: var(--shopify-text); }
+.funnel-count { font-size: 0.75rem; color: var(--shopify-subtext); }
+
+/* Custom Scrollbar for list containers */
+.scroll-container {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.scroll-container::-webkit-scrollbar { width: 4px; }
+.scroll-container::-webkit-scrollbar-track { background: transparent; }
+.scroll-container::-webkit-scrollbar-thumb { background: var(--shopify-border); border-radius: 4px; }
+
+/* Cohort Matrix */
+.cohort-matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.cohort-matrix th, .cohort-matrix td {
+  padding: 0.75rem;
   text-align: center;
-  color: #94a3b8;
-  padding: 2rem 0;
+  border: 1px solid var(--shopify-border);
 }
 
-.analytics-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
+.cohort-matrix th { background: #f9fafb; font-weight: 600; color: var(--shopify-subtext); }
+.cohort-matrix .cohort-label { text-align: left; font-weight: 600; }
+
+/* Chart Customization */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #f1f2f3;
 }
 
-@media (max-width: 1024px) {
-  .charts-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .chart-card.span-2 {
-    grid-column: span 2;
-  }
+.recharts-tooltip-cursor {
+  fill: rgba(0, 0, 0, 0.02);
+}
+
+@media (max-width: 1200px) {
+  .shopify-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
-  .chart-card.span-2 {
-    grid-column: span 1;
-  }
-  .analytics-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
+  .shopify-grid { grid-template-columns: 1fr; }
+  .shopify-card.span-2, .shopify-card.span-3 { grid-column: span 1; }
 }
-
-

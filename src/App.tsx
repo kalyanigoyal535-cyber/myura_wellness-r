@@ -8,7 +8,7 @@ import Footer from "./components/Footer";
 import LoadingScreen from "./components/LoadingScreen";
 import SpinWheelModal from "./components/SpinWheelModal";
 import { SpinWheelProvider, useSpinWheel } from "./context/SpinWheelContext";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { analytics } from "./services/analytics";
 import Login from "./pages/login/Login";
@@ -73,12 +73,17 @@ const AOSRefresher = () => {
 
 const AppContent: React.FC = () => {
   const { isOpen, openSpinWheel, closeSpinWheel } = useSpinWheel();
+  const { user, isAuthenticated } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
-    // Initialize analytics on mount
-    analytics.init();
-  }, []);
+    // Initialize or update analytics session when auth state changes
+    if (isAuthenticated && user) {
+      analytics.init(user.id);
+    } else {
+      analytics.init();
+    }
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     // Track page views on route change

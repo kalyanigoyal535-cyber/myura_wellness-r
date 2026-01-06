@@ -7,6 +7,9 @@ const ANALYTICS_BASE = `${API_BASE_URL}/analytics`;
 interface SessionData {
   id: string;
   userId?: number;
+  guestEmail?: string;
+  guestName?: string;
+  guestPhone?: string;
   deviceType: 'mobile' | 'desktop' | 'tablet';
   browser: string;
   os: string;
@@ -79,8 +82,23 @@ class AnalyticsService {
     return 'Referral';
   }
 
-  public async init(userId?: number) {
-    if (this.initialized && !userId) return;
+  public async init(userId?: number, guestEmail?: string, guestName?: string, guestPhone?: string) {
+    if (this.initialized && !userId && !guestEmail && !guestName && !guestPhone) return;
+
+    // Fetch location data if not already fetched
+    let locationData = null;
+    try {
+      const locRes = await axios.get('https://ipapi.co/json/').catch(() => null);
+      if (locRes && locRes.data) {
+        locationData = {
+          country: locRes.data.country_name,
+          state: locRes.data.region,
+          city: locRes.data.city
+        };
+      }
+    } catch (err) {
+      console.warn('Failed to fetch location data', err);
+    }
 
     const params = new URLSearchParams(window.location.search);
     const utm = {
@@ -92,9 +110,13 @@ class AnalyticsService {
     const sessionData: SessionData = {
       id: this.sessionId,
       userId,
+      guestEmail,
+      guestName,
+      guestPhone,
       deviceType: this.getDeviceType(),
       browser: this.getBrowser(),
       os: this.getOS(),
+      location: locationData || undefined,
       referrerUrl: document.referrer,
       referrerSource: this.getReferrerSource(document.referrer),
       utm,
@@ -106,6 +128,19 @@ class AnalyticsService {
       this.initialized = true;
     } catch (err) {
       console.error('Failed to initialize analytics session', err);
+    }
+  }
+
+  public async updateGuestInfo(email?: string, name?: string, phone?: string) {
+    try {
+      await axios.post(`${ANALYTICS_BASE}/session`, {
+        id: this.sessionId,
+        guestEmail: email,
+        guestName: name,
+        guestPhone: phone
+      });
+    } catch (err) {
+      console.error('Failed to update guest info', err);
     }
   }
 

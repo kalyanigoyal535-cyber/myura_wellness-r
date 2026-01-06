@@ -6,6 +6,10 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
+import SalesAnalytics from "./pages/analytics/SalesAnalytics";
+import TrafficAnalytics from "./pages/analytics/TrafficAnalytics";
+import CustomerAnalytics from "./pages/analytics/CustomerAnalytics";
+import ConversionAnalytics from "./pages/analytics/ConversionAnalytics";
 import Products from "./pages/Products";
 import ProductForm from "./pages/ProductForm";
 import Categories from "./pages/Categories";
@@ -66,6 +70,10 @@ function AppRoutes() {
       >
         <Route index element={<Dashboard />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="analytics/sales" element={<SalesAnalytics />} />
+        <Route path="analytics/traffic" element={<TrafficAnalytics />} />
+        <Route path="analytics/customers" element={<CustomerAnalytics />} />
+        <Route path="analytics/conversion" element={<ConversionAnalytics />} />
         <Route path="products" element={<Products />} />
         <Route path="products/new" element={<ProductForm />} />
         <Route path="products/:id/edit" element={<ProductForm />} />

@@ -6,6 +6,9 @@ export const trackSession = async (req, res) => {
   const {
     id,
     userId,
+    guestEmail,
+    guestName,
+    guestPhone,
     deviceType,
     browser,
     os,
@@ -33,15 +36,18 @@ export const trackSession = async (req, res) => {
 
       await pool.execute(
         `INSERT INTO analytics_sessions (
-          id, user_id, device_type, browser, os, 
+          id, user_id, guest_email, guest_name, guest_phone, device_type, browser, os, 
           location_country, location_state, location_city, 
           referrer_url, referrer_source, 
           utm_source, utm_medium, utm_campaign, 
           landing_page, ip_address
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           id, 
-          userId || null, 
+          userId || null,
+          guestEmail || null,
+          guestName || null,
+          guestPhone || null,
           deviceType || 'desktop', 
           browser || null, 
           os || null,
@@ -57,12 +63,47 @@ export const trackSession = async (req, res) => {
           ipAddress || req.ip || null
         ]
       );
-    } else if (userId) {
-      // Update userId if user logged in during session
-      await pool.execute(
-        "UPDATE analytics_sessions SET user_id = ? WHERE id = ?",
-        [userId, id]
-      );
+    } else {
+      // Update existing session with new info (userId or guest info)
+      const updates = [];
+      const params = [];
+
+      if (userId) {
+        updates.push("user_id = ?");
+        params.push(userId);
+      }
+      if (guestEmail) {
+        updates.push("guest_email = ?");
+        params.push(guestEmail);
+      }
+      if (guestName) {
+        updates.push("guest_name = ?");
+        params.push(guestName);
+      }
+      if (guestPhone) {
+        updates.push("guest_phone = ?");
+        params.push(guestPhone);
+      }
+      if (location?.country) {
+        updates.push("location_country = ?");
+        params.push(location.country);
+      }
+      if (location?.state) {
+        updates.push("location_state = ?");
+        params.push(location.state);
+      }
+      if (location?.city) {
+        updates.push("location_city = ?");
+        params.push(location.city);
+      }
+
+      if (updates.length > 0) {
+        params.push(id);
+        await pool.execute(
+          `UPDATE analytics_sessions SET ${updates.join(", ")} WHERE id = ?`,
+          params
+        );
+      }
     }
 
     return sendSuccess(res, { id }, "Session tracked");
