@@ -53,14 +53,35 @@ const menuItems: MenuItem[] = [
       { path: "/analytics/conversion", label: "Funnel", icon: Filter },
     ]
   },
-  { path: "/products", label: "Products", icon: Package },
-  { path: "/categories", label: "Categories", icon: FolderTree },
-  { path: "/orders", label: "Orders", icon: ShoppingCart },
-  { path: "/carts", label: "Carts", icon: ShoppingBag },
-  { path: "/coupons", label: "Coupons", icon: Tag },
-  { path: "/blogs", label: "Blogs", icon: FileText },
+  { 
+    path: "/products", 
+    label: "Inventory", 
+    icon: Package,
+    subItems: [
+      { path: "/products", label: "All Products", icon: Package },
+      { path: "/categories", label: "Categories", icon: FolderTree },
+    ]
+  },
+  { 
+    path: "/orders", 
+    label: "Sales", 
+    icon: ShoppingCart,
+    subItems: [
+      { path: "/orders", label: "Orders", icon: ShoppingCart },
+      { path: "/carts", label: "Abandoned Carts", icon: ShoppingBag },
+    ]
+  },
+  { 
+    path: "/blogs", 
+    label: "Content", 
+    icon: FileText,
+    subItems: [
+      { path: "/blogs", label: "Blog Posts", icon: FileText },
+      { path: "/coupons", label: "Coupons", icon: Tag },
+      { path: "/contacts", label: "Contact Leads", icon: MessageSquare },
+    ]
+  },
   { path: "/users", label: "Users", icon: Users },
-  { path: "/contacts", label: "Contacts", icon: MessageSquare },
 ];
 
 export default function Layout() {
