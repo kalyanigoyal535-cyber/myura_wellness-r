@@ -24,6 +24,13 @@ export const trackSession = async (req, res) => {
     );
 
     if (existing.length === 0) {
+      const country = location?.country || null;
+      const state = location?.state || null;
+      const city = location?.city || null;
+      const utmSource = utm?.source || null;
+      const utmMedium = utm?.medium || null;
+      const utmCampaign = utm?.campaign || null;
+
       await pool.execute(
         `INSERT INTO analytics_sessions (
           id, user_id, device_type, browser, os, 
@@ -33,11 +40,21 @@ export const trackSession = async (req, res) => {
           landing_page, ip_address
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          id, userId || null, deviceType || 'desktop', browser || null, os || null,
-          location?.country || null, location?.state || null, location?.city || null,
-          referrerUrl || null, referrerSource || 'Direct',
-          utm?.source || null, utm?.medium || null, utm?.campaign || null,
-          landingPage || null, ipAddress || req.ip
+          id, 
+          userId || null, 
+          deviceType || 'desktop', 
+          browser || null, 
+          os || null,
+          country, 
+          state, 
+          city,
+          referrerUrl || null, 
+          referrerSource || 'Direct',
+          utmSource, 
+          utmMedium, 
+          utmCampaign,
+          landingPage || null, 
+          ipAddress || req.ip || null
         ]
       );
     } else if (userId) {
