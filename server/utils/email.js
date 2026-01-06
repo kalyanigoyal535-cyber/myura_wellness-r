@@ -18,6 +18,9 @@ const transporter = nodemailer.createTransport({
 transporter.verify((error, success) => {
   if (error) {
     console.error("❌ Email transporter configuration error:", error.message);
+    if (error.message.includes('535')) {
+      console.warn("💡 Tip: For Gmail, ensure you are using an 'App Password' if 2FA is enabled.");
+    }
     console.warn(
       "⚠️  Email sending will be disabled. Please configure SMTP settings in .env"
     );

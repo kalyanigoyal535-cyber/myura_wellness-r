@@ -16,6 +16,9 @@ import {
   getOrders,
   getOrder,
   updateOrderStatus,
+  getCarts,
+  getCart,
+  deleteCart,
   getUsers,
   getContacts,
   markContactRead,
@@ -28,15 +31,14 @@ import {
   deleteBlog,
   updateProfile,
   resetPassword,
-  getCarts,
-  getCart,
-  deleteCart,
 } from '../controllers/adminController.js';
+import { getDashboardAnalytics } from '../controllers/adminAnalyticsController.js';
 
 const router = express.Router();
 
-// Dashboard Stats
+// Dashboard & Analytics
 router.get('/dashboard/stats', authenticate, requireAdmin, getDashboardStats);
+router.get('/analytics', authenticate, requireAdmin, getDashboardAnalytics);
 
 // Admin Products Routes
 router.get('/products', authenticate, requireAdmin, getProducts);

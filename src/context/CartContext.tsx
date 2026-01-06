@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { cartApi } from "../services/cart";
 import { Cart as ApiCart, CartItem as ApiCartItem } from "../services/types";
 import { AuthContext } from "./AuthContext";
+import { analytics } from "../services/analytics";
 
 export interface CartContextValue {
   items: CartItem[];
@@ -168,6 +169,14 @@ export const useCart = (): CartContextValue => {
       }
 
       const cartResponse = await cartApi.addToCart(productId, qty);
+
+      // Track add to cart event
+      analytics.trackEvent("add_to_cart", {
+        productId,
+        quantity: qty,
+        name: item.name,
+        price: item.price,
+      });
 
       // Use the cart response directly as source of truth (avoids session issues)
       const frontendItems: CartItem[] = cartResponse.items.map(

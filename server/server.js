@@ -17,6 +17,7 @@ import orderRoutes from "./routes/orders.js";
 import addressRoutes from "./routes/addresses.js";
 import couponRoutes from "./routes/coupons.js";
 import notificationRoutes from "./routes/notifications.js";
+import analyticsRoutes from "./routes/analytics.js";
 import { submitContact } from "./controllers/contactController.js";
 
 dotenv.config();
@@ -98,6 +99,7 @@ app.use("/api/addresses", addressRoutes); // User addresses
 app.use("/api/coupons", couponRoutes); // Coupons (public + admin)
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/notifications", notificationRoutes); // Admin notifications
+app.use("/api/analytics", analyticsRoutes); // Traffic and event tracking
 
 // Contact form endpoint (public)
 app.post("/api/contact", submitContact);

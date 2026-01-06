@@ -10,6 +10,7 @@ import SpinWheelModal from "./components/SpinWheelModal";
 import { SpinWheelProvider, useSpinWheel } from "./context/SpinWheelContext";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { analytics } from "./services/analytics";
 import Login from "./pages/login/Login";
 import Signup from "./pages/signup/Signup";
 import BlogPost from "./blogPost/BlogPost";
@@ -72,6 +73,17 @@ const AOSRefresher = () => {
 
 const AppContent: React.FC = () => {
   const { isOpen, openSpinWheel, closeSpinWheel } = useSpinWheel();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Initialize analytics on mount
+    analytics.init();
+  }, []);
+
+  useEffect(() => {
+    // Track page views on route change
+    analytics.trackEvent("page_view");
+  }, [location.pathname]);
 
   useEffect(() => {
     // Prevent browser from restoring scroll position on refresh

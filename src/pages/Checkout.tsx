@@ -23,6 +23,7 @@ import { authApi } from '../services/auth';
 import { addressesApi } from '../services/addresses';
 import type { Address } from '../services/types';
 import { couponsApi, type Coupon } from '../services/coupons';
+import { analytics } from '../services/analytics';
 
 type CheckoutForm = {
   name: string;
@@ -67,6 +68,14 @@ const Checkout: React.FC = () => {
   const [orderError, setOrderError] = useState<string | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loadingCoupons, setLoadingCoupons] = useState(false);
+
+  // Track reached checkout
+  useEffect(() => {
+    analytics.trackEvent('reached_checkout', {
+      total_items: items.length,
+      subtotal
+    });
+  }, []);
 
   const openCartDrawer = () => {
     if (typeof window !== 'undefined') {
@@ -312,6 +321,15 @@ const Checkout: React.FC = () => {
         };
 
         const order = await ordersApi.createOrder(orderData);
+        
+        // Track purchase event for COD
+        analytics.trackEvent('purchase', {
+          orderId: order.id,
+          orderNumber: order.order_number,
+          total: total,
+          paymentMethod: 'cod'
+        });
+
         await clear();
         navigate(`/order-details/${order.id}`, { 
           state: { 

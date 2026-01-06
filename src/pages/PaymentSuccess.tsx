@@ -5,6 +5,7 @@ import { ordersApi } from '../services/orders';
 import { phonepeApi, cashfreeApi } from '../services/payment';
 import { Order } from '../services/types';
 import { useAuth } from '../context/AuthContext';
+import { analytics } from '../services/analytics';
 
 const PaymentSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -57,6 +58,14 @@ const PaymentSuccess: React.FC = () => {
         if (isPaid) {
           setPaymentVerified(true);
           setVerifying(false);
+          
+          // Track purchase event if already paid (e.g. on refresh)
+          analytics.trackEvent('purchase', {
+            orderId: orderData.id,
+            orderNumber: orderData.order_number,
+            total: parseFloat(orderData.total_amount),
+            paymentMethod: orderData.payment_method
+          });
           return;
         }
 
@@ -70,6 +79,14 @@ const PaymentSuccess: React.FC = () => {
             setPaymentVerified(true);
             const updatedOrder = await ordersApi.getOrder(parseInt(orderId));
             setOrder(updatedOrder);
+
+            // Track purchase event
+            analytics.trackEvent('purchase', {
+              orderId: updatedOrder.id,
+              orderNumber: updatedOrder.order_number,
+              total: parseFloat(updatedOrder.total_amount),
+              paymentMethod: 'cashfree'
+            });
           } else {
             setVerificationError('Payment verification failed. Please contact support if payment was deducted.');
           }
@@ -83,6 +100,14 @@ const PaymentSuccess: React.FC = () => {
             setPaymentVerified(true);
             const updatedOrder = await ordersApi.getOrder(parseInt(orderId));
             setOrder(updatedOrder);
+
+            // Track purchase event
+            analytics.trackEvent('purchase', {
+              orderId: updatedOrder.id,
+              orderNumber: updatedOrder.order_number,
+              total: parseFloat(updatedOrder.total_amount),
+              paymentMethod: 'phonepe'
+            });
           } else {
             setVerificationError('Payment verification failed. Please contact support if payment was deducted.');
           }
@@ -91,6 +116,14 @@ const PaymentSuccess: React.FC = () => {
           if (isAlreadyPaid) {
             setPaymentVerified(true);
             setVerifying(false);
+            
+            // Track purchase event
+            analytics.trackEvent('purchase', {
+              orderId: orderData.id,
+              orderNumber: orderData.order_number,
+              total: parseFloat(orderData.total_amount),
+              paymentMethod: orderData.payment_method
+            });
           } else {
             setVerificationError('Payment verification parameters are missing. If payment was successful, your order will be updated shortly. Please contact support if you have concerns.');
           }

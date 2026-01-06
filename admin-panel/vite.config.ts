@@ -8,7 +8,12 @@ export default defineConfig({
     host: true,
   },
   resolve: {
-    extensions: ['.tsx', '.ts'],
+    alias: {
+      '@': '/src',
+    },
+  },
+  optimizeDeps: {
+    include: ['recharts', 'lucide-react', 'axios', 'lodash'],
   },
 });
 

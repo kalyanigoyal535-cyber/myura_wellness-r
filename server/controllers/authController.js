@@ -59,7 +59,10 @@ export const adminLogin = async (req, res) => {
     );
   } catch (error) {
     console.error("Login error:", error);
-    return sendError(res, "Login failed", 500);
+    if (error.code === 'ECONNREFUSED' || error.code === 'PROTOCOL_CONNECTION_LOST' || error.code === 'ECONNRESET') {
+      return sendError(res, "Database connection error. Please ensure MySQL is running.", 500);
+    }
+    return sendError(res, "Login failed. Please try again later.", 500);
   }
 };
 
@@ -93,7 +96,10 @@ export const getCurrentUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Get admin error:", error);
-    return sendError(res, "Failed to get admin", 500);
+    if (error.code === 'ECONNREFUSED' || error.code === 'PROTOCOL_CONNECTION_LOST' || error.code === 'ECONNRESET') {
+      return sendError(res, "Database connection error. Please ensure MySQL is running.", 500);
+    }
+    return sendError(res, "Failed to get admin profile.", 500);
   }
 };
 

@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard,
+  BarChart3,
   Package,
   FolderTree,
   ShoppingCart,
@@ -31,6 +32,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/analytics", label: "Analytics", icon: BarChart3 },
   { path: "/products", label: "Products", icon: Package },
   { path: "/categories", label: "Categories", icon: FolderTree },
   { path: "/orders", label: "Orders", icon: ShoppingCart },

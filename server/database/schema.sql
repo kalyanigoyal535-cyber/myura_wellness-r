@@ -426,3 +426,48 @@ CREATE TABLE
     INDEX `idx_created_at` (`created_at`),
     INDEX `idx_related` (`related_type`, `related_id`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- =====================================================
+-- Table: analytics_sessions
+-- =====================================================
+CREATE TABLE IF NOT EXISTS `analytics_sessions` (
+  `id` VARCHAR(255) PRIMARY KEY,
+  `user_id` INT NULL,
+  `device_type` ENUM('mobile', 'desktop', 'tablet', 'other') DEFAULT 'desktop',
+  `browser` VARCHAR(100),
+  `os` VARCHAR(100),
+  `location_country` VARCHAR(100),
+  `location_state` VARCHAR(100),
+  `location_city` VARCHAR(100),
+  `referrer_url` TEXT,
+  `referrer_source` VARCHAR(100), -- Direct, Social, Search
+  `utm_source` VARCHAR(100),
+  `utm_medium` VARCHAR(100),
+  `utm_campaign` VARCHAR(100),
+  `landing_page` VARCHAR(255),
+  `ip_address` VARCHAR(45),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_created_at` (`created_at`),
+  INDEX `idx_utm` (`utm_source`, `utm_medium`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE SET NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- =====================================================
+-- Table: analytics_events
+-- =====================================================
+CREATE TABLE IF NOT EXISTS `analytics_events` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `session_id` VARCHAR(255),
+  `event_type` ENUM('page_view', 'add_to_cart', 'reached_checkout', 'purchase'),
+  `page_path` VARCHAR(255),
+  `product_id` INT NULL,
+  `order_id` INT NULL,
+  `metadata` JSON, -- Store additional info
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_session_id` (`session_id`),
+  INDEX `idx_event_type` (`event_type`),
+  INDEX `idx_created_at` (`created_at`),
+  FOREIGN KEY (`session_id`) REFERENCES `analytics_sessions` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE SET NULL,
+  FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE SET NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
