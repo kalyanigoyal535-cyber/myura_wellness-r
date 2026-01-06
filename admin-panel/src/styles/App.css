@@ -15,20 +15,20 @@
   --primary: #6366f1;
   --primary-dark: #4f46e5;
   --secondary: #8b5cf6;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
+  --success: #008060; /* Shopify green */
+  --warning: #ffb900;
+  --danger: #d72c0d;
+  --info: #00a0dc;
   
   --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
+  --bg-secondary: #f6f6f7; /* Shopify gray bg */
   --bg-tertiary: #f1f5f9;
   
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
+  --text-primary: #202223; /* Shopify dark text */
+  --text-secondary: #6d7175; /* Shopify subtext */
   --text-tertiary: #94a3b8;
   
-  --border: #e2e8f0;
+  --border: #e1e3e5; /* Shopify border */
   --border-light: #f1f5f9;
   
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -37,9 +37,113 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   
   --radius: 8px;
-  --radius-sm: 6px;
+  --radius-sm: 4px;
   --radius-lg: 12px;
+
+  /* Chart Colors */
+  --chart-blue: #00a0dc;
+  --chart-purple: #8b5cf6;
+  --chart-green: #10b981;
+  --chart-amber: #f59e0b;
 }
+
+/* Page Container Defaults */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Shopify Card Style (Global) */
+.card {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Table Style (Global) */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #f9fafb;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Badge Style (Global) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-success { background: #ecfdf5; color: #065f46; }
+.badge-warning { background: #fffbeb; color: #92400e; }
+.badge-danger { background: #fef2f2; color: #991b1b; }
+.badge-info { background: #eff6ff; color: #1e40af; }
 
 html {
   overflow-x: hidden;

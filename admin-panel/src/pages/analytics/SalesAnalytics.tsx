@@ -76,113 +76,122 @@ export default function SalesAnalytics() {
           <h1 className="analytics-title">Sales Analytics</h1>
           <p className="analytics-subtitle">Monitor your revenue and product performance</p>
         </div>
-        <div className="analytics-actions">
-          <div className="date-selector">
-            <Calendar size={16} />
-            <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
-              <option value={7}>Last 7 days</option>
-              <option value={30}>Last 30 days</option>
-              <option value={90}>Last 90 days</option>
-            </select>
-          </div>
+        <div className="date-selector">
+          <Calendar size={14} />
+          <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
         </div>
       </div>
 
-      <div className="summary-grid">
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Total Sales</p>
-            <h3 className="summary-value">₹{summary.total_sales.toLocaleString("en-IN")}</h3>
-            <div className={`summary-growth ${summary.sales_growth >= 0 ? 'positive' : 'negative'}`}>
-              {summary.sales_growth >= 0 ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+      <div className="shopify-grid">
+        {/* Summary Cards */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Total Sales</h3>
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">₹{summary.total_sales.toLocaleString("en-IN")}</span>
+            <div className={`growth-indicator ${summary.sales_growth >= 0 ? 'positive' : 'negative'}`}>
+              {summary.sales_growth >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
               <span>{Math.abs(summary.sales_growth)}%</span>
             </div>
           </div>
-          <div className="summary-icon blue"><DollarSign size={24} /></div>
+          <p className="card-subtext">Net revenue in selected period</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Total Orders</p>
-            <h3 className="summary-value">{summary.total_orders}</h3>
-            <p className="summary-subtext">Completed purchases</p>
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Total Orders</h3>
           </div>
-          <div className="summary-icon purple"><Package size={24} /></div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Avg. Order Value (AOV)</p>
-            <h3 className="summary-value">₹{summary.aov.toLocaleString("en-IN")}</h3>
-            <p className="summary-subtext">Revenue per order</p>
+          <div className="card-value-container">
+            <span className="card-value">{summary.total_orders}</span>
           </div>
-          <div className="summary-icon green"><TrendingUp size={24} /></div>
+          <p className="card-subtext">Completed purchases</p>
         </div>
 
-        <div className="summary-card highlight">
-          <div className="summary-card-info">
-            <p className="summary-label">Best Seller</p>
-            <h3 className="summary-value text-sm truncate max-w-[150px]">{bestSeller ? bestSeller.name : "N/A"}</h3>
-            <p className="summary-subtext">{bestSeller ? `₹${bestSeller.revenue.toLocaleString()} revenue` : "No sales yet"}</p>
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Avg. Order Value</h3>
           </div>
-          <div className="summary-icon amber"><Sparkles size={24} /></div>
+          <div className="card-value-container">
+            <span className="card-value">₹{summary.aov.toLocaleString("en-IN")}</span>
+          </div>
+          <p className="card-subtext">Average revenue per order</p>
         </div>
-      </div>
 
-      <div className="charts-grid">
-        <div className="chart-card span-3">
-          <h3 className="chart-title">Revenue Trends</h3>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height={350}>
+        {/* Charts */}
+        <div className="shopify-card span-3">
+          <div className="card-header">
+            <h3 className="card-title">Revenue Over Time</h3>
+          </div>
+          <div style={{ height: 350, marginTop: 20 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={charts.sales_over_time}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#00a0dc" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#00a0dc" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="date" tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
-                <YAxis tickFormatter={(value) => `₹${value}`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f2f3" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  tick={{ fontSize: 12, fill: '#6d7175' }}
+                  axisLine={{ stroke: '#e1e3e5' }}
+                />
+                <YAxis 
+                  tickFormatter={(value) => `₹${value}`}
+                  tick={{ fontSize: 12, fill: '#6d7175' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e1e3e5', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   formatter={(value: any) => [`₹${value.toLocaleString()}`, "Sales"]}
                   labelFormatter={(label) => new Date(label).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 />
-                <Area type="monotone" dataKey="sales" stroke="#3b82f6" fillOpacity={1} fill="url(#colorSales)" strokeWidth={3} />
+                <Area type="monotone" dataKey="sales" stroke="#00a0dc" fillOpacity={1} fill="url(#colorSales)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="chart-card span-3">
-          <h3 className="chart-title">Product Performance & Sell-Through Rate</h3>
-          <div className="activity-table-container">
+        {/* Product Table */}
+        <div className="shopify-card span-3">
+          <div className="card-header">
+            <h3 className="card-title">Product Performance & Sell-Through Rate</h3>
+          </div>
+          <div className="activity-table-container" style={{ marginTop: 10 }}>
             <table className="activity-table">
               <thead>
                 <tr>
-                  <th>Product Name</th>
-                  <th>Units Sold</th>
-                  <th>Units Available</th>
-                  <th>Revenue</th>
-                  <th>Sell-Through Rate</th>
+                  <th style={{ textAlign: 'left' }}>Product Name</th>
+                  <th style={{ textAlign: 'center' }}>Units Sold</th>
+                  <th style={{ textAlign: 'center' }}>Units Available</th>
+                  <th style={{ textAlign: 'right' }}>Revenue</th>
+                  <th style={{ textAlign: 'left', paddingLeft: '40px' }}>Sell-Through Rate</th>
                 </tr>
               </thead>
               <tbody>
                 {charts.top_products.map((product, idx) => (
                   <tr key={idx}>
-                    <td className="font-semibold">{product.name}</td>
-                    <td>{product.units}</td>
-                    <td>{product.stock_available}</td>
-                    <td>₹{product.revenue.toLocaleString()}</td>
-                    <td>
-                      <div className="flex items-center gap-2">
+                    <td style={{ fontWeight: 600 }}>{product.name}</td>
+                    <td style={{ textAlign: 'center' }}>{product.units}</td>
+                    <td style={{ textAlign: 'center' }}>{product.stock_available}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{product.revenue.toLocaleString()}</td>
+                    <td style={{ paddingLeft: '40px' }}>
+                      <div className="flex items-center gap-2" style={{ width: '200px' }}>
                         <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-blue-500" 
                             style={{ width: `${Math.min(100, parseFloat(product.sell_through_rate))}%` }}
                           />
                         </div>
-                        <span className="text-xs font-bold">{product.sell_through_rate}%</span>
+                        <span className="text-xs font-bold" style={{ minWidth: '40px' }}>{product.sell_through_rate}%</span>
                       </div>
                     </td>
                   </tr>

@@ -69,109 +69,113 @@ export default function ConversionAnalytics() {
           <h1 className="analytics-title">Conversion Analytics</h1>
           <p className="analytics-subtitle">Analyze your customer journey and funnel efficiency</p>
         </div>
-        <div className="analytics-actions">
-          <div className="date-selector">
-            <Calendar size={16} />
-            <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
-              <option value={7}>Last 7 days</option>
-              <option value={30}>Last 30 days</option>
-              <option value={90}>Last 90 days</option>
-            </select>
-          </div>
+        <div className="date-selector">
+          <Calendar size={14} />
+          <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
         </div>
       </div>
 
-      <div className="summary-grid">
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Overall Conv. Rate</p>
-            <h3 className="summary-value">{summary.conversion_rate}%</h3>
-            <p className="summary-subtext">Session to purchase</p>
+      <div className="shopify-grid">
+        {/* Summary Cards */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Overall Conversion Rate</h3>
           </div>
-          <div className="summary-icon green"><TrendingUp size={24} /></div>
+          <div className="card-value-container">
+            <span className="card-value">{summary.conversion_rate}%</span>
+          </div>
+          <p className="card-subtext">Session to purchase rate</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Cart Add Rate</p>
-            <h3 className="summary-value">
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Add to Cart Rate</h3>
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">
               {charts.funnel[0].value > 0 ? ((charts.funnel[1].value / charts.funnel[0].value) * 100).toFixed(2) : 0}%
-            </h3>
-            <p className="summary-subtext">Session to cart</p>
+            </span>
           </div>
-          <div className="summary-icon blue"><ShoppingCart size={24} /></div>
+          <p className="card-subtext">Percentage of visitors adding to cart</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Checkout Reach Rate</p>
-            <h3 className="summary-value">
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Checkout Reach Rate</h3>
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">
               {charts.funnel[1].value > 0 ? ((charts.funnel[2].value / charts.funnel[1].value) * 100).toFixed(2) : 0}%
-            </h3>
-            <p className="summary-subtext">Cart to checkout</p>
+            </span>
           </div>
-          <div className="summary-icon purple"><CreditCard size={24} /></div>
+          <p className="card-subtext">Percentage of cart additions reaching checkout</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Purchase Completion</p>
-            <h3 className="summary-value">
-              {charts.funnel[2].value > 0 ? ((charts.funnel[3].value / charts.funnel[2].value) * 100).toFixed(2) : 0}%
-            </h3>
-            <p className="summary-subtext">Checkout to paid</p>
+        {/* Funnel Graph */}
+        <div className="shopify-card span-2">
+          <div className="card-header">
+            <h3 className="card-title">Conversion Funnel</h3>
           </div>
-          <div className="summary-icon amber"><CheckCircle size={24} /></div>
-        </div>
-      </div>
-
-      <div className="charts-grid">
-        <div className="chart-card span-2">
-          <h3 className="chart-title">Conversion Rate Trend</h3>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={charts.conversion_over_time}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="date" tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
-                <YAxis tickFormatter={(value) => `${value}%`} />
-                <Tooltip 
-                  formatter={(value: any) => [`${value}%`, "Conv. Rate"]}
-                  labelFormatter={(label) => new Date(label).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                />
-                <Line type="monotone" dataKey="rate" stroke="#10b981" strokeWidth={4} dot={{ r: 6 }} activeDot={{ r: 8 }} />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="funnel-container" style={{ marginTop: 20 }}>
+            {charts.funnel.map((step, i) => (
+              <div key={i} className="funnel-step">
+                <div className="funnel-info">
+                  <span className="funnel-label">{step.name}</span>
+                  <span className="funnel-percentage">
+                    {i === 0 ? "100%" : `${((step.value / charts.funnel[0].value) * 100).toFixed(2)}%`}
+                  </span>
+                  <span className="funnel-count">{step.value} users</span>
+                </div>
+                <div className="funnel-bar-wrapper">
+                  <div className="funnel-bar" style={{ width: `${(step.value / charts.funnel[0].value) * 100}%` }}></div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-
-        <div className="chart-card">
-          <h3 className="chart-title">Purchase Funnel</h3>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={charts.funnel} layout="vertical" margin={{ left: 20, right: 40 }}>
-                <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12 }} />
-                <Tooltip 
-                  cursor={{ fill: '#f8fafc' }}
-                  formatter={(value: any) => [value, "Users"]}
-                />
-                <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={40}>
-                  {charts.funnel.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={1 - index * 0.15} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <div className="funnel-stats mt-4 flex flex-col gap-2">
+          <div className="mt-8">
+            <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '10px' }}>Funnel Drop-offs</h4>
+            <div className="flex flex-col gap-2">
               {charts.funnel.slice(1).map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center text-xs p-2 bg-slate-50 rounded">
-                  <span className="font-medium">{charts.funnel[idx].name} → {item.name}</span>
-                  <span className="font-bold text-blue-600">
-                    {charts.funnel[idx].value > 0 ? ((item.value / charts.funnel[idx].value) * 100).toFixed(1) : 0}% drop-off
+                <div key={idx} className="flex justify-between items-center text-xs p-3 bg-slate-50 rounded border border-slate-100">
+                  <span className="font-medium" style={{ color: '#6d7175' }}>{charts.funnel[idx].name} to {item.name}</span>
+                  <span style={{ color: '#d72c0d', fontWeight: 700 }}>
+                    {charts.funnel[idx].value > 0 ? (100 - (item.value / charts.funnel[idx].value * 100)).toFixed(1) : 0}% drop-off
                   </span>
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Conv. Rate Trend */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Conversion Rate Trend</h3>
+          </div>
+          <div style={{ height: 350, marginTop: 20 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={charts.conversion_over_time}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f2f3" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  tick={{ fontSize: 12, fill: '#6d7175' }}
+                />
+                <YAxis 
+                  tickFormatter={(value) => `${value}%`}
+                  tick={{ fontSize: 12, fill: '#6d7175' }}
+                  axisLine={false}
+                />
+                <Tooltip 
+                  formatter={(value: any) => [`${value}%`, "Conv. Rate"]}
+                />
+                <Line type="monotone" dataKey="rate" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

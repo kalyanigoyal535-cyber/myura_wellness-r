@@ -77,6 +77,17 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shopify-card.clickable {
+  cursor: pointer;
+}
+
+.shopify-card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--shopify-primary);
 }
 
 .shopify-card.span-2 { grid-column: span 2; }

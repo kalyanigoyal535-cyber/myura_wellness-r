@@ -74,67 +74,59 @@ export default function TrafficAnalytics() {
           <h1 className="analytics-title">Traffic Analytics</h1>
           <p className="analytics-subtitle">Understand where your visitors are coming from</p>
         </div>
-        <div className="analytics-actions">
-          <div className="date-selector">
-            <Calendar size={16} />
-            <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
-              <option value={7}>Last 7 days</option>
-              <option value={30}>Last 30 days</option>
-              <option value={90}>Last 90 days</option>
-            </select>
-          </div>
+        <div className="date-selector">
+          <Calendar size={14} />
+          <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
         </div>
       </div>
 
-      <div className="summary-grid">
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Total Sessions</p>
-            <h3 className="summary-value">{summary.sessions.toLocaleString()}</h3>
-            <p className="summary-subtext">Across all sources</p>
+      <div className="shopify-grid">
+        {/* Summary Cards */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Total Sessions</h3>
           </div>
-          <div className="summary-icon blue"><Users size={24} /></div>
+          <div className="card-value-container">
+            <span className="card-value">{summary.sessions.toLocaleString()}</span>
+          </div>
+          <p className="card-subtext">Visitor sessions in period</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Mobile Traffic</p>
-            <h3 className="summary-value">
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Mobile Traffic</h3>
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">
               {charts.devices.find(d => d.name === 'mobile')?.value || 0}%
-            </h3>
-            <p className="summary-subtext">Percentage of users</p>
+            </span>
           </div>
-          <div className="summary-icon purple"><Monitor size={24} /></div>
+          <p className="card-subtext">Percentage of mobile users</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Direct Traffic</p>
-            <h3 className="summary-value">
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Direct Traffic</h3>
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">
               {charts.referrers.find(r => r.name === 'Direct')?.value || 0}%
-            </h3>
-            <p className="summary-subtext">Users via URL</p>
+            </span>
           </div>
-          <div className="summary-icon green"><Globe size={24} /></div>
+          <p className="card-subtext">Users visiting via URL</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Top Landing Page</p>
-            <h3 className="summary-value text-sm truncate max-w-[150px]">
-              {charts.landing_pages[0]?.name || "N/A"}
-            </h3>
-            <p className="summary-subtext">Most frequent entry</p>
+        {/* Sessions Over Time */}
+        <div className="shopify-card span-3">
+          <div className="card-header">
+            <h3 className="card-title">Sessions Over Time</h3>
           </div>
-          <div className="summary-icon amber"><PieChartIcon size={24} /></div>
-        </div>
-      </div>
-
-      <div className="charts-grid">
-        <div className="chart-card span-3">
-          <h3 className="chart-title">Sessions Over Time</h3>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height={300}>
+          <div style={{ height: 300, marginTop: 20 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={charts.sessions_over_time}>
                 <defs>
                   <linearGradient id="colorSessions" x1="0" y1="0" x2="0" y2="1">
@@ -142,36 +134,49 @@ export default function TrafficAnalytics() {
                     <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="date" tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f2f3" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  tick={{ fontSize: 12, fill: '#6d7175' }}
+                  axisLine={{ stroke: '#e1e3e5' }}
+                />
+                <YAxis 
+                  tick={{ fontSize: 12, fill: '#6d7175' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e1e3e5', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   formatter={(value: any) => [value, "Sessions"]}
                   labelFormatter={(label) => new Date(label).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 />
-                <Area type="monotone" dataKey="value" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorSessions)" strokeWidth={3} />
+                <Area type="monotone" dataKey="value" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorSessions)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="chart-card span-2">
-          <h3 className="chart-title">Landing Page Performance</h3>
-          <div className="activity-table-container">
+        {/* Landing Pages */}
+        <div className="shopify-card span-2">
+          <div className="card-header">
+            <h3 className="card-title">Landing Page Performance</h3>
+          </div>
+          <div className="activity-table-container" style={{ marginTop: 10 }}>
             <table className="activity-table">
               <thead>
                 <tr>
-                  <th>Landing Page</th>
-                  <th>Sessions</th>
-                  <th>Conv. Rate</th>
+                  <th style={{ textAlign: 'left' }}>Landing Page</th>
+                  <th style={{ textAlign: 'center' }}>Sessions</th>
+                  <th style={{ textAlign: 'center' }}>Conv. Rate</th>
                 </tr>
               </thead>
               <tbody>
                 {charts.landing_pages.map((page, idx) => (
                   <tr key={idx}>
-                    <td className="truncate max-w-[200px]" title={page.name}>{page.name}</td>
-                    <td>{page.sessions}</td>
-                    <td>
+                    <td className="truncate" style={{ maxWidth: '300px', fontWeight: 500 }} title={page.name}>{page.name}</td>
+                    <td style={{ textAlign: 'center' }}>{page.sessions.toLocaleString()}</td>
+                    <td style={{ textAlign: 'center' }}>
                       <span className={`px-2 py-1 rounded text-xs font-bold ${parseFloat(page.conversion_rate) > 2 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
                         {parseFloat(page.conversion_rate).toFixed(2)}%
                       </span>
@@ -183,49 +188,26 @@ export default function TrafficAnalytics() {
           </div>
         </div>
 
-        <div className="chart-card">
-          <h3 className="chart-title">Device & Source Breakdown</h3>
-          <div className="chart-container flex flex-col gap-8">
-            <div style={{ height: '200px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={charts.devices}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={40}
-                    outerRadius={60}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {charts.devices.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div style={{ height: '200px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={charts.referrers}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={60}
-                    dataKey="value"
-                  >
-                    {charts.referrers.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+        {/* Device Breakdown */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Traffic Source Breakdown</h3>
+          </div>
+          <div style={{ height: 250, marginTop: 10 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={charts.referrers}
+                  cx="50%" cy="50%" outerRadius={70} dataKey="value"
+                >
+                  {charts.referrers.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" align="center" />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

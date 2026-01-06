@@ -67,74 +67,65 @@ export default function CustomerAnalytics() {
           <h1 className="analytics-title">Customer Analytics & Leads</h1>
           <p className="analytics-subtitle">Track your active users and their locations</p>
         </div>
-        <div className="analytics-actions">
-          <div className="date-selector">
-            <Calendar size={16} />
-            <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
-              <option value={7}>Last 7 days</option>
-              <option value={30}>Last 30 days</option>
-              <option value={90}>Last 90 days</option>
-            </select>
-          </div>
+        <div className="date-selector">
+          <Calendar size={14} />
+          <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
         </div>
       </div>
 
-      <div className="summary-grid">
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Total Leads</p>
-            <h3 className="summary-value">{data.recent_activity.length}</h3>
-            <p className="summary-subtext">Recent active users</p>
+      <div className="shopify-grid">
+        {/* Summary Cards */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Total Active Leads</h3>
           </div>
-          <div className="summary-icon blue"><Users size={24} /></div>
+          <div className="card-value-container">
+            <span className="card-value">{data.recent_activity.length}</span>
+          </div>
+          <p className="card-subtext">Recent unique sessions</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Logged In Users</p>
-            <h3 className="summary-value">
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Registered Users</h3>
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">
               {data.recent_activity.filter(a => a.first_name).length}
-            </h3>
-            <p className="summary-subtext">Registered accounts</p>
+            </span>
           </div>
-          <div className="summary-icon purple"><UserCheck size={24} /></div>
+          <p className="card-subtext">Logged in accounts</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Guest Leads</p>
-            <h3 className="summary-value">
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Guest Leads Captured</h3>
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">
               {data.recent_activity.filter(a => !a.first_name && (a.guest_email || a.guest_phone)).length}
-            </h3>
-            <p className="summary-subtext">Captured guest info</p>
+            </span>
           </div>
-          <div className="summary-icon amber"><UserX size={24} /></div>
+          <p className="card-subtext">With contact information</p>
         </div>
 
-        <div className="summary-card">
-          <div className="summary-card-info">
-            <p className="summary-label">Top Location</p>
-            <h3 className="summary-value text-sm truncate max-w-[150px]">
-              {data.charts.detailed_locations[0]?.city || "N/A"}
-            </h3>
-            <p className="summary-subtext">{data.charts.detailed_locations[0]?.sessions || 0} sessions</p>
+        {/* Lead Table */}
+        <div className="shopify-card span-2">
+          <div className="card-header">
+            <h3 className="card-title">Recent Active Users (Leads)</h3>
           </div>
-          <div className="summary-icon green"><MapPin size={24} /></div>
-        </div>
-      </div>
-
-      <div className="charts-grid">
-        <div className="chart-card span-2">
-          <h3 className="chart-title">Recent Active Users (Leads)</h3>
-          <div className="activity-table-container">
+          <div className="activity-table-container" style={{ marginTop: 10 }}>
             <table className="activity-table">
               <thead>
                 <tr>
-                  <th>User / Guest</th>
-                  <th>Contact Info</th>
-                  <th>Last Action</th>
-                  <th>Cart/Purchase</th>
-                  <th>Time</th>
+                  <th style={{ textAlign: 'left' }}>User / Guest</th>
+                  <th style={{ textAlign: 'left' }}>Contact Details</th>
+                  <th style={{ textAlign: 'center' }}>Last Action</th>
+                  <th style={{ textAlign: 'right' }}>Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -142,7 +133,7 @@ export default function CustomerAnalytics() {
                   <tr key={idx}>
                     <td>
                       <div className="user-name-cell">
-                        {activity.first_name ? `${activity.first_name} ${activity.last_name}` : activity.guest_name || "Anonymous"}
+                        <span style={{ fontWeight: 600 }}>{activity.first_name ? `${activity.first_name} ${activity.last_name}` : activity.guest_name || "Anonymous"}</span>
                         {activity.first_name ? 
                           <span className="user-badge">User</span> : 
                           (activity.guest_name ? <span className="guest-badge">Guest</span> : null)
@@ -155,18 +146,14 @@ export default function CustomerAnalytics() {
                         <span className="flex items-center gap-1 text-xs"><Phone size={10} /> {activity.user_phone || activity.guest_phone || "N/A"}</span>
                       </div>
                     </td>
-                    <td>
+                    <td style={{ textAlign: 'center' }}>
                       <span className={`event-badge ${activity.last_event}`}>
                         {activity.last_event.replace('_', ' ')}
                       </span>
                     </td>
-                    <td>
-                      <div className="flex gap-2">
-                        <span className="text-xs">🛒 {activity.cart_adds}</span>
-                        <span className="text-xs">💰 {activity.purchases > 0 ? "Yes" : "No"}</span>
-                      </div>
+                    <td style={{ textAlign: 'right', fontSize: '12px', color: '#64748b' }}>
+                      {new Date(activity.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </td>
-                    <td className="text-xs">{new Date(activity.created_at).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -174,10 +161,13 @@ export default function CustomerAnalytics() {
           </div>
         </div>
 
-        <div className="chart-card">
-          <h3 className="chart-title">Top Locations Breakdown</h3>
-          <div className="locations-list">
-            {data.charts.detailed_locations.map((loc, idx) => (
+        {/* Top Locations */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Top Locations (Cities)</h3>
+          </div>
+          <div className="locations-list" style={{ marginTop: 10 }}>
+            {data.charts.detailed_locations.slice(0, 10).map((loc, idx) => (
               <div key={idx} className="location-item">
                 <div className="location-info">
                   <MapPin size={16} className="text-slate-400" />
@@ -186,7 +176,7 @@ export default function CustomerAnalytics() {
                     <span className="text-xs text-slate-500">{loc.state}, {loc.country}</span>
                   </div>
                 </div>
-                <span className="location-value font-bold">{loc.sessions} <span className="text-xs font-normal">sessions</span></span>
+                <span className="location-value font-bold">{loc.sessions}</span>
               </div>
             ))}
           </div>

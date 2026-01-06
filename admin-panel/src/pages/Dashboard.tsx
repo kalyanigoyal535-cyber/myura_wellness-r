@@ -8,16 +8,20 @@ import {
   TrendingUp,
   TrendingDown,
   AlertCircle,
+  Calendar,
+  MoreHorizontal
 } from "lucide-react";
 import { DashboardStats } from "../types";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
 import "../styles/Dashboard.css";
-
-interface StatCard {
-  title: string;
-  value: string | number;
-  icon: React.ComponentType<any>;
-  iconClass: "blue" | "purple" | "green" | "amber";
-}
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -41,178 +45,128 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="dashboard-loading">
-        <div className="loading-spinner"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-message">
-        <AlertCircle className="error-icon" size={20} />
-        <p className="error-text">{error}</p>
-      </div>
-    );
-  }
-
+  if (loading) return <div className="dashboard-loading"><div className="loading-spinner"></div></div>;
+  if (error) return <div className="error-message"><AlertCircle size={20} /><p>{error}</p></div>;
   if (!stats) return null;
 
   const { overview, monthly, recent_orders, pending_contacts } = stats;
 
-  const statCards: StatCard[] = [
-    {
-      title: "Total Users",
-      value: overview.total_users,
-      icon: Users,
-      iconClass: "blue",
-    },
-    {
-      title: "Total Products",
-      value: overview.total_products,
-      icon: Package,
-      iconClass: "purple",
-    },
-    {
-      title: "Total Orders",
-      value: overview.total_orders,
-      icon: ShoppingCart,
-      iconClass: "green",
-    },
-    {
-      title: "Total Revenue",
-      value: `₹${overview.total_revenue.toLocaleString("en-IN")}`,
-      icon: DollarSign,
-      iconClass: "amber",
-    },
-  ];
-
   return (
     <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Dashboard</h1>
-        <p className="dashboard-subtitle">
-          Welcome to Myura Wellness Admin Panel
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">Welcome back! Here's what's happening today.</p>
+        </div>
+        <div className="date-selector">
+          <Calendar size={14} />
+          <span>Last 30 days</span>
+        </div>
       </div>
 
-      <div className="stats-grid">
-        {statCards.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div key={index} className="stat-card">
-              <div className="stat-card-header">
+      <div className="shopify-grid">
+        {/* Row 1: Key Metrics */}
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Total Revenue</h3>
+            <DollarSign size={14} className="text-slate-400" />
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">₹{overview.total_revenue.toLocaleString("en-IN")}</span>
+            {monthly.revenue_growth > 0 && (
+              <span className="growth-indicator positive"><TrendingUp size={12} /> {((monthly.revenue_growth / (monthly.revenue - monthly.revenue_growth)) * 100).toFixed(0)}%</span>
+            )}
+          </div>
+          <p className="card-subtext">Total earnings from all orders</p>
+        </div>
+
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Total Orders</h3>
+            <ShoppingCart size={14} className="text-slate-400" />
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">{overview.total_orders}</span>
+            {monthly.orders_growth > 0 && (
+              <span className="growth-indicator positive"><TrendingUp size={12} /> {((monthly.orders_growth / (monthly.orders - monthly.orders_growth)) * 100).toFixed(0)}%</span>
+            )}
+          </div>
+          <p className="card-subtext">Cumulative order count</p>
+        </div>
+
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Total Customers</h3>
+            <Users size={14} className="text-slate-400" />
+          </div>
+          <div className="card-value-container">
+            <span className="card-value">{overview.total_users}</span>
+          </div>
+          <p className="card-subtext">Registered user accounts</p>
+        </div>
+
+        {/* Row 2: Recent Activity & Alerts */}
+        <div className="shopify-card span-2">
+          <div className="card-header">
+            <h3 className="card-title">Recent Orders</h3>
+            <button className="text-xs text-blue-600 font-medium">View all</button>
+          </div>
+          <div className="activity-table-container">
+            <table className="activity-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'right' }}>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recent_orders.slice(0, 5).map((order) => (
+                  <tr key={order.order_id}>
+                    <td className="font-semibold">{order.order_number}</td>
+                    <td>{order.customer_name || "Guest"}</td>
+                    <td>₹{Number(order.total_amount).toLocaleString("en-IN")}</td>
+                    <td>
+                      <span className={`order-status ${order.order_status}`}>
+                        {order.order_status}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right', fontSize: '12px', color: '#6d7175' }}>
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Pending Alerts</h3>
+          </div>
+          <div className="alerts-list">
+            {pending_contacts > 0 ? (
+              <div className="alert-item-box warning">
+                <AlertCircle size={20} />
                 <div>
-                  <p className="stat-card-title">{stat.title}</p>
-                  <p className="stat-card-value">{stat.value}</p>
-                </div>
-                <div className={`stat-card-icon ${stat.iconClass}`}>
-                  <Icon size={24} />
+                  <p className="alert-box-title">{pending_contacts} New Contacts</p>
+                  <p className="alert-box-msg">Review unread messages from customers.</p>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="monthly-stats-grid">
-        <div className="monthly-stat-card">
-          <h2 className="monthly-stat-title">Monthly Orders</h2>
-          <div className="monthly-stat-content">
-            <div>
-              <p className="monthly-stat-value">{monthly.orders}</p>
-              <p className="monthly-stat-label">This month</p>
-            </div>
-            {monthly.orders_growth !== 0 && (
-              <div
-                className={`monthly-stat-growth ${
-                  monthly.orders_growth > 0 ? "positive" : "negative"
-                }`}
-              >
-                {monthly.orders_growth > 0 ? (
-                  <TrendingUp size={20} />
-                ) : (
-                  <TrendingDown size={20} />
-                )}
-                <span>{Math.abs(monthly.orders_growth)}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="monthly-stat-card">
-          <h2 className="monthly-stat-title">Monthly Revenue</h2>
-          <div className="monthly-stat-content">
-            <div>
-              <p className="monthly-stat-value">
-                ₹{monthly.revenue.toLocaleString("en-IN")}
-              </p>
-              <p className="monthly-stat-label">This month</p>
-            </div>
-            {monthly.revenue_growth !== 0 && (
-              <div
-                className={`monthly-stat-growth ${
-                  monthly.revenue_growth > 0 ? "positive" : "negative"
-                }`}
-              >
-                {monthly.revenue_growth > 0 ? (
-                  <TrendingUp size={20} />
-                ) : (
-                  <TrendingDown size={20} />
-                )}
-                <span>
-                  ₹{Math.abs(monthly.revenue_growth).toLocaleString("en-IN")}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="dashboard-content-grid">
-        <div className="dashboard-section">
-          <h2 className="section-title">Recent Orders</h2>
-          <div className="recent-orders-list">
-            {recent_orders && recent_orders.length > 0 ? (
-              recent_orders.slice(0, 5).map((order) => (
-                <div key={order.order_id} className="order-item">
-                  <div className="order-info">
-                    <p className="order-number">{order.order_number}</p>
-                    <p className="order-amount">
-                      ₹{Number(order.total_amount).toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                  <span className={`order-status ${order.order_status}`}>
-                    {order.order_status}
-                  </span>
-                </div>
-              ))
             ) : (
-              <div className="empty-state">No recent orders</div>
+              <p className="empty-text">No pending alerts</p>
             )}
-          </div>
-        </div>
-
-        <div className="dashboard-section">
-          <h2 className="section-title">Alerts</h2>
-          <div className="recent-orders-list">
-            {pending_contacts > 0 && (
-              <div className="alert-item">
-                <AlertCircle className="alert-icon" size={20} />
-                <div className="alert-content">
-                  <p className="alert-title">
-                    {pending_contacts} unread contact submission
-                    {pending_contacts > 1 ? "s" : ""}
-                  </p>
-                  <p className="alert-message">Review in Contacts section</p>
-                </div>
+            
+            <div className="alert-item-box info">
+              <Package size={20} />
+              <div>
+                <p className="alert-box-title">{overview.total_products} Products</p>
+                <p className="alert-box-msg">Your inventory is healthy.</p>
               </div>
-            )}
-            {pending_contacts === 0 && (
-              <div className="empty-state">No pending alerts</div>
-            )}
+            </div>
           </div>
         </div>
       </div>

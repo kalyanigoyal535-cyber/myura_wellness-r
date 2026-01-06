@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import {
   Calendar,
@@ -54,6 +55,7 @@ interface AnalyticsData {
 const COLORS = ["#00a0dc", "#8b5cf6", "#f43f5e", "#fbbf24", "#10b981"];
 
 export default function Analytics() {
+  const navigate = useNavigate();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -119,7 +121,7 @@ export default function Analytics() {
 
       <div className="shopify-grid">
         {/* Row 1: Sales Channel, AOV, Total Sales by Product */}
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
           <div className="card-header">
             <h3 className="card-title">Total sales by sales channel</h3>
             <Info size={14} className="text-slate-400" />
@@ -144,7 +146,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
           <div className="card-header">
             <h3 className="card-title">Average order value over time</h3>
           </div>
@@ -165,7 +167,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
           <div className="card-header">
             <h3 className="card-title">Total sales by product</h3>
             <MoreHorizontal size={14} />
@@ -184,7 +186,7 @@ export default function Analytics() {
         </div>
 
         {/* Row 2: Sessions over time, Conversion rate over time, Conversion rate breakdown */}
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
             <h3 className="card-title">Sessions over time</h3>
           </div>
@@ -205,7 +207,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/conversion')}>
           <div className="card-header">
             <h3 className="card-title">Conversion rate over time</h3>
           </div>
@@ -226,7 +228,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/conversion')}>
           <div className="card-header">
             <h3 className="card-title">Conversion rate breakdown</h3>
           </div>
@@ -249,7 +251,7 @@ export default function Analytics() {
         </div>
 
         {/* Row 3: Sessions by device, Sessions by location, Total sales by social referrer */}
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
             <h3 className="card-title">Sessions by device type</h3>
           </div>
@@ -275,7 +277,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/customers')}>
           <div className="card-header">
             <h3 className="card-title">Sessions by location</h3>
           </div>
@@ -292,7 +294,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
             <h3 className="card-title">Total sales by social referrer</h3>
           </div>
@@ -310,7 +312,7 @@ export default function Analytics() {
         </div>
 
         {/* Row 4: Sessions by landing page, Sessions by social referrer, Products by sell-through rate */}
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
             <h3 className="card-title">Sessions by landing page</h3>
           </div>
@@ -327,7 +329,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
             <h3 className="card-title">Sessions by social referrer</h3>
           </div>
@@ -343,7 +345,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        <div className="shopify-card">
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
           <div className="card-header">
             <h3 className="card-title">Products by sell-through rate</h3>
           </div>
