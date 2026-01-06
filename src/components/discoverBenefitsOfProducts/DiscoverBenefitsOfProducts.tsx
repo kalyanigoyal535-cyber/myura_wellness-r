@@ -49,7 +49,7 @@ const DiscoverBenefitsOfProducts = (props: Props) => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="flex flex-col items-start gap-2 rounded-2xl border border-slate-100 bg-white/80 p-3 shadow-sm">
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-500">
                   <ShieldCheck className="h-5 w-5" />
                 </div>
                 <p className="text-xs font-display text-slate-900 uppercase tracking-[0.2em]">
@@ -60,7 +60,7 @@ const DiscoverBenefitsOfProducts = (props: Props) => {
                 </p>
               </div>
               <div className="flex flex-col items-start gap-2 rounded-2xl border border-slate-100 bg-white/80 p-3 shadow-sm">
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-500">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-500">
                   <Award className="h-5 w-5" />
                 </div>
                 <p className="text-xs font-display text-slate-900 uppercase tracking-[0.2em]">
