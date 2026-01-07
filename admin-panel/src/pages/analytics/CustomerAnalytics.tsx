@@ -29,6 +29,7 @@ interface RecentActivity {
 interface AnalyticsData {
   charts: {
     detailed_locations: any[];
+    india_regions: any[];
   };
   recent_activity: RecentActivity[];
 }
@@ -179,6 +180,26 @@ export default function CustomerAnalytics() {
                 <span className="location-value font-bold">{loc.sessions}</span>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="shopify-card">
+          <div className="card-header">
+            <h3 className="card-title">Top Regions (India)</h3>
+          </div>
+          <div className="locations-list" style={{ marginTop: 10 }}>
+            {data.charts.india_regions.map((region, idx) => (
+              <div key={idx} className="location-item">
+                <div className="location-info">
+                  <MapPin size={16} className="text-slate-400" />
+                  <span className="text-sm font-semibold">{region.name}</span>
+                </div>
+                <span className="location-value font-bold">{region.value} sessions</span>
+              </div>
+            ))}
+            {data.charts.india_regions.length === 0 && (
+              <p className="empty-text">No data for India regions yet.</p>
+            )}
           </div>
         </div>
       </div>

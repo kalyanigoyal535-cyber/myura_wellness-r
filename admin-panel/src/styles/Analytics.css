@@ -1,57 +1,52 @@
 :root {
-  --shopify-blue: #008060;
-  --shopify-blue-light: #f4f6f8;
-  --shopify-text: #202223;
-  --shopify-subtext: #6d7175;
-  --shopify-border: #e1e3e5;
-  --shopify-surface: #ffffff;
-  --shopify-bg: #f6f6f7;
-  --shopify-success: #008060;
-  --shopify-danger: #d72c0d;
-  --shopify-warning: #ffb900;
-  --shopify-primary: #3b82f6; /* Use standard blue for primary charts as per image */
-  --chart-blue: #00a0dc;
-  --chart-purple: #8b5cf6;
-  --chart-green: #10b981;
-  --chart-amber: #f59e0b;
+  --analytics-bg: #f9fafb;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --accent: #3b82f6;
 }
 
 .analytics-container {
-  padding: 2rem;
-  background-color: var(--shopify-bg);
+  padding: 24px;
+  background-color: var(--analytics-bg);
   min-height: 100vh;
-  color: var(--shopify-text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .analytics-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--shopify-border);
+  margin-bottom: 32px;
 }
 
 .analytics-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--shopify-text);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
   margin: 0;
+}
+
+.analytics-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
 .date-selector {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   background: white;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--shopify-border);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 0.875rem;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
 .date-selector select {
@@ -59,68 +54,58 @@
   background: transparent;
   outline: none;
   font-weight: 600;
-  color: var(--shopify-text);
+  color: var(--text-main);
   cursor: pointer;
 }
 
 .shopify-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 24px;
 }
 
 .shopify-card {
-  background: var(--shopify-surface);
-  border-radius: 0.75rem;
-  border: 1px solid var(--shopify-border);
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  background: var(--card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .shopify-card.clickable {
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .shopify-card.clickable:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-color: var(--shopify-primary);
-}
-
-.shopify-card.span-2 { grid-column: span 2; }
-.shopify-card.span-3 { grid-column: span 3; }
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .card-title {
-  font-size: 0.875rem;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--shopify-text);
-  margin: 0;
-  border-bottom: 1px dotted var(--shopify-subtext);
-  padding-bottom: 2px;
-  display: inline-block;
-}
-
-.card-value-container {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 16px 0;
+  border: none;
+  padding: 0;
 }
 
 .card-value {
-  font-size: 1.25rem;
+  font-size: 24px;
   font-weight: 700;
-  color: var(--shopify-text);
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+}
+
+.card-subtext {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
 }
 
 .growth-indicator {

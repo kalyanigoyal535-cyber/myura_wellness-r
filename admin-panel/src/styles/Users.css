@@ -13,9 +13,9 @@
 .users-table-container {
   background: white;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .users-table {
@@ -27,17 +27,19 @@
   background: #f9fafb;
   padding: 12px 16px;
   text-align: left;
-  font-size: 12px;
-  font-weight: 600;
-  color: #6d7175;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border);
 }
 
 .users-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #f1f2f3;
-  font-size: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px;
+  color: var(--text-primary);
   vertical-align: middle;
 }
 
@@ -48,40 +50,43 @@
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: var(--bg-tertiary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  color: var(--primary);
-  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 10px;
+  border: 1px solid var(--border);
 }
 
 .user-name {
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
+  font-size: 13px;
 }
 
 .user-username {
-  font-size: 12px;
-  color: #6d7175;
+  font-size: 11px;
+  color: var(--text-tertiary);
   margin: 0;
 }
 
 .role-badge {
   padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .role-badge.superuser { background: #fee2e2; color: #991b1b; }
-.role-badge.staff { background: #eff6ff; color: #1e40af; }
-.role-badge.user { background: #f1f5f9; color: #475569; }
+.role-badge.staff { background: #e0f2fe; color: #0369a1; }
+.role-badge.user { background: var(--bg-tertiary); color: var(--text-secondary); }
 
 .empty-state {
   text-align: center;
@@ -95,4 +100,5 @@
 
 .empty-state-text {
   color: var(--text-secondary);
+  font-size: 14px;
 }

@@ -43,6 +43,7 @@ interface AnalyticsData {
     devices: { name: string; value: number }[];
     locations: { name: string; value: number }[];
     detailed_locations: any[];
+    india_regions: any[];
     referrers: { name: string; value: number }[];
     landing_pages: any[];
     top_products: any[];
@@ -291,6 +292,23 @@ export default function Analytics() {
                 max={Math.max(...charts.locations.map(x => x.value))} 
               />
             ))}
+          </div>
+        </div>
+
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/customers')}>
+          <div className="card-header">
+            <h3 className="card-title">Top Regions (India)</h3>
+          </div>
+          <div className="shopify-bar-list scroll-container">
+            {charts.india_regions.map((region, i) => (
+              <ShopifyBarRow 
+                key={i} 
+                label={region.name} 
+                value={region.value.toLocaleString()} 
+                max={Math.max(...charts.india_regions.map(x => x.value), 1)} 
+              />
+            ))}
+            {charts.india_regions.length === 0 && <p className="empty-text">No data for India regions yet</p>}
           </div>
         </div>
 

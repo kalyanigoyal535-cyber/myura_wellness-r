@@ -21,15 +21,15 @@
   background: white;
   border: 1px solid var(--border);
   padding: 0 12px;
-  border-radius: 8px;
-  height: 40px;
+  border-radius: 6px;
+  height: 36px;
 }
 
 .filter-select {
   border: none;
   background: transparent;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
   outline: none;
@@ -38,9 +38,9 @@
 .orders-table-container {
   background: white;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .orders-table {
@@ -52,68 +52,70 @@
   background: #f9fafb;
   padding: 12px 16px;
   text-align: left;
-  font-size: 12px;
-  font-weight: 600;
-  color: #6d7175;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border);
 }
 
 .orders-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #f1f2f3;
-  font-size: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 13px;
+  color: var(--text-primary);
   vertical-align: middle;
 }
 
 .order-number {
-  font-weight: 600;
-  color: var(--primary);
+  font-weight: 700;
+  color: var(--accent);
   text-decoration: none;
 }
 
 .status-badge {
   padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: capitalize;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.status-badge.pending { background: #fffbeb; color: #92400e; }
-.status-badge.processing { background: #eff6ff; color: #1e40af; }
-.status-badge.shipped { background: #ecfdf5; color: #065f46; }
-.status-badge.delivered { background: #f0fdf4; color: #166534; }
-.status-badge.cancelled { background: #fef2f2; color: #991b1b; }
+.status-badge.pending { background: #fef3c7; color: #92400e; }
+.status-badge.processing { background: #e0f2fe; color: #0369a1; }
+.status-badge.shipped { background: #dcfce7; color: #166534; }
+.status-badge.delivered { background: #dcfce7; color: #166534; }
+.status-badge.cancelled { background: #fee2e2; color: #991b1b; }
 
 .payment-status-badge {
   padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: capitalize;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.payment-status-badge.paid { background: #ecfdf5; color: #065f46; }
-.payment-status-badge.unpaid { background: #fef2f2; color: #991b1b; }
-.payment-status-badge.refunded { background: #f1f5f9; color: #475569; }
+.payment-status-badge.paid { background: #dcfce7; color: #166534; }
+.payment-status-badge.unpaid { background: #fee2e2; color: #991b1b; }
+.payment-status-badge.refunded { background: var(--bg-tertiary); color: var(--text-secondary); }
 
 .view-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: #f8fafc;
+  background: white;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 4px;
   color: var(--text-primary);
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   transition: all 0.2s;
 }
 
 .view-btn:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--bg-secondary);
+  border-color: var(--text-tertiary);
 }

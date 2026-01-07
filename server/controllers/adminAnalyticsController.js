@@ -150,6 +150,18 @@ export const getDashboardAnalytics = async (req, res) => {
       LIMIT 20
     `, [startDateStr]);
 
+    // 7d. India Regions Breakdown
+    const [indiaRegions] = await pool.execute(`
+      SELECT 
+        location_state as name, 
+        COUNT(*) as value
+      FROM analytics_sessions
+      WHERE created_at >= ? AND location_country = 'India' AND location_state IS NOT NULL
+      GROUP BY location_state
+      ORDER BY value DESC
+      LIMIT 10
+    `, [startDateStr]);
+
     // 7c. Conversion & Sessions Over Time
     const [trendOverTime] = await pool.execute(`
       SELECT 
@@ -240,6 +252,7 @@ export const getDashboardAnalytics = async (req, res) => {
         devices: deviceBreakdown,
         locations: locationBreakdown,
         detailed_locations: locationStats,
+        india_regions: indiaRegions,
         referrers: referrerBreakdown,
         landing_pages: landingPageBreakdown,
         top_products: productSales.map(p => ({

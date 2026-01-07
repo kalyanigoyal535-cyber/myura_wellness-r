@@ -12,48 +12,49 @@
 }
 
 .back-btn {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: white;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-secondary);
+  border-radius: 6px;
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .back-btn:hover {
-  background: #f1f2f3;
+  background: var(--bg-secondary);
   color: var(--text-primary);
 }
 
 .product-form-title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .product-form-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin: 0;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
 }
 
 .product-form-card {
   background: white;
-  padding: 24px;
-  border-radius: 8px;
+  padding: 32px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 24px;
 }
 
@@ -63,9 +64,11 @@
 
 .form-label {
   display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 8px;
 }
 
@@ -79,34 +82,36 @@
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-primary);
-  background: #fdfdfd;
+  background: white;
+  transition: all 0.2s;
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--primary);
-  background: white;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .checkbox-group {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 32px;
+  margin-top: 10px;
 }
 
 .checkbox-input {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
+  accent-color: var(--accent);
 }
 
 .checkbox-label {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  color: var(--text-secondary);
 }
 
 .form-actions {
@@ -115,7 +120,7 @@
   gap: 12px;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid #f1f2f3;
+  border-top: 1px solid var(--border-light);
 }
 
 .save-btn {
@@ -123,14 +128,15 @@
   color: white;
   padding: 10px 20px;
   border-radius: 6px;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 13px;
 }
 
 .save-btn:hover:not(:disabled) {
-  background: var(--primary-dark);
+  opacity: 0.9;
 }
 
 .cancel-btn {
@@ -139,11 +145,12 @@
   border: 1px solid var(--border);
   padding: 10px 20px;
   border-radius: 6px;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 .cancel-btn:hover {
-  background: #f8fafc;
+  background: var(--bg-secondary);
 }
 
 @media (max-width: 640px) {
