@@ -9,6 +9,7 @@ import {
   requestPasswordReset,
   confirmPasswordReset,
   logout,
+  googleLogin,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -68,6 +69,9 @@ router.post(
 
 // Logout
 router.post("/logout/", authenticate, logout);
+
+// Google login
+router.post("/google-login/", googleLogin);
 
 export default router;
 

@@ -8,6 +8,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { LogOut, User } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
+import GoogleButton from 'react-google-button';
+import { useGoogleLogin } from '@react-oauth/google';
 
 interface LoginValues {
   email: string;
@@ -15,13 +17,34 @@ interface LoginValues {
 }
 
 const Login = () => {
-  const { login, logout, user, isAuthenticated } = useAuth();
+  const { login, logout, user, isAuthenticated, googleLogin } = useAuth();
   const { syncCart, clear } = useCart();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const googleLoginHandler = useGoogleLogin({
+    onSuccess: async (tokenResponse: any) => {
+      try {
+        await googleLogin(tokenResponse.credential);
+        // Merge guest cart with user cart after Google login
+        await syncCart();
+        // Redirect to home
+        navigate("/");
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Google login failed. Please try again."
+        );
+      }
+    },
+    onError: () => {
+      setError("Google login failed. Please try again.");
+    },
+  });
 
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
@@ -225,6 +248,17 @@ const Login = () => {
                       component="p"
                       className="text-red-500 text-sm"
                     />
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <div className="w-full md:w-6/12 my-4">
+                      <button type="button" onClick={() => googleLoginHandler()} className="w-full">
+                        <GoogleButton
+                          label="Login with Google"
+                        />
+                      </button>
+                    </div>
+                    <span className="text-gray-500 my-2">OR</span>
                   </div>
 
                   {/* Button */}

@@ -7,6 +7,8 @@ import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { Eye, EyeOff } from "lucide-react";
+import GoogleButton from 'react-google-button';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 interface SignupValues {
   firstName: string;
@@ -18,11 +20,32 @@ interface SignupValues {
 }
 
 const Signup = () => {
-  const { register } = useAuth();
+  const { register, googleLogin } = useAuth();
   const { syncCart } = useCart();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const googleLoginHandler = useGoogleLogin({
+    onSuccess: async (tokenResponse: any) => {
+      try {
+        await googleLogin(tokenResponse.credential);
+        // Merge guest cart with user cart after Google login
+        await syncCart();
+        // Redirect to home
+        navigate("/");
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Google login failed. Please try again."
+        );
+      }
+    },
+    onError: () => {
+      setError("Google login failed. Please try again.");
+    },
+  });
 
   const validationSchema = Yup.object({
     firstName: Yup.string().min(2, "At least 2 chars").required("Required"),
@@ -36,7 +59,7 @@ const Signup = () => {
   });
 
   const handleSubmit = async (values: SignupValues,
-    helpers: FormikHelpers<SignupValues>  ) : Promise<void> => {
+    helpers: FormikHelpers<SignupValues>): Promise<void> => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -236,6 +259,17 @@ const Signup = () => {
                   component="p"
                   className="text-red-500 text-sm"
                 />
+              </div>
+
+              <div className="flex flex-col items-center">
+                <div className="w-full md:w-6/12 my-4">
+                  <button type="button" onClick={() => googleLoginHandler()} className="w-full">
+                    <GoogleButton
+                      label="Sign up with Google"
+                    />
+                  </button>
+                </div>
+                <span className="text-gray-500 my-2">OR</span>
               </div>
 
               <Button

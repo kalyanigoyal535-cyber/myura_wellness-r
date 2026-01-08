@@ -33,6 +33,10 @@ export interface PasswordResetConfirm {
   new_password2: string;
 }
 
+export interface GoogleLoginData {
+  credential: string;
+}
+
 export const authApi = {
   register: async (data: RegisterData): Promise<AuthResponse> => {
     try {
@@ -54,7 +58,7 @@ export const authApi = {
     try {
       const response = await apiClient.post<any>('/user/login/', credentials);
       const data = response.data;
-      
+
       let accessToken: string | null = null;
       let refreshToken: string | null = null;
       let userData: User | null = null;
@@ -75,7 +79,7 @@ export const authApi = {
       if (refreshToken) {
         localStorage.setItem('refresh_token', refreshToken);
       }
-      
+
       if (userData) {
         localStorage.setItem('user', JSON.stringify(userData));
       }
@@ -171,6 +175,22 @@ export const authApi = {
         new_password: data.new_password,
         new_password2: data.new_password2,
       });
+      return response.data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
+  },
+
+  googleLogin: async (data: GoogleLoginData): Promise<AuthResponse> => {
+    try {
+      const response = await apiClient.post<AuthResponse>('/user/google-login/', data);
+      if (response.data.tokens) {
+        localStorage.setItem('access_token', response.data.tokens.access);
+        localStorage.setItem('refresh_token', response.data.tokens.refresh);
+      }
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
       return response.data;
     } catch (error) {
       throw new Error(getErrorMessage(error));

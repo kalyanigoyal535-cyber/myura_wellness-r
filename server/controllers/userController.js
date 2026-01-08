@@ -7,6 +7,7 @@ import { getImageUrl } from "../utils/imageUrl.js";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "../utils/email.js";
 import { createNotification } from "./notificationController.js";
+import { OAuth2Client } from "google-auth-library";
 
 // Register user
 export const register = async (req, res) => {
@@ -340,9 +341,8 @@ export const requestPasswordReset = async (req, res) => {
     }
 
     // Generate reset link
-    const resetLink = `${
-      process.env.FRONTEND_URL || "http://localhost:3000"
-    }/reset-password/${user.id}/${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"
+      }/reset-password/${user.id}/${resetToken}`;
 
     // Send password reset email
     const emailSent = await sendPasswordResetEmail(
@@ -459,4 +459,138 @@ export const confirmPasswordReset = async (req, res) => {
 // Logout
 export const logout = async (req, res) => {
   return sendSuccess(res, {}, "Logged out successfully");
+};
+
+// Google OAuth login
+export const googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return sendBadRequest(res, "Google credential is required");
+    }
+
+    // Verify Google token
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const googleId = payload['sub'];
+    const email = payload['email'];
+    const firstName = payload['given_name'] || '';
+    const lastName = payload['family_name'] || '';
+    const picture = payload['picture'];
+
+    // Check if user already exists with this Google ID in social_logins
+    let [existingSocialLogins] = await pool.execute(
+      "SELECT user_id FROM social_logins WHERE provider = 'google' AND provider_id = ?",
+      [googleId]
+    );
+
+    if (existingSocialLogins.length > 0) {
+      // User already exists, log them in
+      const userId = existingSocialLogins[0].user_id;
+
+      // Get user details
+      const [users] = await pool.execute(
+        "SELECT id, email, username, first_name, last_name, phone_number FROM user WHERE id = ?",
+        [userId]
+      );
+
+      if (users.length === 0) {
+        return sendError(res, "User not found", 404);
+      }
+
+      const user = users[0];
+      const { accessToken, refreshToken } = generateTokens(user.id);
+
+      return sendSuccess(res, {
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          phone_number: user.phone_number,
+        },
+        tokens: {
+          access: accessToken,
+          refresh: refreshToken,
+        },
+      }, "Google login successful");
+    }
+
+    // Check if user exists with this email
+    let [users] = await pool.execute(
+      "SELECT id, email, username, first_name, last_name, phone_number FROM user WHERE email = ?",
+      [email]
+    );
+
+    let userId;
+
+    if (users.length > 0) {
+      // User already exists, link Google account to existing user
+      userId = users[0].id;
+
+      // Insert into social_logins table
+      await pool.execute(
+        "INSERT INTO social_logins (user_id, provider, provider_id) VALUES (?, 'google', ?)",
+        [userId, googleId]
+      );
+    } else {
+      // Create new user
+      const username = email.split('@')[0];
+      const [result] = await pool.execute(
+        `INSERT INTO user (email, username, first_name, last_name, status, is_verified) 
+         VALUES (?, ?, ?, ?, 'Active', 1)`,
+        [email, username, firstName, lastName]
+      );
+
+      userId = result.insertId;
+
+      // Insert into social_logins table
+      await pool.execute(
+        "INSERT INTO social_logins (user_id, provider, provider_id) VALUES (?, 'google', ?)",
+        [userId, googleId]
+      );
+
+      // Create notification for admin about new user registration
+      const fullName = firstName && lastName ? `${firstName} ${lastName}` : username || email;
+      await createNotification(
+        "user_registered",
+        "New User Registered",
+        `${fullName} (${email}) has registered on the platform via Google`,
+        userId,
+        "user"
+      );
+    }
+
+    // Get user details
+    const [newUsers] = await pool.execute(
+      "SELECT id, email, username, first_name, last_name, phone_number, date_joined FROM user WHERE id = ?",
+      [userId]
+    );
+
+    const user = newUsers[0];
+    const { accessToken, refreshToken } = generateTokens(userId);
+
+    return sendSuccess(
+      res,
+      {
+        user: user,
+        tokens: {
+          access: accessToken,
+          refresh: refreshToken,
+        },
+      },
+      "Google login successful",
+      200
+    );
+  } catch (error) {
+    console.error("Google login error:", error);
+    return sendError(res, "Google login failed", 500);
+  }
 };

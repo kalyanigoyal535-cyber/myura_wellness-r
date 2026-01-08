@@ -23,6 +23,7 @@ interface AuthContextValue {
   logout: () => Promise<void>;
   updateProfile: (data: UpdateProfileData) => Promise<void>;
   refreshUser: () => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(
@@ -123,6 +124,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const googleLogin = useCallback(async (credential: string) => {
+    try {
+      const response = await authApi.googleLogin({ credential });
+      setUser(response.user);
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
   const value: AuthContextValue = {
     user,
     isAuthenticated: !!user && authApi.isAuthenticated(),
@@ -132,6 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     updateProfile,
     refreshUser,
+    googleLogin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

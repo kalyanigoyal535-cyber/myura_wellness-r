@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/forgotPassword/ForgotPassword";
 import ResetPasswordConfirm from "./pages/forgotPassword/ResetPasswordConfirm";
 import OrderDetails from "./pages/orderDetails/OrderDetails";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Lazy load routes for code splitting
 const Home = lazy(() => import("./pages/Home"));
@@ -137,7 +138,7 @@ const AppContent: React.FC = () => {
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/profile" element={<Profile/>}/>
+              <Route path="/profile" element={<Profile />} />
               <Route path="/my-account" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/cart" element={<Cart />} />
@@ -171,13 +172,15 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <SpinWheelProvider>
-          <AppContent />
-        </SpinWheelProvider>
-      </CartProvider>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ""}>
+      <AuthProvider>
+        <CartProvider>
+          <SpinWheelProvider>
+            <AppContent />
+          </SpinWheelProvider>
+        </CartProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 
