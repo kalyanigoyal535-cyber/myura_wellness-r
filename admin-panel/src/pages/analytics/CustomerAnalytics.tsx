@@ -82,7 +82,7 @@ export default function CustomerAnalytics() {
         {/* Summary Cards */}
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Total Active Leads</h3>
+            <h3 className="card-title">👥 Total Active Leads</h3>
           </div>
           <div className="card-value-container">
             <span className="card-value">{data.recent_activity.length}</span>
@@ -92,7 +92,7 @@ export default function CustomerAnalytics() {
 
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Registered Users</h3>
+            <h3 className="card-title">✅ Registered Users</h3>
           </div>
           <div className="card-value-container">
             <span className="card-value">
@@ -104,7 +104,7 @@ export default function CustomerAnalytics() {
 
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Guest Leads Captured</h3>
+            <h3 className="card-title">📧 Guest Leads Captured</h3>
           </div>
           <div className="card-value-container">
             <span className="card-value">
@@ -117,9 +117,9 @@ export default function CustomerAnalytics() {
         {/* Lead Table */}
         <div className="shopify-card span-2">
           <div className="card-header">
-            <h3 className="card-title">Recent Active Users (Leads)</h3>
+            <h3 className="card-title">📊 Recent Active Users (Leads)</h3>
           </div>
-          <div className="activity-table-container" style={{ marginTop: 10 }}>
+          <div className="activity-table-container" style={{ marginTop: 16 }}>
             <table className="activity-table">
               <thead>
                 <tr>
@@ -134,7 +134,7 @@ export default function CustomerAnalytics() {
                   <tr key={idx}>
                     <td>
                       <div className="user-name-cell">
-                        <span style={{ fontWeight: 600 }}>{activity.first_name ? `${activity.first_name} ${activity.last_name}` : activity.guest_name || "Anonymous"}</span>
+                        <span style={{ fontWeight: 700, fontSize: '14px' }}>{activity.first_name ? `${activity.first_name} ${activity.last_name}` : activity.guest_name || "Anonymous"}</span>
                         {activity.first_name ? 
                           <span className="user-badge">User</span> : 
                           (activity.guest_name ? <span className="guest-badge">Guest</span> : null)
@@ -143,8 +143,12 @@ export default function CustomerAnalytics() {
                     </td>
                     <td>
                       <div className="flex flex-col gap-1">
-                        <span className="flex items-center gap-1 text-xs"><Mail size={10} /> {activity.user_email || activity.guest_email || "N/A"}</span>
-                        <span className="flex items-center gap-1 text-xs"><Phone size={10} /> {activity.user_phone || activity.guest_phone || "N/A"}</span>
+                        <span className="flex items-center gap-1 text-xs" style={{ color: '#64748b' }}>
+                          <Mail size={12} style={{ color: '#3b82f6' }} /> {activity.user_email || activity.guest_email || "N/A"}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs" style={{ color: '#64748b' }}>
+                          <Phone size={12} style={{ color: '#10b981' }} /> {activity.user_phone || activity.guest_phone || "N/A"}
+                        </span>
                       </div>
                     </td>
                     <td style={{ textAlign: 'center' }}>
@@ -152,7 +156,7 @@ export default function CustomerAnalytics() {
                         {activity.last_event.replace('_', ' ')}
                       </span>
                     </td>
-                    <td style={{ textAlign: 'right', fontSize: '12px', color: '#64748b' }}>
+                    <td style={{ textAlign: 'right', fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
                       {new Date(activity.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </td>
                   </tr>
@@ -165,15 +169,15 @@ export default function CustomerAnalytics() {
         {/* Top Locations */}
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Top Locations (Cities)</h3>
+            <h3 className="card-title">🌆 Top Locations (Cities)</h3>
           </div>
-          <div className="locations-list" style={{ marginTop: 10 }}>
+          <div className="locations-list" style={{ marginTop: 16 }}>
             {data.charts.detailed_locations.slice(0, 10).map((loc, idx) => (
               <div key={idx} className="location-item">
                 <div className="location-info">
-                  <MapPin size={16} className="text-slate-400" />
+                  <MapPin size={18} className="text-slate-400" />
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold">{loc.city || "Unknown City"}</span>
+                    <span className="text-sm font-semibold" style={{ color: '#0f172a' }}>{loc.city || "Unknown City"}</span>
                     <span className="text-xs text-slate-500">{loc.state}, {loc.country}</span>
                   </div>
                 </div>
@@ -185,20 +189,20 @@ export default function CustomerAnalytics() {
 
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Top Regions (India)</h3>
+            <h3 className="card-title">🇮🇳 Top Regions (India)</h3>
           </div>
-          <div className="locations-list" style={{ marginTop: 10 }}>
+          <div className="locations-list" style={{ marginTop: 16 }}>
             {data.charts.india_regions.map((region, idx) => (
               <div key={idx} className="location-item">
                 <div className="location-info">
-                  <MapPin size={16} className="text-slate-400" />
-                  <span className="text-sm font-semibold">{region.name}</span>
+                  <MapPin size={18} className="text-slate-400" />
+                  <span className="text-sm font-semibold" style={{ color: '#0f172a' }}>{region.name}</span>
                 </div>
                 <span className="location-value font-bold">{region.value} sessions</span>
               </div>
             ))}
             {data.charts.india_regions.length === 0 && (
-              <p className="empty-text">No data for India regions yet.</p>
+              <p className="empty-text">No India regional data available yet.</p>
             )}
           </div>
         </div>
