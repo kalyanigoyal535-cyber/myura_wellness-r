@@ -433,6 +433,9 @@ CREATE TABLE
 CREATE TABLE IF NOT EXISTS `analytics_sessions` (
   `id` VARCHAR(255) PRIMARY KEY,
   `user_id` INT NULL,
+  `guest_email` VARCHAR(255) NULL,
+  `guest_name` VARCHAR(255) NULL,
+  `guest_phone` VARCHAR(20) NULL,
   `device_type` ENUM('mobile', 'desktop', 'tablet', 'other') DEFAULT 'desktop',
   `browser` VARCHAR(100),
   `os` VARCHAR(100),
