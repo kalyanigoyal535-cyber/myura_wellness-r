@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import {
   Calendar,
   ArrowUpRight,
   ArrowDownRight,
-  ChevronRight,
-  MoreHorizontal,
-  Info
+  ChevronRight
 } from "lucide-react";
 import {
   AreaChart,
@@ -86,20 +84,24 @@ export default function Analytics() {
   const { summary, charts } = data;
 
   // Horizontal Bar Component for Shopify style lists
-  const ShopifyBarRow = ({ label, value, subValue, percentage, max }: any) => (
+  const ShopifyBarRow = ({ label, value, subValue, percentage, max, rawValue }: any) => (
     <div className="bar-item">
       <div className="bar-label-row">
-        <span>{label}</span>
-        <span>{value}</span>
+        <span className="truncate" title={label}>{label}</span>
+        <span className="font-bold">{value}</span>
       </div>
       <div className="bar-container">
-        <div className="bar-fill" style={{ width: `${(percentage || (max ? (parseFloat(value) / max) * 100 : 0))}%` }}></div>
+        <div 
+          className="bar-fill" 
+          style={{ width: `${(percentage !== undefined ? percentage : (max ? (rawValue / max) * 100 : 0))}%` }}
+        ></div>
       </div>
       <div className="bar-value-row">
         <span>{subValue}</span>
         {percentage !== undefined && (
-          <span className="growth-indicator positive">
-            <ArrowUpRight size={10} /> {percentage.toFixed(0)}%
+          <span className={`growth-indicator ${percentage >= 0 ? 'positive' : 'negative'}`}>
+            {percentage >= 0 ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+            {Math.abs(percentage).toFixed(1)}%
           </span>
         )}
       </div>
@@ -109,9 +111,12 @@ export default function Analytics() {
   return (
     <div className="analytics-container">
       <div className="analytics-header">
-        <h1 className="analytics-title">Analytics</h1>
+        <div>
+          <h1 className="analytics-title">Analytics Overview</h1>
+          <p className="analytics-subtitle">Comprehensive insights into your business performance</p>
+        </div>
         <div className="date-selector">
-          <Calendar size={14} />
+          <Calendar size={16} />
           <select value={days} onChange={(e) => setDays(parseInt(e.target.value))}>
             <option value={7}>Last 7 days</option>
             <option value={30}>Last 30 days</option>
@@ -124,45 +129,42 @@ export default function Analytics() {
         {/* Row 1: Sales Channel, AOV, Total Sales by Product */}
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
           <div className="card-header">
-            <h3 className="card-title">Total sales by sales channel</h3>
-            <Info size={14} className="text-slate-400" />
+            <h3 className="card-title">💰 Total Sales Revenue</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
           <div className="card-value-container">
             <span className="card-value">₹{summary.total_sales.toLocaleString("en-IN")}</span>
-            <span className="growth-indicator positive"><ArrowUpRight size={12} /> 11%</span>
+            <span className="growth-indicator positive"><ArrowUpRight size={14} /> 11%</span>
           </div>
-          <div style={{ height: 200, marginTop: 10 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={[{ name: 'Online Store', value: summary.total_sales }]}
-                  cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value"
-                >
-                  <Cell fill="#00a0dc" />
-                </Pie>
-                <Tooltip />
-                <Legend verticalAlign="middle" align="right" layout="vertical" />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
-          <div className="card-header">
-            <h3 className="card-title">Average order value over time</h3>
-          </div>
-          <div className="card-value-container">
-            <span className="card-value">₹{summary.aov.toLocaleString("en-IN")}</span>
-            <span className="growth-indicator negative"><ArrowDownRight size={12} /> 16%</span>
-          </div>
-          <div style={{ height: 200 }}>
+          <p className="card-subtext">Across all sales channels</p>
+          <div style={{ height: 200, marginTop: 16 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={charts.sales_over_time}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" hide />
-                <YAxis hide />
-                <Tooltip />
-                <Area type="monotone" dataKey="sales" stroke="#00a0dc" fill="#eef2ff" strokeWidth={2} />
+                <defs>
+                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  minTickGap={20}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
+                />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  formatter={(value: any) => [`₹${value.toLocaleString()}`, 'Sales']}
+                />
+                <Area type="monotone" dataKey="sales" stroke="#6366f1" fill="url(#colorSales)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -170,17 +172,60 @@ export default function Analytics() {
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
           <div className="card-header">
-            <h3 className="card-title">Total sales by product</h3>
-            <MoreHorizontal size={14} />
+            <h3 className="card-title">📈 Average Order Value</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <div className="card-value-container">
+            <span className="card-value">₹{summary.aov.toLocaleString("en-IN")}</span>
+            <span className="growth-indicator negative"><ArrowDownRight size={14} /> 16%</span>
+          </div>
+          <p className="card-subtext">Per order over time</p>
+          <div style={{ height: 200, marginTop: 16 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={charts.sales_over_time}>
+                <defs>
+                  <linearGradient id="colorAOV" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  minTickGap={20}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Area type="monotone" dataKey="sales" stroke="#3b82f6" fill="url(#colorAOV)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
+          <div className="card-header">
+            <h3 className="card-title">🏆 Top Products</h3>
+            <ChevronRight size={18} className="text-slate-400" />
+          </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 16 }}>Best performing products by revenue</p>
           <div className="shopify-bar-list scroll-container">
             {charts.top_products.slice(0, 5).map((p, i) => (
               <ShopifyBarRow 
                 key={i} 
                 label={p.name} 
                 value={`₹${p.revenue.toLocaleString()}`} 
-                subValue="₹0" 
-                max={Math.max(...charts.top_products.map(x => x.revenue))} 
+                rawValue={p.revenue}
+                subValue={`${p.orders} orders`} 
+                max={Math.max(...charts.top_products.map(x => x.revenue), 1)} 
               />
             ))}
           </div>
@@ -189,20 +234,40 @@ export default function Analytics() {
         {/* Row 2: Sessions over time, Conversion rate over time, Conversion rate breakdown */}
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
-            <h3 className="card-title">Sessions over time</h3>
+            <h3 className="card-title">👥 Total Sessions</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
           <div className="card-value-container">
             <span className="card-value">{summary.sessions.toLocaleString()}</span>
-            <span className="growth-indicator positive"><ArrowUpRight size={12} /> 41%</span>
+            <span className="growth-indicator positive"><ArrowUpRight size={14} /> 41%</span>
           </div>
-          <div style={{ height: 200 }}>
+          <p className="card-subtext">User visits over time</p>
+          <div style={{ height: 200, marginTop: 16 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={charts.sessions_over_time}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" hide />
-                <YAxis hide />
-                <Tooltip />
-                <Area type="monotone" dataKey="value" stroke="#00a0dc" fill="#eef2ff" strokeWidth={2} />
+                <defs>
+                  <linearGradient id="colorSessions" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  minTickGap={20}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Area type="monotone" dataKey="value" stroke="#8b5cf6" fill="url(#colorSessions)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -210,20 +275,36 @@ export default function Analytics() {
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/conversion')}>
           <div className="card-header">
-            <h3 className="card-title">Conversion rate over time</h3>
+            <h3 className="card-title">🎯 Conversion Rate</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
           <div className="card-value-container">
             <span className="card-value">{summary.conversion_rate}%</span>
-            <span className="growth-indicator positive"><ArrowUpRight size={12} /> 3%</span>
+            <span className="growth-indicator positive"><ArrowUpRight size={14} /> 3%</span>
           </div>
-          <div style={{ height: 200 }}>
+          <p className="card-subtext">Session to purchase conversion</p>
+          <div style={{ height: 200, marginTop: 16 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={charts.conversion_over_time}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" hide />
-                <YAxis hide />
-                <Tooltip />
-                <Line type="monotone" dataKey="rate" stroke="#00a0dc" strokeWidth={2} dot={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  minTickGap={20}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  tickFormatter={(value) => `${value}%`}
+                />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  formatter={(value: any) => [`${value}%`, 'Conversion Rate']}
+                />
+                <Line type="monotone" dataKey="rate" stroke="#10b981" strokeWidth={2} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -231,17 +312,19 @@ export default function Analytics() {
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/conversion')}>
           <div className="card-header">
-            <h3 className="card-title">Conversion rate breakdown</h3>
+            <h3 className="card-title">📩 Conversion Funnel</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 8 }}>Customer journey breakdown</p>
           <div className="funnel-container">
             {charts.funnel.map((step, i) => (
               <div key={i} className="funnel-step">
                 <div className="funnel-info">
                   <span className="funnel-label">{step.name}</span>
                   <span className="funnel-percentage">
-                    {i === 0 ? "100%" : `${((step.value / charts.funnel[0].value) * 100).toFixed(2)}%`}
+                    {i === 0 ? "100%" : `${((step.value / charts.funnel[0].value) * 100).toFixed(1)}%`}
                   </span>
-                  <span className="funnel-count">{step.value}</span>
+                  <span className="funnel-count">{step.value.toLocaleString()}</span>
                 </div>
                 <div className="funnel-bar-wrapper">
                   <div className="funnel-bar" style={{ width: `${(step.value / charts.funnel[0].value) * 100}%` }}></div>
@@ -254,25 +337,27 @@ export default function Analytics() {
         {/* Row 3: Sessions by device, Sessions by location, Total sales by social referrer */}
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
-            <h3 className="card-title">Sessions by device type</h3>
+            <h3 className="card-title">📱 Device Breakdown</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
           <div className="card-value-container">
             <span className="card-value">{summary.sessions.toLocaleString()}</span>
-            <span className="growth-indicator positive"><ArrowUpRight size={12} /> 41%</span>
+            <span className="growth-indicator positive"><ArrowUpRight size={14} /> 41%</span>
           </div>
-          <div style={{ height: 200 }}>
+          <p className="card-subtext">Sessions by device type</p>
+          <div style={{ height: 200, marginTop: 16 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={charts.devices}
-                  cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value"
+                  cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={2} dataKey="value"
                 >
                   {charts.devices.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend verticalAlign="middle" align="right" layout="vertical" />
+                <Legend verticalAlign="bottom" align="center" iconType="circle" />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -280,16 +365,19 @@ export default function Analytics() {
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/customers')}>
           <div className="card-header">
-            <h3 className="card-title">Sessions by location</h3>
+            <h3 className="card-title">🌍 Top Locations</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 12 }}>Sessions by geographic location</p>
           <div className="shopify-bar-list scroll-container">
             {charts.locations.map((loc, i) => (
               <ShopifyBarRow 
                 key={i} 
                 label={loc.name} 
                 value={loc.value.toLocaleString()} 
-                subValue="1" 
-                max={Math.max(...charts.locations.map(x => x.value))} 
+                rawValue={loc.value}
+                subValue="sessions" 
+                max={Math.max(...charts.locations.map(x => x.value), 1)} 
               />
             ))}
           </div>
@@ -297,33 +385,40 @@ export default function Analytics() {
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/customers')}>
           <div className="card-header">
-            <h3 className="card-title">Top Regions (India)</h3>
+            <h3 className="card-title">🇮🇳 India Regions</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 12 }}>Top regions within India</p>
           <div className="shopify-bar-list scroll-container">
             {charts.india_regions.map((region, i) => (
               <ShopifyBarRow 
                 key={i} 
                 label={region.name} 
                 value={region.value.toLocaleString()} 
+                rawValue={region.value}
+                subValue="sessions"
                 max={Math.max(...charts.india_regions.map(x => x.value), 1)} 
               />
             ))}
-            {charts.india_regions.length === 0 && <p className="empty-text">No data for India regions yet</p>}
+            {charts.india_regions.length === 0 && <p className="empty-text">No India regional data available yet</p>}
           </div>
         </div>
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
-            <h3 className="card-title">Total sales by social referrer</h3>
+            <h3 className="card-title">📱 Social Sales</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 12 }}>Revenue by social source</p>
           <div className="shopify-bar-list">
             {charts.sales_by_referrer.length > 0 ? charts.sales_by_referrer.map((r, i) => (
               <ShopifyBarRow 
                 key={i} 
                 label={r.name} 
                 value={`₹${r.revenue.toLocaleString()}`} 
-                subValue="₹0" 
-                max={Math.max(...charts.sales_by_referrer.map(x => x.revenue))} 
+                rawValue={r.revenue}
+                subValue="revenue" 
+                max={Math.max(...charts.sales_by_referrer.map(x => x.revenue), 1)} 
               />
             )) : <p className="empty-text">No data for this date range</p>}
           </div>
@@ -332,16 +427,20 @@ export default function Analytics() {
         {/* Row 4: Sessions by landing page, Sessions by social referrer, Products by sell-through rate */}
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
-            <h3 className="card-title">Sessions by landing page</h3>
+            <h3 className="card-title">📄 Landing Pages</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 12 }}>Performance by entry point</p>
           <div className="shopify-bar-list scroll-container">
             {charts.landing_pages.map((p, i) => (
               <ShopifyBarRow 
                 key={i} 
                 label={p.name} 
                 value={p.sessions.toLocaleString()} 
+                rawValue={p.sessions}
+                subValue={`CR: ${p.conversion_rate}%`}
                 percentage={parseFloat(p.conversion_rate)} 
-                max={Math.max(...charts.landing_pages.map(x => x.sessions))} 
+                max={Math.max(...charts.landing_pages.map(x => x.sessions), 1)} 
               />
             ))}
           </div>
@@ -349,15 +448,19 @@ export default function Analytics() {
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/traffic')}>
           <div className="card-header">
-            <h3 className="card-title">Sessions by social referrer</h3>
+            <h3 className="card-title">🔗 Social Sessions</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 12 }}>Traffic from social networks</p>
           <div className="shopify-bar-list">
             {charts.social_referrer_sessions.length > 0 ? charts.social_referrer_sessions.map((r, i) => (
               <ShopifyBarRow 
                 key={i} 
                 label={r.name} 
                 value={r.sessions.toLocaleString()} 
-                max={Math.max(...charts.social_referrer_sessions.map(x => x.sessions))} 
+                rawValue={r.sessions}
+                subValue="sessions"
+                max={Math.max(...charts.social_referrer_sessions.map(x => x.sessions), 1)} 
               />
             )) : <p className="empty-text">No data for this date range</p>}
           </div>
@@ -365,26 +468,31 @@ export default function Analytics() {
 
         <div className="shopify-card clickable" onClick={() => navigate('/analytics/sales')}>
           <div className="card-header">
-            <h3 className="card-title">Products by sell-through rate</h3>
+            <h3 className="card-title">📦 Sell-through Rate</h3>
+            <ChevronRight size={18} className="text-slate-400" />
           </div>
+          <p className="card-subtext" style={{ marginTop: 0, marginBottom: 12 }}>Inventory turnover by product</p>
           <div className="shopify-bar-list scroll-container">
             {charts.top_products.map((p, i) => (
               <ShopifyBarRow 
                 key={i} 
                 label={p.name} 
                 value={`${p.sell_through_rate}%`} 
-                subValue="0%" 
+                rawValue={parseFloat(p.sell_through_rate)}
+                subValue="rate" 
                 percentage={parseFloat(p.sell_through_rate)} 
+                max={100}
               />
             ))}
           </div>
         </div>
 
-        {/* Row 5: Customer cohort analysis (Placeholder/Mock) */}
+        {/* Row 5: Customer cohort analysis */}
         <div className="shopify-card span-3">
           <div className="card-header">
-            <h3 className="card-title">Customer cohort analysis</h3>
+            <h3 className="card-title">👥 Customer Retention (Cohort Analysis)</h3>
           </div>
+          <p className="card-subtext" style={{ marginBottom: 20 }}>Percentage of returning customers by month of first purchase</p>
           <div className="activity-table-container">
             <table className="cohort-matrix">
               <thead>
@@ -402,8 +510,14 @@ export default function Analytics() {
                 {['Jan 2026', 'Dec 2025', 'Nov 2025', 'Oct 2025'].map((month, i) => (
                   <tr key={i}>
                     <td className="cohort-label">{month}</td>
-                    {[...Array(6-i)].map((_, j) => <td key={j}>0%</td>)}
-                    {[...Array(i)].map((_, j) => <td key={j} style={{ background: '#f9fafb' }}></td>)}
+                    {[...Array(6-i)].map((_, j) => (
+                      <td key={j} className={`retention-cell ${j === 0 ? 'first' : ''}`}>
+                        {j === 0 ? '100%' : '0%'}
+                      </td>
+                    ))}
+                    {[...Array(i)].map((_, j) => (
+                      <td key={j} className="empty-cell"></td>
+                    ))}
                   </tr>
                 ))}
               </tbody>

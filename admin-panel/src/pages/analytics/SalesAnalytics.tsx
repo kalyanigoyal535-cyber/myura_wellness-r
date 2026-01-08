@@ -90,12 +90,12 @@ export default function SalesAnalytics() {
         {/* Summary Cards */}
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Total Sales</h3>
+            <h3 className="card-title">💰 Total Sales</h3>
           </div>
           <div className="card-value-container">
             <span className="card-value">₹{summary.total_sales.toLocaleString("en-IN")}</span>
             <div className={`growth-indicator ${summary.sales_growth >= 0 ? 'positive' : 'negative'}`}>
-              {summary.sales_growth >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+              {summary.sales_growth >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
               <span>{Math.abs(summary.sales_growth)}%</span>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function SalesAnalytics() {
 
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Total Orders</h3>
+            <h3 className="card-title">📎 Total Orders</h3>
           </div>
           <div className="card-value-container">
             <span className="card-value">{summary.total_orders}</span>
@@ -114,7 +114,7 @@ export default function SalesAnalytics() {
 
         <div className="shopify-card">
           <div className="card-header">
-            <h3 className="card-title">Avg. Order Value</h3>
+            <h3 className="card-title">📊 Avg. Order Value</h3>
           </div>
           <div className="card-value-container">
             <span className="card-value">₹{summary.aov.toLocaleString("en-IN")}</span>
@@ -125,36 +125,37 @@ export default function SalesAnalytics() {
         {/* Charts */}
         <div className="shopify-card span-3">
           <div className="card-header">
-            <h3 className="card-title">Revenue Over Time</h3>
+            <h3 className="card-title">📈 Revenue Over Time</h3>
           </div>
-          <div style={{ height: 350, marginTop: 20 }}>
+          <div style={{ height: 350, marginTop: 24 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={charts.sales_over_time}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00a0dc" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#00a0dc" stopOpacity={0.2}/>
                     <stop offset="95%" stopColor="#00a0dc" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f2f3" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis 
                   dataKey="date" 
                   tickFormatter={(str) => new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  tick={{ fontSize: 12, fill: '#6d7175' }}
-                  axisLine={{ stroke: '#e1e3e5' }}
+                  tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
+                  axisLine={{ stroke: '#cbd5e1' }}
+                  tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <YAxis 
                   tickFormatter={(value) => `₹${value}`}
-                  tick={{ fontSize: 12, fill: '#6d7175' }}
+                  tick={{ fontSize: 13, fill: '#64748b', fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip 
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e1e3e5', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', padding: '12px' }}
                   formatter={(value: any) => [`₹${value.toLocaleString()}`, "Sales"]}
                   labelFormatter={(label) => new Date(label).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 />
-                <Area type="monotone" dataKey="sales" stroke="#00a0dc" fillOpacity={1} fill="url(#colorSales)" strokeWidth={2} />
+                <Area type="monotone" dataKey="sales" stroke="#00a0dc" fillOpacity={1} fill="url(#colorSales)" strokeWidth={3} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -163,9 +164,9 @@ export default function SalesAnalytics() {
         {/* Product Table */}
         <div className="shopify-card span-3">
           <div className="card-header">
-            <h3 className="card-title">Product Performance & Sell-Through Rate</h3>
+            <h3 className="card-title">🏆 Product Performance & Sell-Through Rate</h3>
           </div>
-          <div className="activity-table-container" style={{ marginTop: 10 }}>
+          <div className="activity-table-container" style={{ marginTop: 16 }}>
             <table className="activity-table">
               <thead>
                 <tr>
@@ -182,16 +183,20 @@ export default function SalesAnalytics() {
                     <td style={{ fontWeight: 600 }}>{product.name}</td>
                     <td style={{ textAlign: 'center' }}>{product.units}</td>
                     <td style={{ textAlign: 'center' }}>{product.stock_available}</td>
-                    <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{product.revenue.toLocaleString()}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 700, color: '#10b981' }}>₹{product.revenue.toLocaleString()}</td>
                     <td style={{ paddingLeft: '40px' }}>
                       <div className="flex items-center gap-2" style={{ width: '200px' }}>
                         <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-blue-500" 
-                            style={{ width: `${Math.min(100, parseFloat(product.sell_through_rate))}%` }}
+                            style={{ 
+                              width: `${Math.min(100, parseFloat(product.sell_through_rate))}%`,
+                              background: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
+                              boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)'
+                            }}
                           />
                         </div>
-                        <span className="text-xs font-bold" style={{ minWidth: '40px' }}>{product.sell_through_rate}%</span>
+                        <span className="text-xs font-bold" style={{ minWidth: '50px', color: '#3b82f6' }}>{product.sell_through_rate}%</span>
                       </div>
                     </td>
                   </tr>
