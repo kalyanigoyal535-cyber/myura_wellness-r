@@ -5,9 +5,66 @@ import { generateTokens, verifyRefreshToken } from "../utils/jwt.js";
 import { sendSuccess, sendError, sendBadRequest } from "../utils/response.js";
 import { getImageUrl } from "../utils/imageUrl.js";
 import crypto from "crypto";
-import { sendPasswordResetEmail } from "../utils/email.js";
+import { sendPasswordResetEmail, sendOTPEmail } from "../utils/email.js";
 import { createNotification } from "./notificationController.js";
 import { OAuth2Client } from "google-auth-library";
+
+// Send OTP to email
+export const sendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return sendBadRequest(res, "Email is required");
+    }
+
+    // Check if user already exists
+    const [existing] = await pool.execute(
+      "SELECT id FROM user WHERE email = ?",
+      [email]
+    );
+
+    if (existing.length > 0) {
+      return sendBadRequest(res, "User with this email already exists");
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+    // Store OTP in database (create table if not exists - better to do this once in a migration, but for now we'll handle it)
+    try {
+      await pool.execute(
+        "CREATE TABLE IF NOT EXISTS email_otps (id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) NOT NULL, otp VARCHAR(6) NOT NULL, expires_at DATETIME NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+      );
+
+      // Delete any existing OTP for this email
+      await pool.execute("DELETE FROM email_otps WHERE email = ?", [email]);
+
+      // Insert new OTP
+      await pool.execute(
+        "INSERT INTO email_otps (email, otp, expires_at) VALUES (?, ?, ?)",
+        [email, otp, expiresAt]
+      );
+
+      // Send email
+      const emailSent = await sendOTPEmail(email, otp);
+
+      if (!emailSent) {
+        // In development, we might still want to know the OTP
+        console.log(`OTP for ${email}: ${otp}`);
+      }
+
+      return sendSuccess(res, {}, "Verification code sent to your email");
+    } catch (dbError) {
+      console.error("OTP storage error:", dbError);
+      return sendError(res, "Failed to send verification code", 500);
+    }
+  } catch (error) {
+    console.error("Send OTP error:", error);
+    return sendError(res, "Failed to send verification code", 500);
+  }
+};
 
 // Register user
 export const register = async (req, res) => {
@@ -25,11 +82,26 @@ export const register = async (req, res) => {
       last_name,
       username,
       phone_number,
+      otp,
+      address,
+      city,
+      state,
+      postal_code,
     } = req.body;
 
     // Validate password match
     if (password !== password2) {
       return sendBadRequest(res, "Passwords do not match");
+    }
+
+    // Verify OTP
+    const [otpRecords] = await pool.execute(
+      "SELECT * FROM email_otps WHERE email = ? AND otp = ? AND expires_at > NOW()",
+      [email, otp]
+    );
+
+    if (otpRecords.length === 0) {
+      return sendBadRequest(res, "Invalid or expired verification code");
     }
 
     // Check if user exists
@@ -49,9 +121,21 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
+    try {
+      // Ensure columns exist (proactive schema update)
+      await pool.execute("ALTER TABLE user ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20) NULL");
+      await pool.execute("ALTER TABLE user ADD COLUMN IF NOT EXISTS address TEXT NULL");
+      await pool.execute("ALTER TABLE user ADD COLUMN IF NOT EXISTS city VARCHAR(100) NULL");
+      await pool.execute("ALTER TABLE user ADD COLUMN IF NOT EXISTS state VARCHAR(100) NULL");
+      await pool.execute("ALTER TABLE user ADD COLUMN IF NOT EXISTS postal_code VARCHAR(20) NULL");
+    } catch (schemaError) {
+      // Ignore if columns already exist or if DB doesn't support ADD COLUMN IF NOT EXISTS
+      console.warn("Schema update warning:", schemaError.message);
+    }
+
     const [result] = await pool.execute(
-      `INSERT INTO user (email, username, first_name, last_name, password, phone_number, status) 
-       VALUES (?, ?, ?, ?, ?, ?, 'Active')`,
+      `INSERT INTO user (email, username, first_name, last_name, password, phone_number, address, city, state, postal_code, status, is_verified) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', 1)`,
       [
         email,
         username || null,
@@ -59,10 +143,17 @@ export const register = async (req, res) => {
         last_name || null,
         hashedPassword,
         phone_number || null,
+        address || null,
+        city || null,
+        state || null,
+        postal_code || null,
       ]
     );
 
     const userId = result.insertId;
+
+    // Delete used OTP
+    await pool.execute("DELETE FROM email_otps WHERE email = ?", [email]);
 
     // Create notification for admin about new user registration
     const userName =
@@ -180,7 +271,7 @@ export const getProfile = async (req, res) => {
 
     // Fetch user data
     const [users] = await pool.execute(
-      "SELECT id, email, username, first_name, last_name, phone, phone_number, photo, is_verified, status, date_joined FROM user WHERE id = ?",
+      "SELECT id, email, username, first_name, last_name, phone_number, address, city, state, postal_code, photo, is_verified, status, date_joined FROM user WHERE id = ?",
       [userId]
     );
 
@@ -196,8 +287,11 @@ export const getProfile = async (req, res) => {
       username: user.username,
       first_name: user.first_name,
       last_name: user.last_name,
-      phone: user.phone,
       phone_number: user.phone_number,
+      address: user.address,
+      city: user.city,
+      state: user.state,
+      postal_code: user.postal_code,
       photo: user.photo ? getImageUrl(req, user.photo, "users") : null,
       is_verified: user.is_verified,
       status: user.status,
@@ -218,7 +312,7 @@ export const updateProfile = async (req, res) => {
       return sendError(res, "Authentication required", 401);
     }
 
-    const { first_name, last_name, phone_number } = req.body;
+    const { first_name, last_name, phone_number, address, city, state, postal_code } = req.body;
 
     // Update user
     const updateFields = [];
@@ -236,6 +330,22 @@ export const updateProfile = async (req, res) => {
       updateFields.push("phone_number = ?");
       values.push(phone_number);
     }
+    if (address !== undefined) {
+      updateFields.push("address = ?");
+      values.push(address);
+    }
+    if (city !== undefined) {
+      updateFields.push("city = ?");
+      values.push(city);
+    }
+    if (state !== undefined) {
+      updateFields.push("state = ?");
+      values.push(state);
+    }
+    if (postal_code !== undefined) {
+      updateFields.push("postal_code = ?");
+      values.push(postal_code);
+    }
 
     if (updateFields.length === 0) {
       return sendBadRequest(res, "No fields to update");
@@ -250,7 +360,7 @@ export const updateProfile = async (req, res) => {
 
     // Fetch updated user
     const [users] = await pool.execute(
-      "SELECT id, email, username, first_name, last_name, phone, phone_number, photo, is_verified, status, date_joined FROM user WHERE id = ?",
+      "SELECT id, email, username, first_name, last_name, phone_number, address, city, state, postal_code, photo, is_verified, status, date_joined FROM user WHERE id = ?",
       [userId]
     );
 
@@ -264,8 +374,11 @@ export const updateProfile = async (req, res) => {
         username: user.username,
         first_name: user.first_name,
         last_name: user.last_name,
-        phone: user.phone,
         phone_number: user.phone_number,
+        address: user.address,
+        city: user.city,
+        state: user.state,
+        postal_code: user.postal_code,
         photo: user.photo ? getImageUrl(req, user.photo, "users") : null,
         is_verified: user.is_verified,
         status: user.status,
@@ -515,6 +628,10 @@ export const googleLogin = async (req, res) => {
           first_name: user.first_name,
           last_name: user.last_name,
           phone_number: user.phone_number,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          postal_code: user.postal_code,
         },
         tokens: {
           access: accessToken,
@@ -525,7 +642,7 @@ export const googleLogin = async (req, res) => {
 
     // Check if user exists with this email
     let [users] = await pool.execute(
-      "SELECT id, email, username, first_name, last_name, phone_number FROM user WHERE email = ?",
+      "SELECT id, email, username, first_name, last_name, phone_number, address, city, state, postal_code FROM user WHERE email = ?",
       [email]
     );
 
@@ -570,7 +687,7 @@ export const googleLogin = async (req, res) => {
 
     // Get user details
     const [newUsers] = await pool.execute(
-      "SELECT id, email, username, first_name, last_name, phone_number, date_joined FROM user WHERE id = ?",
+      "SELECT id, email, username, first_name, last_name, phone_number, address, city, state, postal_code, date_joined FROM user WHERE id = ?",
       [userId]
     );
 

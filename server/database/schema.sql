@@ -34,24 +34,36 @@ CREATE TABLE
     `email` VARCHAR(100) NOT NULL UNIQUE,
     `username` VARCHAR(100) UNIQUE NULL,
     `password` VARCHAR(255) NOT NULL,
-    `photo` VARCHAR(255) UNIQUE,
+    `photo` VARCHAR(255) NULL,
     `first_name` VARCHAR(100) NULL,
     `last_name` VARCHAR(100) NULL,
     `dob` DATE DEFAULT NULL,
     `phone` VARCHAR(20) DEFAULT NULL,
     `phone_number` VARCHAR(20) DEFAULT NULL,
     `anniversary` DATE DEFAULT NULL,
-    `address` LONGTEXT CHARACTER
-    SET
-      utf8mb4 COLLATE utf8mb4_bin,
-      `is_verified` TINYINT (1) DEFAULT 0,
-      `status` ENUM ('Active', 'Inactive', 'Blocked') DEFAULT 'Active',
-      `reset_token` VARCHAR(255) DEFAULT NULL,
-      `reset_token_expiry` TIMESTAMP NULL,
-      `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      `date_joined` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT `address_check` CHECK (json_valid (`address`))
+    `address` TEXT DEFAULT NULL,
+    `city` VARCHAR(100) DEFAULT NULL,
+    `state` VARCHAR(100) DEFAULT NULL,
+    `postal_code` VARCHAR(20) DEFAULT NULL,
+    `is_verified` TINYINT (1) DEFAULT 0,
+    `status` ENUM ('Active', 'Inactive', 'Blocked') DEFAULT 'Active',
+    `reset_token` VARCHAR(255) DEFAULT NULL,
+    `reset_token_expiry` TIMESTAMP NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `date_joined` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- =====================================================
+-- Table: email_otps
+-- =====================================================
+CREATE TABLE
+  IF NOT EXISTS `email_otps` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `email` VARCHAR(255) NOT NULL,
+    `otp` VARCHAR(6) NOT NULL,
+    `expires_at` DATETIME NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- =====================================================
@@ -371,6 +383,7 @@ CREATE TABLE
     `subject` VARCHAR(200) NOT NULL,
     `message` TEXT NOT NULL,
     `is_read` TINYINT (1) DEFAULT 0,
+    `is_resolved` TINYINT (1) DEFAULT 0,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 

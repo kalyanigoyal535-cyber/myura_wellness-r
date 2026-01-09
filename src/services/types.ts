@@ -8,6 +8,10 @@ export interface User {
   first_name: string;
   last_name: string;
   phone_number?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
   date_joined: string;
 }
 

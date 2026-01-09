@@ -24,6 +24,7 @@ interface AuthContextValue {
   updateProfile: (data: UpdateProfileData) => Promise<void>;
   refreshUser: () => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
+  sendOTP: (email: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(
@@ -133,6 +134,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const sendOTP = useCallback(async (email: string) => {
+    try {
+      await authApi.sendOTP({ email });
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
   const value: AuthContextValue = {
     user,
     isAuthenticated: !!user && authApi.isAuthenticated(),
@@ -143,6 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateProfile,
     refreshUser,
     googleLogin,
+    sendOTP,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -14,6 +14,11 @@ export interface RegisterData {
   first_name?: string;
   last_name?: string;
   phone_number?: string;
+  otp: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
 }
 
 export interface UpdateProfileData {
@@ -22,15 +27,8 @@ export interface UpdateProfileData {
   phone_number?: string;
 }
 
-export interface PasswordResetRequest {
+export interface OTPData {
   email: string;
-}
-
-export interface PasswordResetConfirm {
-  uid: string;
-  token: string;
-  new_password: string;
-  new_password2: string;
 }
 
 export interface GoogleLoginData {
@@ -38,6 +36,15 @@ export interface GoogleLoginData {
 }
 
 export const authApi = {
+  sendOTP: async (data: OTPData): Promise<{ message: string }> => {
+    try {
+      const response = await apiClient.post<{ message: string }>('/user/send-otp/', data);
+      return response.data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error));
+    }
+  },
+
   register: async (data: RegisterData): Promise<AuthResponse> => {
     try {
       const response = await apiClient.post<AuthResponse>('/user/register/', data);

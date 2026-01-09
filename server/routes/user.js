@@ -10,9 +10,13 @@ import {
   confirmPasswordReset,
   logout,
   googleLogin,
+  sendOTP,
 } from "../controllers/userController.js";
 
 const router = express.Router();
+
+// Send OTP
+router.post("/send-otp/", sendOTP);
 
 // Register
 router.post(
@@ -22,6 +26,7 @@ router.post(
     body("password").isLength({ min: 6 }),
     body("password2").notEmpty(),
     body("username").optional().trim(),
+    body("otp").notEmpty().withMessage("Verification code is required"),
   ],
   register
 );
