@@ -845,137 +845,236 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
             </div>
           </section>
 
-          {/* Ingredients & Usage Section */}
+          {/* Ingredients & Usage Section - Accordion Style */}
           <section 
-            className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-6xl mx-auto"
+            className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4"
             data-aos="fade-up"
             data-aos-delay="150"
             data-aos-duration="900"
             data-aos-easing="ease-out-cubic"
           >
-            {/* Key Ingredients */}
+            {/* Key Ingredients Accordion */}
             <div 
-              className="rounded-2xl border-2 bg-gradient-to-br from-white via-white to-white p-4 sm:p-5 shadow-xl"
+              className="rounded-xl border-2 bg-white/90 backdrop-blur-sm overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
               style={{ 
-                borderColor: 'var(--product-border)',
-                background: `var(--product-card-gradient)`,
-                boxShadow: `var(--product-shadow)`
+                borderColor: expandedSection === 'key-ingredients' ? 'var(--product-base)' : 'var(--product-border)',
+                boxShadow: expandedSection === 'key-ingredients' ? 'var(--product-shadow)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
               }}
-              data-aos="slide-right"
+              data-aos="fade-up"
               data-aos-delay="200"
-              data-aos-duration="850"
+              data-aos-duration="600"
             >
-              <div className="flex items-center gap-2.5 mb-4">
+              <button
+                onClick={() => toggleSection('key-ingredients')}
+                className="flex flex-col w-full px-4 py-4 text-left transition-all duration-300 hover:bg-opacity-50 group"
+                style={{ 
+                  backgroundColor: expandedSection === 'key-ingredients' ? 'var(--product-chip-bg)' : 'transparent'
+                }}
+              >
+                <div className="flex items-start justify-between gap-3 mb-3">
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: 'var(--product-chip-bg)' }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 flex-shrink-0"
+                    style={{ 
+                      backgroundColor: expandedSection === 'key-ingredients' ? 'var(--product-base)' : 'var(--product-chip-bg)',
+                      color: 'var(--product-darker)'
+                    }}
                   >
-                    <span style={{ color: 'var(--product-darker)' }}>
-                      <Leaf className="h-5 w-5" />
-                    </span>
+                    <Leaf className="h-5 w-5" />
                   </div>
-                <div>
+                  <div 
+                    className="p-1.5 rounded-lg transition-all duration-300 transform group-hover:scale-110 flex-shrink-0"
+                    style={{ 
+                      color: 'var(--product-darker)',
+                      backgroundColor: expandedSection === 'key-ingredients' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'
+                    }}
+                  >
+                    {expandedSection === 'key-ingredients' ? (
+                      <Minus className="h-4 w-4" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1">
                   <p 
-                    className="text-[10px] font-semibold uppercase tracking-[0.4em]"
+                    className="text-[9px] font-bold uppercase tracking-[0.3em] mb-1.5"
                     style={{ color: 'var(--product-darker)' }}
                   >
-                    Key Ingredients
+                    KEY INGREDIENTS
                   </p>
-                  <h3 className="text-xl font-bold text-slate-900 mt-0.5">Lab-verified herbal matrix</h3>
+                  <h3 className="text-base font-bold text-slate-900 transition-colors duration-300 leading-tight">
+                    Lab-Verified Formula
+                  </h3>
                 </div>
-              </div>
-              <div className="space-y-2.5">
-                {keyIngredientHighlights.map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-slate-700">
-                    <div className="flex-shrink-0 mt-1.5">
+              </button>
+              <div 
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  expandedSection === 'key-ingredients' ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="px-4 pb-4 pt-2">
+                  <div className="space-y-2.5">
+                    {keyIngredientHighlights.map((item, idx) => (
                       <div 
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: `var(--product-base)` }}
-                      />
-                    </div>
-                    <span className="text-sm leading-relaxed">{item}</span>
+                        key={idx} 
+                        className="flex items-start gap-2.5 text-slate-700 p-2.5 rounded-lg transition-colors duration-200 hover:bg-white/50"
+                      >
+                        <div className="flex-shrink-0 mt-1">
+                          <div 
+                            className="w-1.5 h-1.5 rounded-full shadow-sm"
+                            style={{ background: `var(--product-base)` }}
+                          />
+                        </div>
+                        <span className="text-xs leading-relaxed flex-1">{item}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
 
-            {/* How to Use & Suitable For */}
+            {/* How to Use Accordion */}
             <div 
-              className="space-y-4"
-              data-aos="slide-left"
+              className="rounded-xl border-2 bg-white/90 backdrop-blur-sm overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+              style={{ 
+                borderColor: expandedSection === 'how-to-use' ? 'var(--product-base)' : 'var(--product-border)',
+                boxShadow: expandedSection === 'how-to-use' ? 'var(--product-shadow)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+              data-aos="fade-up"
               data-aos-delay="250"
-              data-aos-duration="850"
+              data-aos-duration="600"
             >
-              <div 
-                className="rounded-2xl border-2 bg-gradient-to-br from-white to-white p-4 sm:p-5 shadow-xl"
+              <button
+                onClick={() => toggleSection('how-to-use')}
+                className="flex flex-col w-full px-4 py-4 text-left transition-all duration-300 hover:bg-opacity-50 group"
                 style={{ 
-                  borderColor: 'var(--product-border)',
-                  background: `var(--product-card-gradient)`,
-                  boxShadow: `var(--product-shadow)`
+                  backgroundColor: expandedSection === 'how-to-use' ? 'var(--product-chip-bg)' : 'transparent'
                 }}
               >
-                <div className="flex items-center gap-2.5 mb-4">
+                <div className="flex items-start justify-between gap-3 mb-3">
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: 'var(--product-chip-bg)' }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 flex-shrink-0"
+                    style={{ 
+                      backgroundColor: expandedSection === 'how-to-use' ? 'var(--product-base)' : 'var(--product-chip-bg)',
+                      color: 'var(--product-darker)'
+                    }}
                   >
-                    <span style={{ color: 'var(--product-darker)' }}>
-                      <Icon3 className="h-5 w-5" />
-                    </span>
+                    <Icon3 className="h-5 w-5" />
                   </div>
-                  <div>
-                    <p 
-                      className="text-[10px] font-semibold uppercase tracking-[0.4em]"
-                      style={{ color: 'var(--product-darker)' }}
-                    >
-                      How to Use
-                    </p>
-                    <h3 className="text-xl font-bold text-slate-900 mt-0.5">Your Daily Ritual</h3>
+                  <div 
+                    className="p-1.5 rounded-lg transition-all duration-300 transform group-hover:scale-110 flex-shrink-0"
+                    style={{ 
+                      color: 'var(--product-darker)',
+                      backgroundColor: expandedSection === 'how-to-use' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'
+                    }}
+                  >
+                    {expandedSection === 'how-to-use' ? (
+                      <Minus className="h-4 w-4" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
                   </div>
                 </div>
-                <p className="text-sm text-slate-700 leading-relaxed">{product.howToUse}</p>
+                <div className="flex-1">
+                  <p 
+                    className="text-[9px] font-bold uppercase tracking-[0.3em] mb-1.5"
+                    style={{ color: 'var(--product-darker)' }}
+                  >
+                    USAGE GUIDE
+                  </p>
+                  <h3 className="text-base font-bold text-slate-900 transition-colors duration-300 leading-tight">
+                    How to Use
+                  </h3>
+                </div>
+              </button>
+              <div 
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  expandedSection === 'how-to-use' ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="px-4 pb-4 pt-2">
+                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">{product.howToUse}</p>
+                </div>
               </div>
+            </div>
 
-              <div 
-                className="rounded-2xl border-2 bg-gradient-to-br from-white via-white to-white p-4 sm:p-5 shadow-xl"
+            {/* Suitable For Accordion */}
+            <div 
+              className="rounded-xl border-2 bg-white/90 backdrop-blur-sm overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+              style={{ 
+                borderColor: expandedSection === 'suitable-for' ? 'var(--product-base)' : 'var(--product-border)',
+                boxShadow: expandedSection === 'suitable-for' ? 'var(--product-shadow)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+              data-aos="fade-up"
+              data-aos-delay="300"
+              data-aos-duration="600"
+            >
+              <button
+                onClick={() => toggleSection('suitable-for')}
+                className="flex flex-col w-full px-4 py-4 text-left transition-all duration-300 hover:bg-opacity-50 group"
                 style={{ 
-                  borderColor: 'var(--product-border)',
-                  background: `var(--product-card-gradient)`,
-                  boxShadow: `var(--product-shadow)`
+                  backgroundColor: expandedSection === 'suitable-for' ? 'var(--product-chip-bg)' : 'transparent'
                 }}
               >
-                <div className="flex items-center gap-2.5 mb-4">
+                <div className="flex items-start justify-between gap-3 mb-3">
                   <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: 'var(--product-chip-bg)' }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 flex-shrink-0"
+                    style={{ 
+                      backgroundColor: expandedSection === 'suitable-for' ? 'var(--product-base)' : 'var(--product-chip-bg)',
+                      color: 'var(--product-darker)'
+                    }}
                   >
-                    <span style={{ color: 'var(--product-darker)' }}>
-                      <Heart className="h-5 w-5" />
-                    </span>
+                    <Heart className="h-5 w-5" />
                   </div>
-                  <div>
-                    <p 
-                      className="text-[10px] font-semibold uppercase tracking-[0.4em]"
-                      style={{ color: 'var(--product-darker)' }}
-                    >
-                      Suitable For
-                    </p>
-                    <h3 className="text-xl font-bold text-slate-900 mt-0.5">Perfect For You</h3>
+                  <div 
+                    className="p-1.5 rounded-lg transition-all duration-300 transform group-hover:scale-110 flex-shrink-0"
+                    style={{ 
+                      color: 'var(--product-darker)',
+                      backgroundColor: expandedSection === 'suitable-for' ? 'rgba(255, 255, 255, 0.5)' : 'transparent'
+                    }}
+                  >
+                    {expandedSection === 'suitable-for' ? (
+                      <Minus className="h-4 w-4" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
                   </div>
                 </div>
-                <ul className="space-y-2.5">
-                  {suitableForHighlights.map((item, idx) => (
-                    <li key={idx} className="flex gap-2.5 text-slate-700">
-                      <div className="flex-shrink-0 mt-1.5">
-                        <div 
-                          className="w-1.5 h-1.5 rounded-full"
-                          style={{ background: `var(--product-base)` }}
-                        />
-                      </div>
-                      <span className="text-sm leading-relaxed">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex-1">
+                  <p 
+                    className="text-[9px] font-bold uppercase tracking-[0.3em] mb-1.5"
+                    style={{ color: 'var(--product-darker)' }}
+                  >
+                    IDEAL FOR
+                  </p>
+                  <h3 className="text-base font-bold text-slate-900 transition-colors duration-300 leading-tight">
+                    Suitable For
+                  </h3>
+                </div>
+              </button>
+              <div 
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  expandedSection === 'suitable-for' ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="px-4 pb-4 pt-2">
+                  <ul className="space-y-2.5">
+                    {suitableForHighlights.map((item, idx) => (
+                      <li 
+                        key={idx} 
+                        className="flex gap-2.5 text-slate-700 p-2.5 rounded-lg transition-colors duration-200 hover:bg-white/50"
+                      >
+                        <div className="flex-shrink-0 mt-1">
+                          <div 
+                            className="w-1.5 h-1.5 rounded-full shadow-sm"
+                            style={{ background: `var(--product-base)` }}
+                          />
+                        </div>
+                        <span className="text-xs leading-relaxed flex-1">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
           </section>
@@ -1309,4 +1408,5 @@ const ThemedProductPage: React.FC<ThemedProductPageProps> = React.memo(({ produc
 ThemedProductPage.displayName = 'ThemedProductPage';
 
 export default ThemedProductPage;
+
 

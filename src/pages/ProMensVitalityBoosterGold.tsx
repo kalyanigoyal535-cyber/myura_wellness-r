@@ -1,15 +1,20 @@
 import React from 'react';
-import ProductDetailWrapper from '../components/ProductDetailWrapper';
-import { Activity, Sparkles, Award } from 'lucide-react';
+import { Navigate, useParams } from 'react-router-dom';
+import ProMensVitalityBoosterGoldPage from '../components/ProMensVitalityBoosterGoldPage';
+import { getProductById } from '../data/products';
 
 const ProMensVitalityBoosterGold: React.FC = () => {
-  return (
-    <ProductDetailWrapper
-      themeClassName="pro-mens-vitality-booster-gold-theme"
-      decorativeIcons={[Activity, Sparkles, Award]}
-      fallbackId="pro-mens-vitality-booster-gold"
-    />
-  );
+  const { id } = useParams<{ id: string }>();
+  
+  const productId = (id || 'pro-mens-vitality-booster-gold').toLowerCase().trim();
+  const product = getProductById(productId);
+
+  if (!product) {
+    console.warn(`Product not found for ID: ${productId}`);
+    return <Navigate to="/product" replace />;
+  }
+
+  return <ProMensVitalityBoosterGoldPage product={product} />;
 };
 
 export default ProMensVitalityBoosterGold;

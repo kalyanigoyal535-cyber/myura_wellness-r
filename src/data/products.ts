@@ -143,7 +143,7 @@ export const productCatalog: ProductRecord[] = [
     id: 'pro-mens-multivitamin',
     name: 'PRO MEN\'S MULTIVITAMIN',
     headline: 'Science-Informed Daily Formula',
-    price: 1449,
+    price: 1199,
     originalPrice: 1899,
     rating: 5,
     reviews: 156,
@@ -162,7 +162,7 @@ export const productCatalog: ProductRecord[] = [
       'Includes herbal adaptogens (Ginseng, Ashwagandha, Shilajit) to support stress resilience and mental focus',
     ],
     keyIngredients:
-      'Flaxseed Oil – 50 mg, Wheat Germ Oil – 25 mg, Krill Oil – 25 mg, Ginseng Extract – 12.5 mg, Ginkgo Biloba Extract – 20 mg, Citrus Bioflavonoids – 12.5 mg, Green Tea Extract – 10 mg, Grape Seed Extract – 10 mg, Bilberry Extract – 10 mg, Resveratrol – 10 mg, Co-Enzyme Q10 – 10 mg, Seabuckthorn Oil – 10 mg, Betaine Hydrochloride – 10 mg, Policosanol – 10 mg, Lutein / Zeaxanthin Complex – 10 mg, Mixed Carotenoids (30% dispersion) – 5 mg, Chloride (Eq. to elemental Chloride) – 2 mg, Manganese (as Manganese Sulphate; Eq. to elemental Manganese) – 4 mg, Magnesium (as Magnesium Oxide; Eq. to elemental Magnesium) – 5 mg, Calcium (as Dibasic Calcium Phosphate; Eq. to elemental Calcium) – 5 mg, Phosphorus (Eq. to elemental Phosphorous) – 3.86 mg, Copper (as Copper Sulphate; Eq. to elemental Copper) – 1.7 mg, Molybdenum (as Sodium Molybdate; Eq. to elemental Molybdenum) – 45 mcg, Selenium (as Sodium Selenate; Eq. to elemental Selenium) – 40 mcg, Iodine (as Potassium Iodide; Eq. to elemental Iodine) – 50 mcg, Chromium (as Chromium Picolinate; Eq. to elemental Chromium) – 50 mcg.',
+      'Flaxseed Oil – 50 mg, Wheat Germ Oil – 25 mg, Krill Oil – 25 mg, Ginseng Extract – 12.5 mg, Ginkgo Biloba Extract – 20 mg, Citrus Bioflavonoids – 12.5 mg, Green Tea Extract – 10 mg, Grape Seed Extract – 10 mg, Bilberry Extract – 10 mg, Resveratrol – 10 mg, Co-Enzyme Q10 – 10 mg, Seabuckthorn Oil – 10 mg, Betaine Hydrochloride – 10 mg, Policosanol – 10 mg, Lutein / Zeaxanthin Complex – 10 mg, Mixed Carotenoids (30% dispersion) – 5 mg, Piperine – 5 mg, Tocotrienols – 5 mg, Ashwagandha Extract – 50 mg, Brahmi Extract – 5 mg, Shankhpushpi Extract – 5 mg, Shilajit Extract – 80 mg, Amla Extract – 5 mg, Icarin Extract – 2 mg, Safed Musli – 50 mg, Lycopene (10% dispersion) – 2 mg, Vitamin A – 1,600 IU, Vitamin D3 – 400 IU, Vitamin E – 12.5 IU, Vitamin K3 – 55 mcg, Vitamin C – 12.5 mg, Niacinamide (Vitamin B3) – 23 mg, Vitamin B1 (Thiamine) – 1 mg, Vitamin B2 (Riboflavin) – 1 mg, Pantothenic Acid (Eq. to Panthenol) – 5 mg, Vitamin B6 – 2 mg, Folic Acid – 50 mcg, Biotin – 10 mcg, Vitamin B12 – 1 mcg, Zinc (as Zinc Sulphate; Eq. to elemental Zinc) – 15 mg, Iron (as Ferrous Fumarate; Eq. to elemental Iron) – 10 mg, Potassium (as Potassium Chloride; Eq. to elemental Potassium) – 10 mg, Sodium (as Sodium Chloride; Eq. to elemental Sodium) – 9.07 mg, Chloride (Eq. to elemental Chloride) – 2 mg, Manganese (as Manganese Sulphate; Eq. to elemental Manganese) – 4 mg, Magnesium (as Magnesium Oxide; Eq. to elemental Magnesium) – 5 mg, Calcium (as Dibasic Calcium Phosphate; Eq. to elemental Calcium) – 5 mg, Phosphorus (Eq. to elemental Phosphorous) – 3.86 mg, Copper (as Copper Sulphate; Eq. to elemental Copper) – 1.7 mg, Molybdenum (as Sodium Molybdate; Eq. to elemental Molybdenum) – 45 mcg, Selenium (as Sodium Selenate; Eq. to elemental Selenium) – 40 mcg, Iodine (as Potassium Iodide; Eq. to elemental Iodine) – 50 mcg, Chromium (as Chromium Picolinate; Eq. to elemental Chromium) – 50 mcg, L-Methionine – 10 mg, L-Lysine – 10 mg, L-Tyrosine – 6 mg, L-Histidine – 5 mg, L-Isoleucine – 5 mg, L-Leucine – 5 mg, L-Threonine – 5 mg, L-Phenylalanine – 5 mg, L-Tryptophan – 5 mg, L-Valine – 5 mg, L-Cysteine – 2.5 mg, L-Glutamic Acid – 20 mg, 5-Hydroxy Tryptophan – 5 mg, L-Glutamine – 5 mg, L-Hydroxy Lysine – 5 mg, L-Hydroxyproline – 5 mg, N-Acetyl Cysteine – 5 mg, L-Ornithine – 5 mg, L-Proline – 5 mg, L-Serine – 5 mg, L-Acetyl Tyrosine – 5 mg, L-3,4-Dihydroxyphenylalanine – 1 mg. Approved colour used. No added preservatives. Appropriate overages added to compensate for storage loss.',
     suitableFor:
       'Adult men seeking a single, broad-spectrum multivitamin to support daily nutrition. Men with active lifestyles who want support for energy, recovery, and immunity. Those looking to complement a balanced diet with antioxidants, amino acids, and botanical extracts. (Not for use by pregnant or lactating women or minors. Consult your healthcare provider if you are on medication or have existing health conditions.)',
     howToUse:
@@ -186,33 +186,34 @@ export const productCatalog: ProductRecord[] = [
   {
     id: 'pro-mens-vitality-booster-gold',
     name: 'PRO MEN\'S VITALITY BOOSTER GOLD',
-    headline: 'Advanced Nutraceutical Formula',
+    headline: 'Build from Within. Strengthen the Core of Your Vitality.',
     price: 2499,
     originalPrice: 3799,
     rating: 5,
     reviews: 134,
     inStock: true,
     accentGradient: 'from-teal-500/70 via-cyan-400/50 to-slate-900/90',
-    notes: ['Advanced nutraceutical', 'Gold formula'],
+    notes: ['Anabolic Architecture', 'Pro Series Gold'],
     summary:
-      'Experience enhanced everyday energy and vitality with MYURA Men\'s Vitality Booster Gold — an advanced nutraceutical thoughtfully formulated to support stamina, endurance, and overall men\'s wellness.',
+      'Most "boosters" focus on temporary stimulation. MYURA Men\'s Vitality Booster Gold focuses on Anabolic Architecture—optimizing the internal systems that govern muscular force, gonadal health, and cellular recovery.',
     description:
-      'Experience enhanced everyday energy and vitality with MYURA Men\'s Vitality Booster Gold — an advanced nutraceutical thoughtfully formulated to support stamina, endurance, and overall men\'s wellness. This premium blend combines powerful botanical extracts, essential micronutrients, and performance-enhancing compounds for optimal men\'s health.',
+      'Most "boosters" focus on temporary stimulation. MYURA Men\'s Vitality Booster Gold focuses on Anabolic Architecture—optimizing the internal systems that govern muscular force, gonadal health, and cellular recovery. To achieve peak physical performance, your body requires more than just calories; it requires a precise internal environment. Our Pro Series formula targets three foundational pillars of male physiology: The Endocrine Command Center (Gonad Health) — supporting the Hypothalamic-Pituitary-Gonadal (HPG) axis with high-potency Tongkat Ali and Zinc to maintain healthy testosterone production, while Vitamin D3 and Tribulus Terrestris prime your body\'s receptors for optimal muscle maintenance and reproductive health. Hemodynamic Muscle Priming (The Pump) — our Nitric Oxide Matrix featuring Citrulline Malate and L-Arginine widens circulatory pathways, shuttling oxygen and amino acids directly into muscle tissue during load while rapidly clearing lactic acid and ammonia for higher training volume. Mitochondrial Power & Recovery — CoEnzyme Q10 fuels the cellular engines of your muscle fibers, while Magnesium and Zinc act as enzymatic catalysts supervising the repair of micro-tears, ensuring you wake up ready for the next session, not sidelined by soreness. This is a system that improves internal efficiency and balance, not a quick-fix supplement.',
     benefits: [
-      'Boosts energy, stamina, and endurance for enhanced daily and athletic performance',
-      'Promotes reproductive health and hormonal balance naturally',
-      'Helps improve muscle strength and overall physical performance',
-      'Supports stress management and mental focus for a balanced lifestyle',
-      'Enriched with CoQ10, Vitamin D3, Zinc & Magnesium for cellular energy and immunity',
+      'The Endocrine Command Center: High-potency Tongkat Ali and Zinc support Leydig cells for healthy testosterone production, while Vitamin D3 and Tribulus Terrestris optimize receptor sensitivity for muscle maintenance and reproductive health',
+      'Hemodynamic Muscle Priming: Nitric Oxide Matrix (Citrulline Malate & L-Arginine) widens circulatory pathways, forcing oxygen and amino acids into muscle tissue during load and rapidly clearing waste for higher training volume',
+      'Mitochondrial Power & Recovery: CoEnzyme Q10 fuels cellular ATP production while Magnesium and Zinc catalyze enzymatic repair of micro-tears, ensuring faster recovery and reduced soreness',
+      '60-Day Optimization Journey: Experience enhanced vascularity in the first 10 days, increased work capacity by weeks 3-4, and peak systemic balance with improved recovery speed and muscle fullness by weeks 6-8',
+      'Research-Backed Ratios: Every milligram is accounted for based on nutritional science, with a systemic approach that optimizes the entire loop from brain to gonad to muscle',
+      'Clean Label Integrity: No hidden stimulants or synthetic fillers—just pure, bioavailable nutrients in a 100% vegetarian formula',
     ],
     keyIngredients:
       'Horny Goat Weed Extract – 300 mg, Maca Root Powder – 100 mg, Citrulline Malate – 100 mg, Tongkat Ali Root – 40 mg, Tribulus Terrestris Extract – 25 mg, Muira Puama Root – 5 mg, L-Arginine – 5 mg, Panax Ginseng Root – 5 mg, Cayenne Pepper Powder – 5 mg, Yohimbine – 2 mg, Vitamin D3 – 600 IU, Co-Enzyme Q10 – 100 mg, Zinc Sulphate (eq. to Elemental Zinc) – 17.6 mg, Magnesium Oxide (eq. to Elemental Magnesium) – 50 mg. No artificial preservatives. Approved colour used. 100% vegetarian tablets.',
     suitableFor:
-      'Adult men looking to enhance stamina, energy, and reproductive vitality. Fitness enthusiasts aiming to improve strength and performance. Professionals facing stress, fatigue, or low motivation. Men seeking overall hormonal balance and active wellness. (Not intended for women or minors. Please consult a dietitian before prolonged use.)',
+      'Men seeking structural strength and hormonal health optimization. Fitness enthusiasts who demand more than temporary stimulation—those who understand that true performance comes from systemic balance. Professionals who need sustained energy and recovery without crashes. Athletes focused on work capacity, muscle fullness, and physical resilience. Men committed to the 60-day optimization journey for peak results. (Not intended for women or minors. Please consult a dietitian before prolonged use.)',
     howToUse:
-      'Take 1 tablet daily or as directed by a Dietitian. Swallow whole with water — do not chew or crush. For best results, follow a balanced diet and consistent exercise routine.',
+      'Take 1 tablet daily or as directed by a Dietitian. Swallow whole with water — do not chew or crush. For optimal Anabolic Architecture results, follow a balanced diet and consistent exercise routine. The 60-day optimization journey shows progressive benefits: enhanced vascularity and alertness in the first 10 days, increased work capacity by weeks 3-4, and peak systemic balance with improved recovery and muscle fullness by weeks 6-8.',
     faqs:
-      'Advanced nutraceutical formula for daily use. Results typically improve with consistent use. Not intended for women or minors. Please consult a dietitian before prolonged use, especially if you have cardiovascular conditions or are on medications.',
+      'What to expect: The First 10 Days — enhanced vascularity (the "pump") and subtle shifts in morning alertness and drive as Nitric Oxide levels stabilize. Weeks 3–4 — the Strength Shift with higher work capacity as mineral levels optimize. Weeks 6–8 — Systemic Balance where gonadal health and endocrine support peak, with improved recovery speed, mood stability, and visible muscle fullness. This is a system that improves internal efficiency and balance, not a quick-fix supplement. Not intended for women or minors. Please consult a dietitian before prolonged use, especially if you have cardiovascular conditions or are on medications.',
     image: buildImageDescriptorSimple(
       'ProSeries/PRO MEN\'S VITALITY BOOSTER GOLD',
       'main',
@@ -225,7 +226,7 @@ export const productCatalog: ProductRecord[] = [
       { name: '2', altSuffix: 'capsules with premium accents' },
       { name: '3', altSuffix: 'flat lay with elite elements' },
     ]),
-    heroTagline: 'Enhanced energy and vitality for everyday performance',
+    heroTagline: 'The Anabolic Architecture System: Build from Within',
   },
   {
     id: 'pro-omega-3-softgel',
@@ -250,7 +251,7 @@ export const productCatalog: ProductRecord[] = [
       'Contributes to metabolic and cellular function for daily wellness',
     ],
     keyIngredients:
-      'Fish Oil (Omega-3 Fatty Acid) – 1000 mg, providing Eicosapentaenoic Acid (EPA) – 180 mg, providing Docosahexaenoic Acid (DHA) – 120 mg. High-purity, molecularly distilled fish oil for optimal absorption and effectiveness.',
+      'Fish Oil (Omega-3 Fatty Acid) – 1000 mg, providing Eicosapentaenoic Acid (EPA) – 180 mg, providing Docosahexaenoic Acid (DHA) – 120 mg. Approved colour used. No added preservatives. Appropriate overages added to compensate for storage loss.',
     suitableFor:
       'Adults seeking to support heart, brain, eye, and joint health. Individuals with low dietary intake of omega-3 fatty acids. Professionals or fitness enthusiasts aiming for metabolic balance and focus.',
     howToUse:
@@ -294,7 +295,7 @@ export const productCatalog: ProductRecord[] = [
       'Boosts immunity and emotional well-being for daily balance',
     ],
     keyIngredients:
-      'Ashoka Chhal (Saraca asoca) – 300 mg, Shatavari (Asparagus racemosus) – 100 mg, Ashwagandha (Withania somnifera) – 100 mg, Lodhra (Symplocos racemosa) – 75 mg (supports menstrual balance and reduces fatigue), Gokshura (Tribulus terrestris) – 50 mg, Dashmool (Classical) – 50 mg, Yashtimadhu (Licorice) – 25 mg, Kumari (Aloe vera) – 25 mg (promotes hormonal balance and skin health), Guduchi (Tinospora cordifolia) – 25 mg. Approved colour used. No added preservatives. Appropriate overages added to compensate for storage loss.',
+      'Ashoka Chhal (Saraca asoca) – 300 mg, Shatavari (Asparagus racemosus) – 100 mg, Ashwagandha (Withania somnifera) – 100 mg, Lodhra (Symplocos racemosa) – 75 mg, supports menstrual balance and reduces fatigue. Gokshura (Tribulus terrestris) – 50 mg, Dashmool (Classical) – 50 mg, Yashtimadhu (Licorice) – 25 mg, Kumari (Aloe vera) – 25 mg, promotes hormonal balance and skin health. Guduchi (Tinospora cordifolia) – 25 mg. Approved colour used. No added preservatives. Appropriate overages added to compensate for storage loss.',
     suitableFor:
       'Women looking for natural hormonal and menstrual support. Those facing fatigue, pelvic pain, or backache during cycles. Women seeking daily vitality, immunity, and inner strength. (Not recommended for pregnant or lactating women unless advised by a physician.)',
     howToUse:

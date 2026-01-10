@@ -1,15 +1,20 @@
 import React from 'react';
-import ProductDetailWrapper from '../components/ProductDetailWrapper';
-import { Activity, Award, ShieldCheck } from 'lucide-react';
+import { Navigate, useParams } from 'react-router-dom';
+import ProMensMultivitaminPage from '../components/ProMensMultivitaminPage';
+import { getProductById } from '../data/products';
 
 const ProMensMultivitamin: React.FC = () => {
-  return (
-    <ProductDetailWrapper
-      themeClassName="pro-mens-multivitamin-theme"
-      decorativeIcons={[Activity, Award, ShieldCheck]}
-      fallbackId="pro-mens-multivitamin"
-    />
-  );
+  const { id } = useParams<{ id: string }>();
+  
+  const productId = (id || 'pro-mens-multivitamin').toLowerCase().trim();
+  const product = getProductById(productId);
+
+  if (!product) {
+    console.warn(`Product not found for ID: ${productId}`);
+    return <Navigate to="/product" replace />;
+  }
+
+  return <ProMensMultivitaminPage product={product} />;
 };
 
 export default ProMensMultivitamin;

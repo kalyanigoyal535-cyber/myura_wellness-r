@@ -311,6 +311,19 @@ code {
   animation: shimmer 3s ease-in-out infinite;
 }
 
+@keyframes shimmer-shine {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer-shine 3s ease-in-out infinite;
+}
+
 /* Capsule Float Animation - Constrained to prevent overflow */
 @keyframes float {
   0%, 100% {
